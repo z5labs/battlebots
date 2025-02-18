@@ -8,6 +8,7 @@ package battlepb
 
 import (
 	context "context"
+	eventspb "github.com/z5labs/battlebots/pkgs/eventspb"
 	movepb "github.com/z5labs/battlebots/pkgs/movepb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -20,13 +21,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Battle2D_Move_FullMethodName = "/battlebots.protobuf.Battle2D/Move"
+	Battle2D_Events_FullMethodName = "/battlebots.protobuf.Battle2D/Events"
+	Battle2D_Move_FullMethodName   = "/battlebots.protobuf.Battle2D/Move"
 )
 
 // Battle2DClient is the client API for Battle2D service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type Battle2DClient interface {
+	Events(ctx context.Context, in *eventspb.Events2DRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[eventspb.Event2D], error)
 	Move(ctx context.Context, in *movepb.Move2DRequest, opts ...grpc.CallOption) (*movepb.Move2DResponse, error)
 }
 
@@ -37,6 +40,25 @@ type battle2DClient struct {
 func NewBattle2DClient(cc grpc.ClientConnInterface) Battle2DClient {
 	return &battle2DClient{cc}
 }
+
+func (c *battle2DClient) Events(ctx context.Context, in *eventspb.Events2DRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[eventspb.Event2D], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Battle2D_ServiceDesc.Streams[0], Battle2D_Events_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[eventspb.Events2DRequest, eventspb.Event2D]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Battle2D_EventsClient = grpc.ServerStreamingClient[eventspb.Event2D]
 
 func (c *battle2DClient) Move(ctx context.Context, in *movepb.Move2DRequest, opts ...grpc.CallOption) (*movepb.Move2DResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -52,6 +74,7 @@ func (c *battle2DClient) Move(ctx context.Context, in *movepb.Move2DRequest, opt
 // All implementations must embed UnimplementedBattle2DServer
 // for forward compatibility.
 type Battle2DServer interface {
+	Events(*eventspb.Events2DRequest, grpc.ServerStreamingServer[eventspb.Event2D]) error
 	Move(context.Context, *movepb.Move2DRequest) (*movepb.Move2DResponse, error)
 	mustEmbedUnimplementedBattle2DServer()
 }
@@ -63,6 +86,9 @@ type Battle2DServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBattle2DServer struct{}
 
+func (UnimplementedBattle2DServer) Events(*eventspb.Events2DRequest, grpc.ServerStreamingServer[eventspb.Event2D]) error {
+	return status.Errorf(codes.Unimplemented, "method Events not implemented")
+}
 func (UnimplementedBattle2DServer) Move(context.Context, *movepb.Move2DRequest) (*movepb.Move2DResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Move not implemented")
 }
@@ -86,6 +112,17 @@ func RegisterBattle2DServer(s grpc.ServiceRegistrar, srv Battle2DServer) {
 	}
 	s.RegisterService(&Battle2D_ServiceDesc, srv)
 }
+
+func _Battle2D_Events_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(eventspb.Events2DRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(Battle2DServer).Events(m, &grpc.GenericServerStream[eventspb.Events2DRequest, eventspb.Event2D]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Battle2D_EventsServer = grpc.ServerStreamingServer[eventspb.Event2D]
 
 func _Battle2D_Move_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(movepb.Move2DRequest)
@@ -117,18 +154,26 @@ var Battle2D_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Battle2D_Move_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Events",
+			Handler:       _Battle2D_Events_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "battle.proto",
 }
 
 const (
-	Battle3D_Move_FullMethodName = "/battlebots.protobuf.Battle3D/Move"
+	Battle3D_Events_FullMethodName = "/battlebots.protobuf.Battle3D/Events"
+	Battle3D_Move_FullMethodName   = "/battlebots.protobuf.Battle3D/Move"
 )
 
 // Battle3DClient is the client API for Battle3D service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type Battle3DClient interface {
+	Events(ctx context.Context, in *eventspb.Events3DRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[eventspb.Event3D], error)
 	Move(ctx context.Context, in *movepb.Move3DRequest, opts ...grpc.CallOption) (*movepb.Move3DResponse, error)
 }
 
@@ -139,6 +184,25 @@ type battle3DClient struct {
 func NewBattle3DClient(cc grpc.ClientConnInterface) Battle3DClient {
 	return &battle3DClient{cc}
 }
+
+func (c *battle3DClient) Events(ctx context.Context, in *eventspb.Events3DRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[eventspb.Event3D], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Battle3D_ServiceDesc.Streams[0], Battle3D_Events_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[eventspb.Events3DRequest, eventspb.Event3D]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Battle3D_EventsClient = grpc.ServerStreamingClient[eventspb.Event3D]
 
 func (c *battle3DClient) Move(ctx context.Context, in *movepb.Move3DRequest, opts ...grpc.CallOption) (*movepb.Move3DResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -154,6 +218,7 @@ func (c *battle3DClient) Move(ctx context.Context, in *movepb.Move3DRequest, opt
 // All implementations must embed UnimplementedBattle3DServer
 // for forward compatibility.
 type Battle3DServer interface {
+	Events(*eventspb.Events3DRequest, grpc.ServerStreamingServer[eventspb.Event3D]) error
 	Move(context.Context, *movepb.Move3DRequest) (*movepb.Move3DResponse, error)
 	mustEmbedUnimplementedBattle3DServer()
 }
@@ -165,6 +230,9 @@ type Battle3DServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBattle3DServer struct{}
 
+func (UnimplementedBattle3DServer) Events(*eventspb.Events3DRequest, grpc.ServerStreamingServer[eventspb.Event3D]) error {
+	return status.Errorf(codes.Unimplemented, "method Events not implemented")
+}
 func (UnimplementedBattle3DServer) Move(context.Context, *movepb.Move3DRequest) (*movepb.Move3DResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Move not implemented")
 }
@@ -188,6 +256,17 @@ func RegisterBattle3DServer(s grpc.ServiceRegistrar, srv Battle3DServer) {
 	}
 	s.RegisterService(&Battle3D_ServiceDesc, srv)
 }
+
+func _Battle3D_Events_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(eventspb.Events3DRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(Battle3DServer).Events(m, &grpc.GenericServerStream[eventspb.Events3DRequest, eventspb.Event3D]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Battle3D_EventsServer = grpc.ServerStreamingServer[eventspb.Event3D]
 
 func _Battle3D_Move_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(movepb.Move3DRequest)
@@ -219,6 +298,12 @@ var Battle3D_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Battle3D_Move_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Events",
+			Handler:       _Battle3D_Events_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "battle.proto",
 }
