@@ -1,0 +1,16 @@
+edition = "2023";
+
+package battlebots.protobuf;
+
+option go_package = "github.com/z5labs/battlebots/pkgs/vectorpb";
+
+message Vector2 {
+    double x = 1;
+    double y = 2;
+}
+
+message Vector3 {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}

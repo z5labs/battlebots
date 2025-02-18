@@ -1,0 +1,19 @@
+edition = "2023";
+
+package battlebots.protobuf;
+
+option go_package = "github.com/z5labs/battlebots/pkgs/movepb";
+
+import "vector.proto";
+
+message Move2DRequest {
+    Vector2 velocity = 1;
+}
+
+message Move2DResponse {}
+
+message Move3DRequest {
+    Vector3 velocity = 1;
+}
+
+message Move3DResponse {}

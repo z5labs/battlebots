@@ -1,0 +1,15 @@
+edition = "2023";
+
+package battlebots.protobuf;
+
+option go_package = "github.com/z5labs/battlebots/pkgs/battlepb";
+
+import "move.proto";
+
+service Battle2D {
+    rpc Move (Move2DRequest) returns (Move2DResponse);
+}
+
+service Battle3D {
+    rpc Move (Move3DRequest) returns (Move3DResponse);
+}
