@@ -5,12 +5,18 @@
 
 package battle2d
 
-import "github.com/z5labs/battlebots/pkgs/battlepb"
+import (
+	"github.com/z5labs/battlebots/pkgs/battlepb"
 
-type Server struct {
+	"google.golang.org/grpc"
+)
+
+type Service struct {
 	battlepb.UnimplementedBattle2DServer
 }
 
-func NewServer() *Server {
-	return &Server{}
+func Register(sr grpc.ServiceRegistrar) {
+	s := &Service{}
+
+	battlepb.RegisterBattle2DServer(sr, s)
 }
