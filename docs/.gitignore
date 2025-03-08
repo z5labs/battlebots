@@ -1,0 +1,9 @@
+#############
+# Hugo      #
+#############
+
+public/
+resources/_gen/
+.hugo_build.lock
+package.json
+package-lock.json
