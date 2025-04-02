@@ -1,0 +1,33 @@
+{
+    "name": "humus",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/devcontainers/features/go:1": {
+            "version": "1.24"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "go.lintTool": "golangci-lint",
+                "go.formatTool": "custom",
+                "go.alternateTools": {
+                    "customFormatter": "golangci-lint"
+                },
+                "go.formatFlags": [
+                    "fmt",
+                    "--stdin"
+                ],
+                "licenser.author": "Z5Labs and Contributors",
+                "licenser.license": "MIT"
+            }
+        }
+    },
+    "containerEnv": {
+        "HOME": "/home/vscode"
+    },
+    "runArgs": [
+        "--userns=keep-id",
+        "--security-opt=label=disable"
+    ]
+}
