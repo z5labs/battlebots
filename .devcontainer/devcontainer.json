@@ -4,6 +4,10 @@
     "features": {
         "ghcr.io/devcontainers/features/go:1": {
             "version": "1.24"
+        },
+        "ghcr.io/devcontainers/features/hugo:1": {
+            "version": "0.140.2",
+            "extended": true
         }
     },
     "customizations": {
