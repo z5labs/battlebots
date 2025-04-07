@@ -8,7 +8,8 @@
         "ghcr.io/devcontainers/features/hugo:1": {
             "version": "0.140.2",
             "extended": true
-        }
+        },
+        "ghcr.io/devcontainers-extra/features/protoc:1": {}
     },
     "customizations": {
         "vscode": {
@@ -24,7 +25,10 @@
                 ],
                 "licenser.author": "Z5Labs and Contributors",
                 "licenser.license": "MIT"
-            }
+            },
+            "extensions": [
+                "pbkit.vscode-pbkit"
+            ]
         }
     },
     "containerEnv": {
