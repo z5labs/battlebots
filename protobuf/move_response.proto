@@ -4,7 +4,4 @@ package battlebots.protobuf;
 
 option go_package = "github.com/z5labs/battlebots/pkgs/battlebotspb;battlebotspb";
 
-message Vector {
-    double x0 = 1;
-    double x1 = 2;
-}
+message MoveResponse {}

@@ -1,0 +1,18 @@
+edition = "2023";
+
+package battlebots.protobuf;
+
+option go_package = "github.com/z5labs/battlebots/pkgs/battlebotspb;battlebotspb";
+
+import "bot.proto";
+import "vector.proto";
+
+message StateChangeEvent {
+    oneof subject {
+        Bot bot = 1;
+    }
+
+    oneof event {
+        Vector position = 2;
+    }
+}
