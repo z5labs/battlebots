@@ -1,0 +1,16 @@
+edition = "2023";
+
+package battlebots.protobuf;
+
+option go_package = "github.com/z5labs/battlebots/pkgs/battlebotspb;battlebotspb";
+
+import "state_change_subscription.proto";
+import "state_change_event.proto";
+import "move_request.proto";
+import "move_response.proto";
+
+service Battle {
+    rpc State (StateChangeSubscription) returns (stream StateChangeEvent);
+
+    rpc Move (MoveRequest) returns (MoveResponse);
+}
