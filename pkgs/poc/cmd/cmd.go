@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	crand "crypto/rand"
-	"fmt"
 	"io"
 	"log/slog"
 	"math/rand/v2"
@@ -12,13 +11,15 @@ import (
 	"time"
 
 	"github.com/z5labs/battlebots/pkgs/battlebotspb"
+	"github.com/z5labs/battlebots/pkgs/poc"
 
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel"
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	experimental "google.golang.org/grpc/experimental/opentelemetry"
+	"google.golang.org/grpc/stats/opentelemetry"
 )
 
 func ExitWithCodeOnError(code int, err error) {
@@ -35,12 +36,14 @@ func Run(ctx context.Context) error {
 	cmd := &cobra.Command{
 		Use:     "poc",
 		PreRun:  initOTelSDK,
-		Run:     poc,
+		Run:     run,
 		PostRun: shutdownOTelSDK,
 	}
 
 	cmd.Flags().String("otlp-endpoint", "", "Specify OTLP endpoint for sending telemetry signals to.")
 	cmd.Flags().String("game-server-endpoint", "", "Specify the game server endpoint.")
+	cmd.Flags().Duration("min-wait-for", 16*time.Millisecond, "Set the minimum time to wait before randomly moving.")
+	cmd.Flags().Duration("max-wait-for", 100*time.Millisecond, "Set the maximum time to wait before randomly moving.")
 
 	cmd.MarkFlagRequired("otlp-endpoint")
 	cmd.MarkFlagRequired("game-server-endpoint")
@@ -56,114 +59,65 @@ func shutdownOTelSDK(cmd *cobra.Command, args []string) {
 	// TODO
 }
 
-func poc(cmd *cobra.Command, args []string) {
+func run(cmd *cobra.Command, args []string) {
 	ctx := cmd.Context()
 	log := otelslog.NewLogger("poc")
 
-	// TODO: connect to game server
+	minWaitFor, err := cmd.Flags().GetDuration("min-wait-for")
+	if err != nil {
+		log.ErrorContext(ctx, "failed to get min wait for duration", slog.String("error", err.Error()))
+		return
+	}
+
+	maxWaitFor, err := cmd.Flags().GetDuration("max-wait-for")
+	if err != nil {
+		log.ErrorContext(ctx, "failed to get max wait for duration", slog.String("error", err.Error()))
+		return
+	}
+
 	gameServerEndpoint, err := cmd.Flags().GetString("game-server-endpoint")
 	if err != nil {
 		log.ErrorContext(ctx, "failed to get game server endpoint", slog.String("error", err.Error()))
 		return
 	}
 
-	cc, err := grpc.NewClient(gameServerEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cc, err := grpc.NewClient(
+		gameServerEndpoint,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		opentelemetry.DialOption(opentelemetry.Options{
+			MetricsOptions: opentelemetry.MetricsOptions{
+				MeterProvider: otel.GetMeterProvider(),
+			},
+			TraceOptions: experimental.TraceOptions{
+				TracerProvider:    otel.GetTracerProvider(),
+				TextMapPropagator: otel.GetTextMapPropagator(),
+			},
+		}),
+	)
 	if err != nil {
 		log.ErrorContext(ctx, "failed to init grpc conn", slog.String("error", err.Error()))
 		return
 	}
 
-	battlebots := battlebotspb.NewBattleClient(cc)
+	battleClient := battlebotspb.NewBattleClient(cc)
 
-	eg, egctx := errgroup.WithContext(ctx)
-	eg.Go(func() error {
-		var subscription battlebotspb.StateChangeSubscription
-		events, err := battlebots.State(egctx, &subscription)
-		if err != nil {
-			return err
-		}
-
-		for {
-			event, err := events.Recv()
-			if err != nil {
-				return err
-			}
-
-			processEvent(egctx, log, event)
-		}
-	})
-
-	eg.Go(func() error {
-		var seed [32]byte
-		_, err := io.ReadFull(crand.Reader, seed[:])
-		if err != nil {
-			return err
-		}
-
-		r := rand.New(rand.NewChaCha8(seed))
-
-		fmt.Println("Press the enter key to begin randomly moving...")
-		_, err = fmt.Scanln()
-		if err != nil {
-			return err
-		}
-
-		for {
-			// 60 FPS = 16.6666... ms per frame so we test with double frame time
-			// as worst case for delay between move actions. This was selected completed
-			// arbitrarily.
-			waitFor := time.Duration(r.IntN(32)) * time.Millisecond
-			select {
-			case <-egctx.Done():
-				return egctx.Err()
-			case <-time.After(waitFor):
-			}
-
-			err = randomlyMove(egctx, battlebots)
-			if err != nil {
-				return err
-			}
-		}
-	})
-	err = eg.Wait()
+	var seed [32]byte
+	_, err = io.ReadFull(crand.Reader, seed[:])
 	if err != nil {
-		log.ErrorContext(ctx, "unexpected error while running the poc", slog.String("error", err.Error()))
-		return
-	}
-}
-
-func processEvent(ctx context.Context, log *slog.Logger, event *battlebotspb.StateChangeEvent) {
-	spanCtx, span := otel.Tracer("cmd").Start(ctx, "processEvent")
-	defer span.End()
-
-	if !event.HasPosition() {
-		log.WarnContext(spanCtx, "expected to only receive position state changes")
+		log.ErrorContext(ctx, "failed to read crypto bytes", slog.String("error", err.Error()))
 		return
 	}
 
-	bot := event.GetBot()
-	pos := event.GetPosition()
-
-	log.InfoContext(
-		spanCtx,
-		"received position state change event",
-		slog.String("bot.id", bot.GetId()),
-		slog.Float64("position.x0", pos.GetX0()),
-		slog.Float64("position.x1", pos.GetX1()),
+	bot := poc.NewBot(
+		battleClient,
+		rand.NewChaCha8(seed),
+		poc.MinWaitFor(minWaitFor),
+		poc.MaxWaitFor(maxWaitFor),
 	)
-}
 
-func randomlyMove(ctx context.Context, battlebots battlebotspb.BattleClient) error {
-	spanCtx, span := otel.Tracer("cmd").Start(ctx, "randomlyMove")
-	defer span.End()
-
-	var velocity battlebotspb.Vector
-	velocity.SetX0(rand.Float64())
-	velocity.SetX1(rand.Float64())
-
-	var req battlebotspb.MoveRequest
-	req.SetVelocity(&velocity)
-
-	_, err := battlebots.Move(spanCtx, &req)
-	return err
+	err = bot.Run(ctx)
+	if err != nil {
+		log.ErrorContext(ctx, "failed to run bot", slog.String("error", err.Error()))
+		return
+	}
 }
