@@ -1,0 +1,7 @@
+battle_service:
+  endpoint: {{env "BATTLE_SERVICE_ENDPOINT"}}
+
+bot:
+  wait_for:
+    min: {{env "BOT_WAIT_FOR_MIN" | default "10ms"}}
+    max: {{env "BOT_WAIT_FOR_MAX" | default "100ms"}}
