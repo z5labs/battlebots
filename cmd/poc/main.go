@@ -1,11 +1,17 @@
 package main
 
 import (
-	"context"
+	"bytes"
+	_ "embed"
 
-	"github.com/z5labs/battlebots/pkgs/poc/cmd"
+	"github.com/z5labs/battlebots/cmd/poc/app"
+
+	"github.com/z5labs/humus/job"
 )
 
+//go:embed config.yaml
+var configBytes []byte
+
 func main() {
-	cmd.ExitWithCodeOnError(1, cmd.Run(context.Background()))
+	job.Run(bytes.NewReader(configBytes), app.Init)
 }
