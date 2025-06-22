@@ -5,14 +5,17 @@ package battlebots.protobuf;
 option go_package = "github.com/z5labs/battlebots/pkgs/battlebotspb;battlebotspb";
 
 import "bot.proto";
+import "span_context.proto";
 import "vector.proto";
 
 message StateChangeEvent {
+    SpanContext span_context = 1;
+
     oneof subject {
-        Bot bot = 1;
+        Bot bot = 2;
     }
 
     oneof event {
-        Vector position = 2;
+        Vector position = 3;
     }
 }
