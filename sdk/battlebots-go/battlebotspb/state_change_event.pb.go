@@ -21,11 +21,12 @@ const (
 )
 
 type StateChangeEvent struct {
-	state              protoimpl.MessageState     `protogen:"opaque.v1"`
-	xxx_hidden_Subject isStateChangeEvent_Subject `protobuf_oneof:"subject"`
-	xxx_hidden_Event   isStateChangeEvent_Event   `protobuf_oneof:"event"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state                  protoimpl.MessageState     `protogen:"opaque.v1"`
+	xxx_hidden_SpanContext *SpanContext               `protobuf:"bytes,1,opt,name=span_context,json=spanContext"`
+	xxx_hidden_Subject     isStateChangeEvent_Subject `protobuf_oneof:"subject"`
+	xxx_hidden_Event       isStateChangeEvent_Event   `protobuf_oneof:"event"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *StateChangeEvent) Reset() {
@@ -53,6 +54,13 @@ func (x *StateChangeEvent) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+func (x *StateChangeEvent) GetSpanContext() *SpanContext {
+	if x != nil {
+		return x.xxx_hidden_SpanContext
+	}
+	return nil
+}
+
 func (x *StateChangeEvent) GetBot() *Bot {
 	if x != nil {
 		if x, ok := x.xxx_hidden_Subject.(*stateChangeEvent_Bot); ok {
@@ -71,6 +79,10 @@ func (x *StateChangeEvent) GetPosition() *Vector {
 	return nil
 }
 
+func (x *StateChangeEvent) SetSpanContext(v *SpanContext) {
+	x.xxx_hidden_SpanContext = v
+}
+
 func (x *StateChangeEvent) SetBot(v *Bot) {
 	if v == nil {
 		x.xxx_hidden_Subject = nil
@@ -85,6 +97,13 @@ func (x *StateChangeEvent) SetPosition(v *Vector) {
 		return
 	}
 	x.xxx_hidden_Event = &stateChangeEvent_Position{v}
+}
+
+func (x *StateChangeEvent) HasSpanContext() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_SpanContext != nil
 }
 
 func (x *StateChangeEvent) HasSubject() bool {
@@ -117,6 +136,10 @@ func (x *StateChangeEvent) HasPosition() bool {
 	return ok
 }
 
+func (x *StateChangeEvent) ClearSpanContext() {
+	x.xxx_hidden_SpanContext = nil
+}
+
 func (x *StateChangeEvent) ClearSubject() {
 	x.xxx_hidden_Subject = nil
 }
@@ -138,7 +161,7 @@ func (x *StateChangeEvent) ClearPosition() {
 }
 
 const StateChangeEvent_Subject_not_set_case case_StateChangeEvent_Subject = 0
-const StateChangeEvent_Bot_case case_StateChangeEvent_Subject = 1
+const StateChangeEvent_Bot_case case_StateChangeEvent_Subject = 2
 
 func (x *StateChangeEvent) WhichSubject() case_StateChangeEvent_Subject {
 	if x == nil {
@@ -153,7 +176,7 @@ func (x *StateChangeEvent) WhichSubject() case_StateChangeEvent_Subject {
 }
 
 const StateChangeEvent_Event_not_set_case case_StateChangeEvent_Event = 0
-const StateChangeEvent_Position_case case_StateChangeEvent_Event = 2
+const StateChangeEvent_Position_case case_StateChangeEvent_Event = 3
 
 func (x *StateChangeEvent) WhichEvent() case_StateChangeEvent_Event {
 	if x == nil {
@@ -170,6 +193,7 @@ func (x *StateChangeEvent) WhichEvent() case_StateChangeEvent_Event {
 type StateChangeEvent_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	SpanContext *SpanContext
 	// Fields of oneof xxx_hidden_Subject:
 	Bot *Bot
 	// -- end of xxx_hidden_Subject
@@ -182,6 +206,7 @@ func (b0 StateChangeEvent_builder) Build() *StateChangeEvent {
 	m0 := &StateChangeEvent{}
 	b, x := &b0, m0
 	_, _ = b, x
+	x.xxx_hidden_SpanContext = b.SpanContext
 	if b.Bot != nil {
 		x.xxx_hidden_Subject = &stateChangeEvent_Bot{b.Bot}
 	}
@@ -216,7 +241,7 @@ type isStateChangeEvent_Subject interface {
 }
 
 type stateChangeEvent_Bot struct {
-	Bot *Bot `protobuf:"bytes,1,opt,name=bot,oneof"`
+	Bot *Bot `protobuf:"bytes,2,opt,name=bot,oneof"`
 }
 
 func (*stateChangeEvent_Bot) isStateChangeEvent_Subject() {}
@@ -226,7 +251,7 @@ type isStateChangeEvent_Event interface {
 }
 
 type stateChangeEvent_Position struct {
-	Position *Vector `protobuf:"bytes,2,opt,name=position,oneof"`
+	Position *Vector `protobuf:"bytes,3,opt,name=position,oneof"`
 }
 
 func (*stateChangeEvent_Position) isStateChangeEvent_Event() {}
@@ -235,27 +260,30 @@ var File_state_change_event_proto protoreflect.FileDescriptor
 
 const file_state_change_event_proto_rawDesc = "" +
 	"\n" +
-	"\x18state_change_event.proto\x12\x13battlebots.protobuf\x1a\tbot.proto\x1a\fvector.proto\"\x8f\x01\n" +
-	"\x10StateChangeEvent\x12,\n" +
-	"\x03bot\x18\x01 \x01(\v2\x18.battlebots.protobuf.BotH\x00R\x03bot\x129\n" +
-	"\bposition\x18\x02 \x01(\v2\x1b.battlebots.protobuf.VectorH\x01R\bpositionB\t\n" +
+	"\x18state_change_event.proto\x12\x13battlebots.protobuf\x1a\tbot.proto\x1a\x12span_context.proto\x1a\fvector.proto\"\xd4\x01\n" +
+	"\x10StateChangeEvent\x12C\n" +
+	"\fspan_context\x18\x01 \x01(\v2 .battlebots.protobuf.SpanContextR\vspanContext\x12,\n" +
+	"\x03bot\x18\x02 \x01(\v2\x18.battlebots.protobuf.BotH\x00R\x03bot\x129\n" +
+	"\bposition\x18\x03 \x01(\v2\x1b.battlebots.protobuf.VectorH\x01R\bpositionB\t\n" +
 	"\asubjectB\a\n" +
 	"\x05eventB=Z;github.com/z5labs/battlebots/pkgs/battlebotspb;battlebotspbb\beditionsp\xe8\a"
 
 var file_state_change_event_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_state_change_event_proto_goTypes = []any{
 	(*StateChangeEvent)(nil), // 0: battlebots.protobuf.StateChangeEvent
-	(*Bot)(nil),              // 1: battlebots.protobuf.Bot
-	(*Vector)(nil),           // 2: battlebots.protobuf.Vector
+	(*SpanContext)(nil),      // 1: battlebots.protobuf.SpanContext
+	(*Bot)(nil),              // 2: battlebots.protobuf.Bot
+	(*Vector)(nil),           // 3: battlebots.protobuf.Vector
 }
 var file_state_change_event_proto_depIdxs = []int32{
-	1, // 0: battlebots.protobuf.StateChangeEvent.bot:type_name -> battlebots.protobuf.Bot
-	2, // 1: battlebots.protobuf.StateChangeEvent.position:type_name -> battlebots.protobuf.Vector
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 0: battlebots.protobuf.StateChangeEvent.span_context:type_name -> battlebots.protobuf.SpanContext
+	2, // 1: battlebots.protobuf.StateChangeEvent.bot:type_name -> battlebots.protobuf.Bot
+	3, // 2: battlebots.protobuf.StateChangeEvent.position:type_name -> battlebots.protobuf.Vector
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_state_change_event_proto_init() }
@@ -264,6 +292,7 @@ func file_state_change_event_proto_init() {
 		return
 	}
 	file_bot_proto_init()
+	file_span_context_proto_init()
 	file_vector_proto_init()
 	file_state_change_event_proto_msgTypes[0].OneofWrappers = []any{
 		(*stateChangeEvent_Bot)(nil),
