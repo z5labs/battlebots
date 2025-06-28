@@ -8,11 +8,13 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// Bot
 type Bot struct {
 	tracer trace.Tracer
 	client battlebotspb.BattleClient
 }
 
+// Move
 func (b *Bot) Move(ctx context.Context, dx, dy float64) error {
 	spanCtx, span := b.tracer.Start(ctx, "Bot.Move")
 	defer span.End()

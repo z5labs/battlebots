@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+// Config
 type Config struct {
 	job.Config `config:",squash"`
 
