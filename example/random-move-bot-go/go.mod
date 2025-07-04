@@ -6,7 +6,7 @@ replace github.com/z5labs/battlebots/sdk/battlebots-go => ../../sdk/battlebots-g
 
 require (
 	github.com/z5labs/battlebots/sdk/battlebots-go v0.0.0
-	github.com/z5labs/humus v0.11.0
+	github.com/z5labs/humus v0.11.1
 )
 
 require (
