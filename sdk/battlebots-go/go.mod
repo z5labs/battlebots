@@ -3,7 +3,7 @@ module github.com/z5labs/battlebots/sdk/battlebots-go
 go 1.24.0
 
 require (
-	github.com/z5labs/bedrock v0.20.0
+	github.com/z5labs/bedrock v0.20.1
 	github.com/z5labs/humus v0.11.1
 	github.com/z5labs/sdk-go v0.2.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0
@@ -33,7 +33,7 @@ require (
 	go.opentelemetry.io/otel/log v0.13.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.37.0 // indirect
-	go.opentelemetry.io/otel/sdk/log v0.12.2 // indirect
+	go.opentelemetry.io/otel/sdk/log v0.13.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.7.0 // indirect
 	golang.org/x/net v0.41.0 // indirect
