@@ -3,7 +3,7 @@ module github.com/z5labs/battlebots/sdk/battlebots-go
 go 1.24.0
 
 require (
-	github.com/z5labs/bedrock v0.20.1
+	github.com/z5labs/bedrock v0.20.2
 	github.com/z5labs/humus v0.11.2
 	github.com/z5labs/sdk-go v0.2.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0
