@@ -1,0 +1,20 @@
+{
+  "name": "battle-bots",
+  "engineVersion": "v0.18.12",
+  "sdk": {
+    "source": "go"
+  },
+  "dependencies": [
+    {
+      "name": "go",
+      "source": "github.com/z5labs/daggerverse/go@main",
+      "pin": "de964337c54aad97de8016472ea46620230035ae"
+    },
+    {
+      "name": "protobuf",
+      "source": "github.com/z5labs/daggerverse/protobuf@main",
+      "pin": "38815e3caba9ce86260f9af15477e42142b063d5"
+    }
+  ],
+  "source": "dagger"
+}
