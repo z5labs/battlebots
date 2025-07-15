@@ -13,7 +13,7 @@
     {
       "name": "protobuf",
       "source": "github.com/z5labs/daggerverse/protobuf@main",
-      "pin": "38815e3caba9ce86260f9af15477e42142b063d5"
+      "pin": "dd8d0ee1a7a96b9f0343ebaa059d58f150495ec4"
     }
   ],
   "source": "dagger"
