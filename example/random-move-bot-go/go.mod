@@ -6,7 +6,7 @@ replace github.com/z5labs/battlebots/sdk/battlebots-go => ../../sdk/battlebots-g
 
 require (
 	github.com/z5labs/battlebots/sdk/battlebots-go v0.0.0
-	github.com/z5labs/humus v0.11.2
+	github.com/z5labs/humus v0.11.3
 )
 
 require (
@@ -16,7 +16,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1 // indirect
-	github.com/z5labs/bedrock v0.20.1 // indirect
+	github.com/z5labs/bedrock v0.20.2 // indirect
 	github.com/z5labs/sdk-go v0.2.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.12.0 // indirect
