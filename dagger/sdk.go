@@ -27,12 +27,17 @@ func (m *BattleBots) Sdk() *Sdk {
 func (sdk *Sdk) Ci(ctx context.Context) error {
 	ep := pool.New().WithErrors().WithContext(ctx)
 
-	ep.Go(sdk.Go)
+	ep.Go(sdk.Go().Ci)
 
 	return ep.Wait()
 }
 
-func (sdk *Sdk) Go(ctx context.Context) error {
+type SdkGo struct {
+	// +private
+	Module *dagger.GoMod
+}
+
+func (sdk *Sdk) Go() *SdkGo {
 	c := dag.Go(dagger.GoOpts{Version: "latest"}).Container()
 
 	c = dag.Protobuf("v31.1").
@@ -41,12 +46,24 @@ func (sdk *Sdk) Go(ctx context.Context) error {
 		Protobuf().
 		CopyTo(c)
 
-	return dag.Go(dagger.GoOpts{
+	mod := dag.Go(dagger.GoOpts{
 		From: c,
-	}).
-		Module(sdk.Source, dagger.GoModuleOpts{
-			Path: "sdk/battlebots-go",
-		}).
-		Library().
-		Ci(ctx)
+	}).Module(sdk.Source, dagger.GoModuleOpts{
+		Path: "sdk/battlebots-go",
+	})
+
+	return &SdkGo{
+		Module: mod,
+	}
+}
+
+func (g *SdkGo) Ci(ctx context.Context) error {
+	return g.Module.Library().Ci(ctx)
+}
+
+func (g *SdkGo) GenerateProto(ctx context.Context) *dagger.Directory {
+	return g.Module.
+		Generate("./...").
+		Diff().
+		Directory("sdk/battlebots-go/battlebotspb")
 }
