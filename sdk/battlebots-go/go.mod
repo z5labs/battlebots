@@ -4,12 +4,12 @@ go 1.24.0
 
 require (
 	github.com/z5labs/bedrock v0.20.2
-	github.com/z5labs/humus v0.11.3
+	github.com/z5labs/humus v0.11.4
 	github.com/z5labs/sdk-go v0.2.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.1
 	google.golang.org/protobuf v1.36.6
 )
 
