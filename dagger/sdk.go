@@ -34,7 +34,7 @@ func (sdk *Sdk) Ci(ctx context.Context) error {
 
 type SdkGo struct {
 	// +private
-	Module *dagger.GoMod
+	Library *dagger.GoLibrary
 }
 
 func (sdk *Sdk) Go() *SdkGo {
@@ -46,24 +46,18 @@ func (sdk *Sdk) Go() *SdkGo {
 		Protobuf().
 		CopyTo(c)
 
-	mod := dag.Go(dagger.GoOpts{
+	lib := dag.Go(dagger.GoOpts{
 		From: c,
 	}).Module(sdk.Source, dagger.GoModuleOpts{
 		Path: "sdk/battlebots-go",
-	})
+	}).
+		Library()
 
 	return &SdkGo{
-		Module: mod,
+		Library: lib,
 	}
 }
 
 func (g *SdkGo) Ci(ctx context.Context) error {
-	return g.Module.Library().Ci(ctx)
-}
-
-func (g *SdkGo) GenerateProto(ctx context.Context) *dagger.Directory {
-	return g.Module.
-		Generate("./...").
-		Diff().
-		Directory("sdk/battlebots-go/battlebotspb")
+	return g.Library.Ci(ctx)
 }
