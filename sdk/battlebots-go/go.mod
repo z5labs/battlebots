@@ -4,12 +4,12 @@ go 1.24.0
 
 require (
 	github.com/z5labs/bedrock v0.20.2
-	github.com/z5labs/humus v0.11.3
+	github.com/z5labs/humus v0.11.4
 	github.com/z5labs/sdk-go v0.2.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.1
 	google.golang.org/protobuf v1.36.6
 )
 
@@ -17,7 +17,7 @@ require (
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
