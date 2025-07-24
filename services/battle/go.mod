@@ -9,7 +9,7 @@ require (
 	github.com/z5labs/humus v0.11.4
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-	google.golang.org/grpc v1.74.1
+	google.golang.org/grpc v1.74.2
 )
 
 require (
