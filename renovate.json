@@ -26,5 +26,9 @@
     "postUpdateOptions": [
         "gomodTidy",
         "gomodUpdateImportPaths"
+    ],
+    "ignorePaths": [
+        "dagger/**",
+        "docs/**"
     ]
 }
