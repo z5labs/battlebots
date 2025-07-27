@@ -5,7 +5,7 @@ go 1.24.4
 replace github.com/z5labs/battlebots/sdk/battlebots-go => ../../sdk/battlebots-go
 
 require (
-	github.com/z5labs/battlebots/sdk/battlebots-go v0.0.0-20250724020500-470443e6db6b
+	github.com/z5labs/battlebots/sdk/battlebots-go v0.0.0-20250726221545-2dcc60a4b00c
 	github.com/z5labs/humus v0.11.4
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
