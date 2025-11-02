@@ -3,7 +3,7 @@ title: "User Journeys"
 description: >
     Documentation of user flows and experiences for the Battlebots platform
 type: docs
-weight: 20
+weight: 10
 ---
 
 ## User Journeys
