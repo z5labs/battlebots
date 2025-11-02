@@ -4,7 +4,7 @@ description: >
     Defines the flow for new users to create an account and gain access to the Battlebots platform
 type: docs
 weight: 0001
-status: "draft"
+status: "accepted"
 date: 2025-11-02
 owner: ""
 stakeholders: []
@@ -27,17 +27,6 @@ The User Registration journey describes how new users create an account on the B
   - Concern about granting OAuth permissions without understanding what data is accessed
   - Unclear terms of service or data usage policies
   - Friction if they need to create a GitHub account first (rare for developer audience)
-
-**Secondary Persona**: Platform Administrator
-- **Description**: Team member who needs to monitor and manage user registrations
-- **Goals**:
-  - Ensure only legitimate users are registering
-  - Have visibility into registration metrics and trends
-  - Prevent abuse and spam accounts
-- **Pain Points**:
-  - Lack of automated fraud detection
-  - Difficulty identifying and removing spam accounts
-  - No analytics on registration conversion rates
 
 ## Journey Flow Diagram
 
