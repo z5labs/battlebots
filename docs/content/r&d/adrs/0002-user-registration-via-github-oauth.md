@@ -80,18 +80,34 @@ Implementation compliance will be confirmed through:
 <!-- This is an optional element. Feel free to remove. -->
 ## Pros and Cons of the Options
 
-### GitHub OAuth authentication
+### GitHub OAuth authentication with OpenFGA authorization
 
-Single OAuth provider (GitHub) for registration and authentication.
+Single OAuth provider (GitHub) for registration and authentication, combined with OpenFGA for fine-grained authorization.
+
+**Authentication vs Authorization:**
+- **Authentication (GitHub OAuth + JWT):** Verifies user identity - "Who are you?"
+- **Authorization (OpenFGA):** Determines permissions - "What can you do?"
+
+This option separates authentication concerns (handled by GitHub OAuth and JWT tokens) from authorization concerns (handled by OpenFGA). Users authenticate once via GitHub, receive JWT tokens for API access, and every protected operation checks permissions through OpenFGA based on relationships between users and resources (organizations, teams, bots, games).
 
 * Good, because target audience (developers) already have GitHub accounts
 * Good, because no password management or reset flows needed
 * Good, because GitHub's OAuth is well-documented and reliable
 * Good, because reduces implementation complexity and time to launch
 * Good, because GitHub identity ties naturally to developer workflows
+* Good, because OpenFGA provides fine-grained authorization (object-level permissions, not just roles)
+* Good, because OpenFGA naturally models organizational hierarchy (organization → team → bot → game)
+* Good, because OpenFGA scales to millions of authorization relationships and checks
+* Good, because separation of authentication (GitHub OAuth) and authorization (OpenFGA) follows security best practices
+* Good, because self-hosted OpenFGA has no per-user costs (important for platform growth)
+* Good, because OpenFGA's ReBAC model supports complex permission inheritance and delegation
 * Neutral, because limits to users with GitHub accounts (acceptable for developer audience)
-* Bad, because vendor dependency on GitHub
+* Neutral, because requires deploying and maintaining OpenFGA service infrastructure
+* Neutral, because requires learning ReBAC authorization modeling concepts
+* Bad, because vendor dependency on GitHub for authentication
 * Bad, because no fallback if GitHub OAuth is unavailable
+* Bad, because additional infrastructure complexity (OpenFGA service + database for authorization data)
+* Bad, because network latency added for OpenFGA authorization checks on every protected operation
 
 #### Implementation Visualization
 
@@ -101,9 +117,11 @@ Single OAuth provider (GitHub) for registration and authentication.
 graph LR
     User[User Browser] --> WebApp[Battle Bots Web App]
     WebApp --> GitHub[GitHub OAuth]
-    WebApp --> DB[(Database)]
+    WebApp --> DB[(Application Database)]
     WebApp --> JWT[JWT Token Service]
     WebApp --> Redis[(Redis - Token Blacklist)]
+    WebApp --> AuthZ[OpenFGA Service]
+    AuthZ --> FGA_DB[(OpenFGA Database)]
     GitHub --> User
 
     style WebApp fill:#e1f5ff
@@ -111,9 +129,15 @@ graph LR
     style DB fill:#fff4e1
     style JWT fill:#f3e5f5
     style Redis fill:#ffe0e0
+    style AuthZ fill:#e8f5e9
+    style FGA_DB fill:#c8e6c9
 ```
 
-**Note**: Session Store has been replaced with stateless JWT Token Service. Redis is optional for token revocation blacklist.
+**Architecture Notes:**
+- **Authentication Layer**: GitHub OAuth validates user identity, JWT Token Service generates stateless tokens
+- **Authorization Layer**: OpenFGA Service handles fine-grained permissions checks for all protected operations
+- **Stateless Design**: JWT tokens eliminate session storage; Redis is optional for token revocation blacklist
+- **Separation of Concerns**: Authentication database (user accounts) separate from authorization database (relationships/permissions)
 
 **REST API Endpoints:**
 
@@ -125,6 +149,25 @@ graph LR
 | `POST` | `/auth/refresh` | Refresh Token (Cookie) | Exchanges valid refresh token for new JWT access token + new refresh token (rotation), updates httpOnly cookies |
 | `GET` | `/auth/session` | JWT (Cookie) | Returns current authenticated user information from JWT claims (no database lookup) |
 | `POST` | `/auth/logout` | JWT (Cookie) | Revokes refresh token in database, optionally blacklists JWT, clears authentication cookies |
+
+**Protected Resource Endpoints (with OpenFGA Authorization):**
+
+Protected endpoints follow a two-step security model: JWT authentication validates identity, then OpenFGA authorization checks permissions.
+
+| Method | Endpoint | Authentication | Authorization Check | Purpose |
+|--------|----------|----------------|---------------------|---------|
+| `POST` | `/bots/:id/deploy` | JWT (Cookie) | OpenFGA: `user:github\|username` has `can_deploy` on `bot:id` | Deploy bot to game server |
+| `PUT` | `/bots/:id` | JWT (Cookie) | OpenFGA: `user:github\|username` has `can_edit` on `bot:id` | Update bot configuration |
+| `DELETE` | `/bots/:id` | JWT (Cookie) | OpenFGA: `user:github\|username` has `can_delete` on `bot:id` | Delete bot |
+| `POST` | `/teams/:id/members` | JWT (Cookie) | OpenFGA: `user:github\|username` has `can_manage_members` on `team:id` | Add member to team |
+| `POST` | `/organizations/:id/teams` | JWT (Cookie) | OpenFGA: `user:github\|username` has `can_create_teams` on `organization:id` | Create team in organization |
+
+**Authorization Flow Pattern:**
+1. Middleware validates JWT and extracts user identity (e.g., `github|username`)
+2. Middleware maps HTTP method + route to OpenFGA relation (e.g., `POST /bots/:id/deploy` → `can_deploy`)
+3. Middleware calls OpenFGA Check API: `check(user, relation, object)`
+4. If OpenFGA returns `allowed: true`, request proceeds to handler
+5. If OpenFGA returns `allowed: false`, return `403 Forbidden`
 
 **Sequence Diagram - Registration/Login Flow:**
 
@@ -172,6 +215,137 @@ sequenceDiagram
         WebApp->>User: Show error message
     end
 ```
+
+**Sequence Diagram - Protected Operation with OpenFGA Authorization:**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant WebApp as Battle Bots Web App
+    participant AuthMiddleware as Auth Middleware
+    participant AuthZMiddleware as AuthZ Middleware
+    participant JWT as JWT Token Service
+    participant OpenFGA as OpenFGA Service
+    participant Handler as Request Handler
+    participant DB as Database
+
+    Note over User,DB: User already authenticated with JWT cookie
+
+    User->>WebApp: POST /bots/battle-bot-1/deploy<br/>(JWT in httpOnly cookie)
+    WebApp->>AuthMiddleware: Validate authentication
+    AuthMiddleware->>JWT: Verify JWT signature & expiry
+    JWT-->>AuthMiddleware: JWT valid, claims extracted
+
+    alt JWT Invalid or Expired
+        AuthMiddleware-->>WebApp: 401 Unauthorized
+        WebApp->>User: Redirect to login or show error
+    else JWT Valid
+        AuthMiddleware->>AuthZMiddleware: user_id: github|alice, operation: deploy, resource: bot:battle-bot-1
+        AuthZMiddleware->>OpenFGA: Check(user: "user:github|alice",<br/>relation: "can_deploy",<br/>object: "bot:battle-bot-1")
+        OpenFGA->>OpenFGA: Evaluate authorization model<br/>(check relationships and rules)
+
+        alt User Not Authorized
+            OpenFGA-->>AuthZMiddleware: allowed: false
+            AuthZMiddleware-->>WebApp: 403 Forbidden
+            WebApp->>User: Show "You don't have permission" error
+        else User Authorized
+            OpenFGA-->>AuthZMiddleware: allowed: true
+            AuthZMiddleware->>Handler: Forward request
+            Handler->>DB: Execute deployment logic
+            DB-->>Handler: Deployment successful
+            Handler-->>WebApp: 200 OK {deployment_status}
+            WebApp->>User: Show success message
+        end
+    end
+```
+
+**Authorization Decision Flow:**
+
+The authorization middleware performs the following steps for every protected endpoint:
+
+1. **Extract User Identity**: Get user ID from validated JWT claims (e.g., `github|alice`)
+2. **Map Operation to Relation**: Translate HTTP method + endpoint to OpenFGA relation
+   - `POST /bots/:id/deploy` → `can_deploy`
+   - `PUT /bots/:id` → `can_edit`
+   - `DELETE /bots/:id` → `can_delete`
+3. **Construct OpenFGA Check**: Build check request with user, relation, and object
+4. **Evaluate Permission**: OpenFGA traverses relationship graph based on authorization model
+5. **Enforce Decision**: Allow (200/201) or deny (403) based on OpenFGA response
+
+**OpenFGA Authorization Model (Starter):**
+
+This is the initial authorization model for Battle Bots MVP. It defines the organizational hierarchy and permission inheritance patterns.
+
+```
+model
+  schema 1.1
+
+type user
+
+type organization
+  relations
+    define owner: [user]
+    define member: [user]
+    define can_create_teams: owner or member
+    define can_invite_members: owner
+
+type team
+  relations
+    define parent_org: [organization]
+    define admin: [user]
+    define member: [user] or admin or owner from parent_org
+    define can_manage_bots: admin or owner from parent_org
+    define can_manage_members: admin or owner from parent_org
+
+type bot
+  relations
+    define parent_team: [team]
+    define creator: [user]
+    define can_view: member from parent_team
+    define can_edit: creator or can_manage_bots from parent_team
+    define can_deploy: creator or can_manage_bots from parent_team
+    define can_delete: creator or admin from parent_team
+
+type game
+  relations
+    define participant_bot: [bot]
+    define creator: [user]
+    define can_view: creator or can_view from participant_bot
+    define can_cancel: creator
+```
+
+**Model Explanation:**
+
+- **Organizations**: Top-level entities with owners and members. Owners can invite members; both can create teams.
+- **Teams**: Belong to organizations. Organization owners automatically have admin rights on all teams in their org. Team admins can manage bots and members.
+- **Bots**: Belong to teams. Bot creators can edit/deploy/delete their bots. Team admins can also manage all bots in their team. All team members can view bots.
+- **Games**: Include participating bots. Game creator and anyone who can view participating bots can view the game.
+
+**Permission Inheritance Examples:**
+- Alice is owner of Org A → Alice is automatically admin of Team X (part of Org A) → Alice can manage all bots in Team X
+- Bob is creator of Bot Y in Team X → Bob can edit, deploy, and delete Bot Y
+- Carol is member of Team X → Carol can view all bots in Team X, but cannot edit/deploy them
+
+**Relationship Tuple Examples:**
+```
+# Organization membership
+user:github|alice, owner, organization:acme-corp
+user:github|bob, member, organization:acme-corp
+
+# Team structure
+organization:acme-corp, parent_org, team:alpha-team
+user:github|carol, admin, team:alpha-team
+
+# Bot ownership
+team:alpha-team, parent_team, bot:battle-bot-1
+user:github|bob, creator, bot:battle-bot-1
+
+# Game participation
+bot:battle-bot-1, participant_bot, game:match-123
+user:github|alice, creator, game:match-123
+```
+
+For complete OpenFGA deployment and configuration details, see [OpenFGA Analysis](/r&d/analysis/open-source-applications/openfga-analysis/).
 
 ### Email/password registration with JWT
 
