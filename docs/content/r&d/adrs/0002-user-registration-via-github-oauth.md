@@ -1,11 +1,11 @@
 ---
 title: "[0002] User Registration via GitHub OAuth"
 description: >
-    How users will register and authenticate with the Battle Bots platform
+    How users will register and authenticate with the Battle Bots platform using GitHub OAuth and stateless JWT tokens
 type: docs
 weight: 0002
 category: "user-journey"
-status: "proposed"
+status: "accepted"
 date: 2025-11-02
 deciders: []
 consulted: []
@@ -43,20 +43,39 @@ How should we implement user registration and authentication for the Battle Bots
 
 ## Decision Outcome
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | ... | comes out best (see below)].
+Chosen option: "GitHub OAuth authentication with stateless JWT tokens", because it best meets our decision drivers:
 
-<!-- This is an optional element. Feel free to remove. -->
+* **User experience**: Developers already have GitHub accounts - minimal registration friction
+* **Security**: Leverages GitHub's OAuth 2.0 without password management burden
+* **Implementation complexity**: Single OAuth provider reduces development time
+* **Timeline**: Fastest path to launch with proven technology
+* **Trust**: GitHub is the natural identity provider for our developer audience
+* **Scalability**: Stateless JWT tokens enable horizontal scaling without session synchronization
+
+The implementation uses GitHub OAuth for initial authentication, then converts the GitHub access token to internal JWT tokens for stateless API authentication. This hybrid approach provides OAuth convenience with JWT scalability.
+
 ### Consequences
 
-* Good, because [positive consequence, e.g., improvement of one or more desired qualities, ...]
-* Bad, because [negative consequence, e.g., compromising one or more desired qualities, ...]
-* ...
+* Good, because no server-side session state enables horizontal scalability
+* Good, because JWT tokens reduce database lookups (user info in token claims)
+* Good, because stateless architecture simplifies microservices integration
+* Good, because developers trust GitHub as identity provider
+* Good, because refresh token rotation provides security without UX friction
+* Neutral, because requires implementing JWT token service (RS256 signing/validation)
+* Neutral, because GitHub OAuth is OAuth 2.0, not OIDC (must generate our own ID tokens)
+* Bad, because vendor dependency on GitHub for initial authentication
+* Bad, because requires token blacklist for immediate revocation (adds some state)
+* Bad, because limits to users with GitHub accounts (acceptable for developer audience)
 
-<!-- This is an optional element. Feel free to remove. -->
 ### Confirmation
 
-[Describe how the implementation of/compliance with the ADR is confirmed. E.g., by a review or an ArchUnit test.
- Although we classify this element as optional, it is included in most ADRs.]
+Implementation compliance will be confirmed through:
+
+1. **Security Testing**: Penetration testing validates XSS/CSRF protection, token validation, and PKCE implementation
+2. **Integration Tests**: Automated tests verify complete OAuth flow and JWT token generation/validation
+3. **Code Review**: Security-focused review of JWT signing, token storage, and refresh token rotation
+4. **Load Testing**: Horizontal scalability validated with 10,000+ concurrent users across multiple servers
+5. **Documentation Review**: Architecture diagrams and sequence diagrams accurately reflect stateless JWT implementation
 
 <!-- This is an optional element. Feel free to remove. -->
 ## Pros and Cons of the Options
@@ -83,24 +102,29 @@ graph LR
     User[User Browser] --> WebApp[Battle Bots Web App]
     WebApp --> GitHub[GitHub OAuth]
     WebApp --> DB[(Database)]
-    WebApp --> Session[Session Store]
+    WebApp --> JWT[JWT Token Service]
+    WebApp --> Redis[(Redis - Token Blacklist)]
     GitHub --> User
 
     style WebApp fill:#e1f5ff
     style GitHub fill:#f0f0f0
     style DB fill:#fff4e1
-    style Session fill:#fff4e1
+    style JWT fill:#f3e5f5
+    style Redis fill:#ffe0e0
 ```
+
+**Note**: Session Store has been replaced with stateless JWT Token Service. Redis is optional for token revocation blacklist.
 
 **REST API Endpoints:**
 
 | Method | Endpoint | Auth Required | Purpose |
 |--------|----------|---------------|---------|
-| `GET` | `/auth/github/login` | No | Initiates GitHub OAuth flow by generating CSRF state token and redirecting to GitHub authorization page |
-| `GET` | `/auth/github/callback` | No | Handles OAuth callback from GitHub, exchanges auth code for access token, fetches user profile, creates/updates account |
-| `POST` | `/auth/terms/accept` | Session | Accepts terms of service for new user accounts (called before account creation) |
-| `GET` | `/auth/session` | Session | Returns current authenticated user information and session status |
-| `POST` | `/auth/logout` | Session | Terminates user session and clears authentication cookies/tokens |
+| `GET` | `/auth/github/login` | No | Initiates GitHub OAuth flow with PKCE by generating code_challenge and CSRF state token, redirecting to GitHub authorization page |
+| `GET` | `/auth/github/callback` | No | Handles OAuth callback from GitHub, exchanges auth code for GitHub access token, fetches user profile, creates/updates account, **generates internal JWT access token + refresh token**, sets httpOnly cookies |
+| `POST` | `/auth/terms/accept` | JWT (Cookie) | Accepts terms of service for new user accounts (called before account creation) |
+| `POST` | `/auth/refresh` | Refresh Token (Cookie) | Exchanges valid refresh token for new JWT access token + new refresh token (rotation), updates httpOnly cookies |
+| `GET` | `/auth/session` | JWT (Cookie) | Returns current authenticated user information from JWT claims (no database lookup) |
+| `POST` | `/auth/logout` | JWT (Cookie) | Revokes refresh token in database, optionally blacklists JWT, clears authentication cookies |
 
 **Sequence Diagram - Registration/Login Flow:**
 
@@ -110,18 +134,19 @@ sequenceDiagram
     participant WebApp as Battle Bots Web App
     participant GitHub as GitHub OAuth
     participant DB as Database
-    participant Session as Session Store
+    participant JWT as JWT Token Service
 
     User->>WebApp: GET /auth/github/login
+    WebApp->>WebApp: Generate code_verifier + code_challenge (PKCE)
     WebApp->>WebApp: Generate CSRF state token
-    WebApp->>User: 302 Redirect to GitHub OAuth
+    WebApp->>User: 302 Redirect to GitHub OAuth (with code_challenge)
     User->>GitHub: Authorize Battle Bots application
 
     alt Authorization Successful
         GitHub->>WebApp: GET /auth/github/callback?code=xxx&state=yyy
-        WebApp->>WebApp: Validate state token
-        WebApp->>GitHub: POST /login/oauth/access_token (exchange code)
-        GitHub-->>WebApp: Return access token
+        WebApp->>WebApp: Validate state token (CSRF protection)
+        WebApp->>GitHub: POST /login/oauth/access_token<br/>(exchange code + code_verifier)
+        GitHub-->>WebApp: Return GitHub access token
         WebApp->>GitHub: GET /user (fetch profile)
         GitHub-->>WebApp: Return user data (ID, username, email)
 
@@ -130,14 +155,17 @@ sequenceDiagram
             DB-->>WebApp: Profile updated
         else New User
             WebApp->>User: Show Terms of Service page
-            User->>WebApp: POST /auth/terms/accept
+            User->>WebApp: POST /auth/terms/accept (with JWT cookie)
             WebApp->>DB: Create user account
             DB-->>WebApp: Account created
         end
 
-        WebApp->>Session: Create authenticated session
-        Session-->>WebApp: Session token
-        WebApp->>User: 302 Redirect to dashboard (with session cookie)
+        WebApp->>JWT: Generate JWT access token (RS256, 15min expiry)
+        JWT-->>WebApp: Signed JWT with claims (sub, iss, aud, exp, github_id, ...)
+        WebApp->>WebApp: Generate refresh token (random 32-byte)
+        WebApp->>DB: Store refresh token hash (user_id, token_hash, expires_at)
+        DB-->>WebApp: Token stored
+        WebApp->>User: 302 Redirect to dashboard<br/>(Set httpOnly cookies: access_token, refresh_token, csrf_token)
 
     else Authorization Failed/Cancelled
         GitHub->>WebApp: GET /auth/github/callback?error=xxx

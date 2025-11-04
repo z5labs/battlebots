@@ -47,7 +47,7 @@ graph TD
     J --> K[Fetch user profile from GitHub]
     K --> L{User exists in system?}
     L -->|Yes| M[Update user profile data]
-    M --> N[Create session]
+    M --> N[Generate JWT access token]
     L -->|No| O[Show terms of service]
     O --> P{User accepts terms?}
     P -->|No| Q[Cancel registration]
@@ -55,7 +55,9 @@ graph TD
     P -->|Yes| R[Create user account]
     R --> S[Store GitHub ID and profile]
     S --> N
-    N --> T[Redirect to onboarding/dashboard]
+    N --> T[Generate refresh token]
+    T --> U[Set httpOnly cookies]
+    U --> V[Redirect to onboarding/dashboard]
 ```
 
 **Flow Narrative**:
@@ -86,8 +88,10 @@ graph TD
     - Store GitHub ID as primary identifier
     - Use GitHub username as default platform username (allow customization later)
 11. **Existing User Flow**: If user exists, update profile data with latest from GitHub
-12. **Session Creation**: Create authenticated session for user
-13. **Redirect**: Redirect to onboarding (new users) or dashboard (returning users)
+12. **JWT Token Generation**: Generate internal JWT access token with user claims (15 min expiry, RS256 signing)
+13. **Refresh Token Generation**: Generate cryptographic refresh token (7 days expiry) and store hash in database
+14. **Cookie Setup**: Set httpOnly, secure, SameSite=strict cookies (access_token, refresh_token, csrf_token)
+15. **Redirect**: Redirect to onboarding (new users) or dashboard (returning users)
 
 **Persona-Specific Variations**:
 - **New Battlebot Developer**: After accepting terms, redirected to onboarding flow to learn about deploying their first bot
@@ -119,8 +123,18 @@ graph TD
 
 #### REQ-AC-005
 - **Priority**: P0
-- **Description**: Store and validate GitHub access tokens securely with appropriate encryption
-- **Rationale**: Protects user's GitHub access tokens from unauthorized use and ensures compliance with OAuth security best practices.
+- **Description**: Generate internal JWT access tokens (RS256, 15 min expiry) after GitHub OAuth authentication
+- **Rationale**: Enables stateless API authentication without server-side session lookups. JWT claims include user identity for authorization decisions on every request.
+
+#### REQ-AC-005a
+- **Priority**: P0
+- **Description**: Generate and rotate refresh tokens (7 days expiry) with database storage of token hash
+- **Rationale**: Allows users to obtain new access tokens without re-authentication. Token rotation detects theft via reuse detection.
+
+#### REQ-AC-005b
+- **Priority**: P0
+- **Description**: Store JWT tokens in httpOnly, secure, SameSite=strict cookies
+- **Rationale**: Protects tokens from XSS attacks (httpOnly) and CSRF attacks (SameSite=strict). Secure flag ensures HTTPS-only transmission.
 
 #### REQ-AC-006
 - **Priority**: P1
@@ -131,6 +145,16 @@ graph TD
 - **Priority**: P1
 - **Description**: Terms of service acceptance required before account creation
 - **Rationale**: Ensures users explicitly consent to platform policies before gaining access, meeting legal requirements.
+
+#### REQ-AC-008
+- **Priority**: P0
+- **Description**: CSRF token validation for state-changing API requests (POST, PUT, PATCH, DELETE)
+- **Rationale**: Defense-in-depth CSRF protection. Requires X-CSRF-Token header matching CSRF cookie value for all state-changing operations.
+
+#### REQ-AC-009
+- **Priority**: P0
+- **Description**: JWT signature and claims validation on every authenticated API request
+- **Rationale**: Ensures token authenticity (signature) and validity (exp, iss, aud claims). Prevents token tampering and expired token usage.
 
 ### Analytics
 
@@ -184,11 +208,10 @@ Success for the User Registration journey is measured by how efficiently and sec
 ## Related Documentation
 
 **Existing ADRs:**
-- (No existing ADRs yet - this is a foundational journey)
+- [ADR-0002: User Registration via GitHub OAuth](/r&d/adrs/0002-user-registration-via-github-oauth/) - Defines GitHub OAuth as authentication method with stateless JWT tokens
+- [ADR-0003: Stateless Authentication via JWT Tokens](/r&d/adrs/0003-stateless-jwt-authentication/) - Defines JWT token strategy, refresh token rotation, and CSRF protection
 
 **Required ADRs (Not Yet Created):**
-- **GitHub OAuth Integration** - Configuration of GitHub OAuth application, scope selection, and token management strategy
-- **Session Management** - Decision on session approach (JWT, server-side sessions, refresh tokens) and expiration policies
 - **Data Privacy & Compliance** - How user data from GitHub is stored, processed, and protected (GDPR, CCPA considerations)
 - **Rate Limiting Strategy** - Approach for preventing OAuth abuse while not impacting legitimate users
 - **Username Customization Policy** - Rules for when/how users can customize their username after initial GitHub-based registration
@@ -216,14 +239,19 @@ Success for the User Registration journey is measured by how efficiently and sec
 
 **Technical Considerations:**
 - OAuth state parameter must be cryptographically random and validated on callback
-- GitHub access tokens should be encrypted at rest using strong encryption (AES-256)
-- Consider token refresh strategy - GitHub OAuth tokens don't expire but can be revoked
+- **Use PKCE (Proof Key for Code Exchange)** for OAuth flow to prevent authorization code interception
+- GitHub access tokens should be encrypted at rest using strong encryption (AES-256) for future GitHub API calls
+- **Generate internal JWT access tokens** (RS256, 15 min expiry) with user claims after OAuth callback
+- **Generate refresh tokens** (random 32-byte, 7 days expiry) and store SHA256 hash in database
+- **Set httpOnly, secure, SameSite=strict cookies** for access_token, refresh_token, csrf_token
 - Implement proper error handling for GitHub API rate limits
 - Store registration attempt metadata for abuse detection
 - Consider implementing a waiting room or queue during high-traffic periods
 - Handle edge cases: user revokes GitHub app access, user deletes GitHub account, user changes GitHub email
 - Implement proper logging for OAuth flow debugging without exposing sensitive tokens
-- Consider PKCE (Proof Key for Code Exchange) extension for additional security
+- **Implement JWT validation middleware** to verify signature and claims on every API request
+- **Implement refresh token rotation** - issue new refresh token on every refresh, revoke old token
+- **Optional: Redis token blacklist** for immediate JWT revocation (logout, security breach)
 
 **Business Considerations:**
 - Clear terms of service and privacy policy explaining what GitHub data is accessed and stored
