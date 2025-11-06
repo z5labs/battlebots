@@ -118,7 +118,7 @@ graph LR
     User[User Browser] --> WebApp[Battle Bots Web App]
     WebApp --> GitHub[GitHub OAuth]
     WebApp --> DB[(Application Database)]
-    WebApp --> JWT[JWT Token Service]
+    WebApp --> AuthSvc[Auth Service<br/>+ JWKS Endpoint]
     WebApp --> Redis[(Redis - Token Blacklist)]
     WebApp --> AuthZ[OpenFGA Service]
     AuthZ --> FGA_DB[(OpenFGA Database)]
@@ -127,17 +127,24 @@ graph LR
     style WebApp fill:#e1f5ff
     style GitHub fill:#f0f0f0
     style DB fill:#fff4e1
-    style JWT fill:#f3e5f5
+    style AuthSvc fill:#f3e5f5
     style Redis fill:#ffe0e0
     style AuthZ fill:#e8f5e9
     style FGA_DB fill:#c8e6c9
 ```
 
 **Architecture Notes:**
-- **Authentication Layer**: GitHub OAuth validates user identity, JWT Token Service generates stateless tokens
+- **Authentication Layer**:
+  - GitHub OAuth validates user identity during initial login
+  - Auth Service generates JWT tokens signed with RS256 private key
+  - JWKS endpoint (`/.well-known/jwks.json`) publishes public keys for token validation
+  - Battle Bots app validates JWT signatures locally using cached public keys (no per-request service call)
 - **Authorization Layer**: OpenFGA Service handles fine-grained permissions checks for all protected operations
 - **Stateless Design**: JWT tokens eliminate session storage; Redis is optional for token revocation blacklist
-- **Separation of Concerns**: Authentication database (user accounts) separate from authorization database (relationships/permissions)
+- **Separation of Concerns**:
+  - Authentication database stores user accounts and refresh tokens
+  - Authorization database (OpenFGA) stores relationships and permissions
+  - Token generation and token validation are decoupled via JWKS standard
 
 **REST API Endpoints:**
 
@@ -149,6 +156,7 @@ graph LR
 | `POST` | `/auth/refresh` | Refresh Token (Cookie) | Exchanges valid refresh token for new JWT access token + new refresh token (rotation), updates httpOnly cookies |
 | `GET` | `/auth/session` | JWT (Cookie) | Returns current authenticated user information from JWT claims (no database lookup) |
 | `POST` | `/auth/logout` | JWT (Cookie) | Revokes refresh token in database, optionally blacklists JWT, clears authentication cookies |
+| `GET` | `/.well-known/jwks.json` | No | Returns JSON Web Key Set (JWKS) containing public keys for JWT signature validation. Used by Battle Bots app to validate tokens locally. |
 
 **Protected Resource Endpoints (with OpenFGA Authorization):**
 
@@ -177,7 +185,7 @@ sequenceDiagram
     participant WebApp as Battle Bots Web App
     participant GitHub as GitHub OAuth
     participant DB as Database
-    participant JWT as JWT Token Service
+    participant AuthSvc as Auth Service
 
     User->>WebApp: GET /auth/github/login
     WebApp->>WebApp: Generate code_verifier + code_challenge (PKCE)
@@ -203,8 +211,9 @@ sequenceDiagram
             DB-->>WebApp: Account created
         end
 
-        WebApp->>JWT: Generate JWT access token (RS256, 15min expiry)
-        JWT-->>WebApp: Signed JWT with claims (sub, iss, aud, exp, github_id, ...)
+        WebApp->>AuthSvc: Generate JWT access token (RS256, 15min expiry)
+        AuthSvc-->>WebApp: Signed JWT with claims (sub, iss, aud, exp, github_id, ...)
+        Note over AuthSvc: Public keys available at<br/>/.well-known/jwks.json
         WebApp->>WebApp: Generate refresh token (random 32-byte)
         WebApp->>DB: Store refresh token hash (user_id, token_hash, expires_at)
         DB-->>WebApp: Token stored
@@ -224,7 +233,6 @@ sequenceDiagram
     participant WebApp as Battle Bots Web App
     participant AuthMiddleware as Auth Middleware
     participant AuthZMiddleware as AuthZ Middleware
-    participant JWT as JWT Token Service
     participant OpenFGA as OpenFGA Service
     participant Handler as Request Handler
     participant DB as Database
@@ -233,13 +241,14 @@ sequenceDiagram
 
     User->>WebApp: POST /bots/battle-bot-1/deploy<br/>(JWT in httpOnly cookie)
     WebApp->>AuthMiddleware: Validate authentication
-    AuthMiddleware->>JWT: Verify JWT signature & expiry
-    JWT-->>AuthMiddleware: JWT valid, claims extracted
+    AuthMiddleware->>AuthMiddleware: Verify JWT signature using cached public key<br/>(from /.well-known/jwks.json)
+    Note over AuthMiddleware: Public keys cached locally,<br/>refreshed periodically or on validation failure
 
     alt JWT Invalid or Expired
         AuthMiddleware-->>WebApp: 401 Unauthorized
         WebApp->>User: Redirect to login or show error
     else JWT Valid
+        AuthMiddleware->>AuthMiddleware: Extract user claims from JWT
         AuthMiddleware->>AuthZMiddleware: user_id: github|alice, operation: deploy, resource: bot:battle-bot-1
         AuthZMiddleware->>OpenFGA: Check(user: "user:github|alice",<br/>relation: "can_deploy",<br/>object: "bot:battle-bot-1")
         OpenFGA->>OpenFGA: Evaluate authorization model<br/>(check relationships and rules)
@@ -346,6 +355,75 @@ user:github|alice, creator, game:match-123
 ```
 
 For complete OpenFGA deployment and configuration details, see [OpenFGA Analysis](/r&d/analysis/open-source-applications/openfga-analysis/).
+
+**JWKS (JSON Web Key Set) Implementation Details:**
+
+The JWKS endpoint provides a standard mechanism for Battle Bots app to validate JWT tokens without coupling to the token generation service.
+
+**JWKS Endpoint Format:**
+
+The Auth Service exposes public keys at `/.well-known/jwks.json`:
+
+```json
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "kid": "2024-11-primary",
+      "use": "sig",
+      "alg": "RS256",
+      "n": "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx...",
+      "e": "AQAB"
+    },
+    {
+      "kty": "RSA",
+      "kid": "2024-10-rotated",
+      "use": "sig",
+      "alg": "RS256",
+      "n": "xjlKJN9C5xW7JVZkGwmZZN3NnPQmbXEps2aiAFbWhM78LhWx...",
+      "e": "AQAB"
+    }
+  ]
+}
+```
+
+**Key Fields:**
+- `kty`: Key type (RSA for RS256 signatures)
+- `kid`: Key ID used in JWT header to identify which key signed the token
+- `use`: Key usage (`sig` for signature verification)
+- `alg`: Algorithm (RS256 = RSA signature with SHA-256)
+- `n`: RSA modulus (base64url-encoded)
+- `e`: RSA exponent (typically AQAB = 65537)
+
+**Key Rotation Strategy:**
+
+1. **New Key Generation**: Auth Service generates new RSA key pair monthly
+2. **Dual Key Period**: Both old and new public keys published in JWKS for 30 days
+3. **Grace Period**: Old key remains in JWKS while tokens signed with it are still valid (15min access token + 7 day refresh token = keep old key for 8 days minimum)
+4. **Key Removal**: Old key removed from JWKS after grace period expires
+
+**Client-Side Caching (Battle Bots App):**
+
+```
+1. On startup: Fetch JWKS from /.well-known/jwks.json
+2. Cache keys in memory with 1-hour TTL
+3. When validating JWT:
+   - Extract 'kid' from JWT header
+   - Look up public key in cache by 'kid'
+   - Verify signature using cached key
+4. On signature validation failure:
+   - Refresh JWKS from endpoint (handle key rotation)
+   - Retry validation with updated keys
+   - Return 401 if still invalid
+5. Periodic refresh: Re-fetch JWKS every hour to stay current
+```
+
+**Security Considerations:**
+- Public keys are safe to cache and distribute (cannot sign tokens, only verify)
+- Always validate JWT signature before trusting claims
+- Respect `kid` header to select correct key (prevents downgrade attacks)
+- JWKS endpoint should be served over HTTPS only
+- Rate limit JWKS endpoint to prevent abuse (recommended: 100 req/min per IP)
 
 ### Email/password registration with JWT
 
