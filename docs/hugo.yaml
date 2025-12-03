@@ -1,65 +1,63 @@
 title: Battle Bots Documentation
-language: en-us
+languageCode: en-us
 
 module:
-  hugoVersion:
-    extended: true
-    min: "0.147.0"
   imports:
-    - path: "github.com/google/docsy"
+    - path: github.com/google/docsy
+      disable: false
+    - path: github.com/google/docsy/dependencies
+      disable: false
 
-enableRobotsTXT: true
+# Highlighting config
+pygmentsCodeFences: true
+pygmentsUseClasses: false
+pygmentsUseClassic: false
+pygmentsStyle: tango
 
-# Will give values to .Lastmod etc.
-enableGitInfo: true
-
+# Image processing configuration
 imaging:
   resampleFilter: CatmullRom
   quality: 75
   anchor: smart
 
-# Highlighting config
-pygmentsCodeFences: true
-pygmentsUseClasses: false
-# Use the new Chroma Go highlighter in Hugo.
-pygmentsUseClassic: false
-# pygmentsOptions: "linenos=table"
-# See https://help.farbox.com/pygments.html
-pygmentsStyle: tango
-
+# Markup settings
 markup:
   goldmark:
-    parser:
-      attribute:
-        block: true
     renderer:
       unsafe: true
   highlight:
     style: tango
 
-outputs:
-  section: [HTML, print, RSS]
-
+# Site params
 params:
+  copyright: Z5Labs and Contributors
+  privacy_policy: ""
+
+  # Repository
   github_repo: https://github.com/z5labs/battlebots
   github_project_repo: https://github.com/z5labs/battlebots
 
+  # Enable Algolia DocSearch
+  algolia_docsearch: false
+
+  # Enable Lunr.js offline search
   offlineSearch: true
-  prism_syntax_highlighting: false
 
-  copyright:
-    authors: Z5Labs and Contributors | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0)
-    from_year: 2025
-
+  # UI
   ui:
-    showLightDarkModeMenu: true
+    sidebar_menu_compact: true
     breadcrumb_disable: false
-    navbar_logo: false
-    navbar_translucent_over_cover_disable: false
-    sidebar_menu_compact: false
-    sidebar_search_disable: true
+    sidebar_search_disable: false
+    navbar_logo: true
+    footer_about_disable: false
 
+  # Links
   links:
+    user:
+      - name: GitHub Discussions
+        url: https://github.com/z5labs/battlebots/discussions
+        icon: fab fa-github
+        desc: Discussion and help from the community
     developer:
       - name: GitHub
         url: https://github.com/z5labs/battlebots
