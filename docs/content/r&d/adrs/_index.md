@@ -3,7 +3,7 @@ title: "Architecture Decision Records"
 description: >
     Documentation of architectural decisions made in the Battlebots platform using MADR 4.0.0 standard
 type: docs
-weight: 20
+weight: 30
 ---
 
 ## Architecture Decision Records (ADRs)
