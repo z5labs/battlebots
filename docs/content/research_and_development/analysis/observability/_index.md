@@ -34,6 +34,34 @@ Includes detailed analysis of:
 - Self-monitoring and operational considerations
 - BattleBots platform integration patterns
 
+### [Log Storage](logs/)
+
+Analysis of log storage backends for the BattleBots observability stack, focusing on systems that integrate with the OpenTelemetry Collector.
+
+Log storage is essential for:
+- Aggregating logs from distributed game servers and services
+- Enabling fast search and filtering for debugging
+- Correlating logs with traces and metrics for unified observability
+- Long-term retention for compliance and historical analysis
+- Cost-effective storage at scale
+
+#### [Grafana Loki](logs/loki/)
+
+Research on Grafana Loki, a horizontally scalable, multi-tenant log aggregation system designed for cost-effective log storage and querying.
+
+Loki uses an index-free approach that indexes only metadata labels rather than full log content, providing:
+- Native OTLP support (Loki v3+) for seamless OpenTelemetry Collector integration
+- Label-based querying through LogQL
+- Efficient storage with compressed chunks
+- Horizontal scalability and multi-tenancy
+- Tight integration with Grafana for visualization
+
+Includes detailed analysis of:
+- Architecture and core concepts
+- Deployment modes and operational best practices
+- OTLP compatibility and OTel Collector integration
+- Label strategy and performance considerations
+
 ## Future ADR Dependencies
 
 This analysis will inform:
