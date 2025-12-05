@@ -103,7 +103,7 @@ Implementation compliance will be verified through:
 
 **Description:** HTTP/2-based RPC framework with Protocol Buffers for serialization and bidirectional streaming for real-time communication.
 
-**Detailed Analysis:** See [gRPC Protocol Analysis](/battlebots/research_and_development/analysis/protocols/grpc/)
+**Detailed Analysis:** See [gRPC Protocol Analysis]({{< relref "../analysis/protocols/grpc/" >}})
 
 **Pros:**
 * ✅ **Native OpenTelemetry support** - Automatic trace propagation, span creation, and metrics collection integrate seamlessly with ADR-0002 observability stack
@@ -131,7 +131,7 @@ Implementation compliance will be verified through:
 
 **Description:** Full-duplex bidirectional communication over persistent TCP connection with JSON or binary serialization.
 
-**Detailed Analysis:** See [HTTP-based Protocols Analysis](/battlebots/research_and_development/analysis/protocols/http/)
+**Detailed Analysis:** See [HTTP-based Protocols Analysis]({{< relref "../analysis/protocols/http/" >}})
 
 **Pros:**
 * ✅ **True bidirectional** - Full-duplex communication without polling
@@ -157,7 +157,7 @@ Implementation compliance will be verified through:
 
 **Description:** Hybrid approach using HTTP POST for bot actions and SSE for server-to-bot event streaming.
 
-**Detailed Analysis:** See [HTTP-based Protocols Analysis](/battlebots/research_and_development/analysis/protocols/http/)
+**Detailed Analysis:** See [HTTP-based Protocols Analysis]({{< relref "../analysis/protocols/http/" >}})
 
 **Pros:**
 * ✅ **Automatic reconnection** - SSE handles reconnect with Last-Event-ID resume
@@ -182,7 +182,7 @@ Implementation compliance will be verified through:
 
 **Description:** Application-specific binary protocol over raw TCP sockets with custom message framing.
 
-**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis](/battlebots/research_and_development/analysis/protocols/custom/)
+**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis]({{< relref "../analysis/protocols/custom/" >}})
 
 **Pros:**
 * ✅ **Maximum control** - Full control over wire format and protocol behavior
@@ -206,7 +206,7 @@ Implementation compliance will be verified through:
 
 **Description:** Connectionless packet-based protocol with custom reliability layer for critical messages.
 
-**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis](/battlebots/research_and_development/analysis/protocols/custom/)
+**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis]({{< relref "../analysis/protocols/custom/" >}})
 
 **Pros:**
 * ✅ **Lowest latency** - 2-10ms potential vs 5-20ms for TCP
