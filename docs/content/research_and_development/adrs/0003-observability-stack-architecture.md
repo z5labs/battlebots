@@ -1,4 +1,5 @@
 ---
+type: docs
 title: "ADR-0003: Observability Stack Architecture"
 linkTitle: "ADR-0003: Observability Stack"
 weight: 3

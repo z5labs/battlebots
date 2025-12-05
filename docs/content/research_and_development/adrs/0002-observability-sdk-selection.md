@@ -1,4 +1,5 @@
 ---
+type: docs
 title: "ADR-0002: Observability SDK Selection"
 linkTitle: "ADR-0002: Observability SDK"
 weight: 2
