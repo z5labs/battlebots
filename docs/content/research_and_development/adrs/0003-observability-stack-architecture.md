@@ -3,7 +3,7 @@ title: "ADR-0003: Observability Stack Architecture"
 linkTitle: "ADR-0003: Observability Stack"
 weight: 3
 date: 2025-12-05
-status: "proposed"
+status: "accepted"
 category: "strategic"
 deciders: []
 consulted: []
@@ -59,22 +59,32 @@ Which combination of ingestion, backend, and visualization components should we 
 
 ## Decision Outcome
 
-Chosen option: **[To be determined after evaluation]**
+Chosen option: **Open-Source Observability Stack with Grafana Ecosystem**
 
-Proposed evaluation approach:
-1. Deploy all options in a test environment
-2. Generate representative load for Battle Bots scenarios
-3. Compare resource usage, query performance, and operational complexity
-4. Select optimal combination based on Decision Drivers
+* **Ingestion**: OpenTelemetry Collector (Option I1)
+* **Visualization**: Grafana (Option V1)
+* **Logs**: Loki (Option L2)
+* **Traces**: Tempo (Option T1)
+* **Metrics**: Mimir (Option M2)
+
+This combination provides a fully open-source, vendor-neutral observability stack that leverages the Grafana ecosystem for seamless integration across all three signals. The stack prioritizes cost-effectiveness (object storage for all backends), operational simplicity (unified Grafana Labs components), and maintains flexibility to swap individual components as needs evolve.
 
 ### Consequences
 
-* Good, because selecting open-source components avoids vendor lock-in
-* Good, because we maintain flexibility to swap individual components
-* Good, because OpenTelemetry SDK allows changing backends without re-instrumentation
-* Bad, because managing multiple separate backends increases operational complexity
-* Bad, because storage requirements will scale with system usage
-* Bad, because commercial visualization solutions introduce ongoing costs
+* Good, because all components are open-source, avoiding vendor lock-in and licensing costs
+* Good, because Grafana ecosystem provides unified, seamless integration across all signals
+* Good, because Tempo, Loki, and Mimir all use object storage, minimizing infrastructure costs
+* Good, because OpenTelemetry Collector decouples applications from backend systems
+* Good, because we maintain flexibility to swap individual components independently
+* Good, because resource efficiency is optimized (Loki and Tempo avoid expensive indexing)
+* Good, because the stack aligns with the project's open-source philosophy
+* Good, because PromQL, LogQL, and TraceQL provide consistent query language patterns
+* Neutral, because we need to self-host and manage all components
+* Neutral, because Grafana requires learning three query languages (PromQL, LogQL, TraceQL)
+* Bad, because operational overhead is higher than managed commercial solutions
+* Bad, because Mimir is more complex to deploy than single-instance Prometheus
+* Bad, because Loki requires careful label design to avoid high cardinality issues
+* Bad, because we lack some enterprise features (advanced RBAC, managed services)
 
 ### Confirmation
 
@@ -332,59 +342,64 @@ Direct export means OpenTelemetry SDK sends telemetry directly to backend system
 
 ### Architecture Overview
 
-The observability stack follows this general architecture:
+The selected observability stack architecture:
 
 ```
 [Battle Bots Services] 
   → [OpenTelemetry SDKs]
-    → [Ingestion: OTel Collector OR Direct Export]
-      → [Traces Backend: Tempo/Jaeger/Zipkin]
-      → [Metrics Backend: Prometheus/Mimir]
-      → [Logs Backend: OpenSearch/Loki]
-        → [Visualization: Grafana/Datadog/Dynatrace/New Relic]
+    → [OpenTelemetry Collector]
+      → [Tempo (Traces)]
+      → [Mimir (Metrics)]
+      → [Loki (Logs)]
+        → [Grafana (Visualization)]
 ```
 
-Or with commercial visualization platforms that provide their own backends:
-
-```
-[Battle Bots Services]
-  → [OpenTelemetry SDKs]
-    → [Ingestion: OTel Collector OR Direct Export]
-      → [Commercial Platform: Datadog/Dynatrace/New Relic]
-        (handles storage + visualization)
-```
+All three backends (Tempo, Mimir, Loki) use object storage (S3, GCS, or local disk) for cost-effective, scalable storage. Grafana provides the unified visualization layer with native support for all three data sources.
 
 ### Implementation Considerations
 
-* **Vendor Lock-in**: Commercial visualization platforms (Datadog, Dynatrace, New Relic) provide convenience but create lock-in, while open-source options (Grafana + backends) maintain flexibility
-* **Cost Model**: Commercial platforms have ongoing per-host/per-GB costs; open-source has infrastructure costs but no licensing fees
-* **Operational Trade-off**: Commercial platforms reduce operational overhead; open-source requires managing multiple components
-* **OpenTelemetry Collector**: Strongly recommended for flexibility and decoupling, even with direct export capability
-* **Starting Point**: Consider starting with lightweight open-source options (OTel Collector → Tempo + Prometheus + Loki → Grafana) and evaluating commercial platforms if needed
-* **Hybrid Approach**: Possible to use OTel Collector to send data to both open-source backends and commercial platforms simultaneously
-* Plan for data retention policies (e.g., 7 days high-resolution, 30 days aggregated)
-* Evaluate resource usage in POC environment before production deployment
+* **OpenTelemetry Collector Configuration**: Deploy as a sidecar or gateway to receive OTLP data and export to Tempo, Mimir, and Loki
+* **Object Storage**: Configure S3-compatible object storage (or local disk for development) for all three backends
+* **Label Design**: Carefully design log labels for Loki to balance query performance and cardinality
+* **Mimir vs Prometheus**: Start with Mimir for long-term storage capabilities, though Prometheus could be used initially if simpler deployment is preferred
+* **Data Retention**: Configure retention policies per signal type (e.g., traces: 7 days, metrics: 30 days with downsampling, logs: 14 days)
+* **Deployment Order**: Deploy in order: object storage → Tempo + Mimir + Loki → OTel Collector → Grafana → configure data sources
+* **Grafana Data Sources**: Configure three data sources in Grafana (Tempo, Mimir/Prometheus, Loki) for unified querying
+* **Correlation**: Leverage trace IDs in logs and metrics to enable correlation across all three signals in Grafana
+* **Resource Planning**: Monitor resource usage in POC environment to right-size deployments for production
+* **Migration Path**: The OpenTelemetry Collector allows future migration to alternative backends without changing application instrumentation
 
-### Recommended Evaluation Criteria
+### Rationale for Selection
 
-For each component combination, measure:
-1. **Total Cost of Ownership**: Infrastructure costs + licensing fees + operational overhead
-2. **Resource Usage**: CPU, memory, disk I/O during typical load
-3. **Query Performance**: P50, P95, P99 latency for common queries
-4. **Storage Efficiency**: Compression ratios, storage costs over 30 days
-5. **Operational Complexity**: Deployment steps, configuration complexity, upgrade process, required expertise
-6. **Feature Completeness**: Support for required query patterns and use cases
-7. **Vendor Lock-in Risk**: Ease of migrating to alternative solutions
+This specific combination was selected based on the following factors:
 
-### Questions to Resolve
+1. **Unified Ecosystem**: Tempo, Loki, and Mimir are all Grafana Labs projects, ensuring consistent design patterns and seamless integration
+2. **Cost Optimization**: All three backends use object storage, significantly reducing storage costs compared to indexed solutions
+3. **Operational Simplicity**: Managing components from the same ecosystem reduces operational complexity versus mixing vendors
+4. **Vendor Neutrality**: All components are open-source, avoiding commercial lock-in while maintaining professional quality
+5. **Scalability**: Each component scales horizontally and is designed for high-volume production use
+6. **Query Languages**: PromQL (Mimir), LogQL (Loki), and TraceQL (Tempo) share similar syntax patterns, reducing learning curve
+7. **OpenTelemetry Native**: All components have native OpenTelemetry support via OTLP protocol
+8. **Resource Efficiency**: Loki and Tempo avoid expensive full-text indexing, keeping resource usage low
+9. **Project Alignment**: Open-source approach aligns with Battle Bots project philosophy
+10. **Migration Flexibility**: OpenTelemetry Collector allows swapping backends without re-instrumenting applications
 
-* What is the expected volume for each signal type (traces/sec, metrics/sec, log lines/sec)?
-* What are the retention requirements for each signal?
-* Is long-term storage (> 30 days) required for any signal?
-* What is the total budget for observability (infrastructure + licensing)?
-* Do we need multi-tenancy support for multiple battle arenas?
-* What are the specific query patterns needed for debugging?
-* Should we prioritize operational simplicity or maintain vendor neutrality?
-* Is there budget for commercial observability platforms?
-* What level of operational expertise is available for managing open-source components?
-* Are there specific compliance or data sovereignty requirements?
+### Next Steps
+
+1. **POC Deployment**: Deploy the full stack (OTel Collector + Tempo + Mimir + Loki + Grafana) in development environment
+2. **Instrumentation**: Instrument Battle Bots services with OpenTelemetry SDK (per ADR-0002) and verify all three signals are collected
+3. **Object Storage Setup**: Configure S3-compatible storage or local disk for backend storage
+4. **Grafana Dashboards**: Create initial dashboards for key metrics, traces, and logs
+5. **Label Strategy**: Define and document label naming conventions for Loki and Mimir
+6. **Retention Policies**: Configure appropriate retention for each signal type based on storage constraints
+7. **Performance Testing**: Generate load and measure resource usage, query performance, and storage costs
+8. **Documentation**: Document deployment procedures, configuration, and operational runbooks
+9. **Production Readiness**: Evaluate high availability, backup, and disaster recovery requirements before production deployment
+
+### Open Questions
+
+* What object storage provider should be used (S3, GCS, MinIO, local disk)?
+* Should Mimir be deployed immediately, or start with Prometheus and migrate later?
+* What are the specific retention requirements for each signal type?
+* Do we need multi-tenancy support for isolating different battle arenas?
+* What high availability requirements exist for the observability stack?
