@@ -3,7 +3,7 @@ title: "ADR-0002: Observability SDK Selection"
 linkTitle: "ADR-0002: Observability SDK"
 weight: 2
 date: 2025-12-05
-status: "proposed"
+status: "accepted"
 category: "strategic"
 deciders: []
 consulted: []
@@ -38,19 +38,27 @@ Which observability SDK should we adopt for instrumenting the Battle Bots platfo
 
 ## Decision Outcome
 
-<!-- Chosen option: "{option}", because {justification}. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below). -->
+Chosen option: **OpenTelemetry**, because it is an open standard that prevents vendor lock-in and aligns with the open-source nature of the Battle Bots project. As a CNCF-graduated project, it provides long-term sustainability and broad industry adoption while maintaining flexibility to switch observability backends without re-instrumentation.
 
-<!-- This is an optional element. Feel free to remove. -->
 ### Consequences
 
-* Good, because {positive consequence, e.g., improvement of one or more desired qualities, …}
-* Bad, because {negative consequence, e.g., compromising one or more desired qualities, …}
-* …
+* Good, because we maintain complete vendor neutrality and can switch backends (Prometheus, Jaeger, Loki, etc.) without changing instrumentation code
+* Good, because we adopt an industry-standard approach to observability that is widely supported and documented
+* Good, because the open-source SDK has no licensing costs and aligns with project philosophy
+* Good, because semantic conventions will ensure consistent telemetry across all Battle Bots components
+* Good, because comprehensive language support enables bot developers to use OpenTelemetry in their preferred languages
+* Bad, because we need to deploy and manage separate backend infrastructure for metrics, traces, and logs
+* Bad, because initial setup requires more configuration compared to all-in-one commercial solutions
+* Bad, because debugging telemetry pipelines may require deeper understanding of the OpenTelemetry architecture
 
-<!-- This is an optional element. Feel free to remove. -->
 ### Confirmation
 
-<!-- How will we know if this decision is successful? What signals will we monitor? -->
+This decision will be considered successful when:
+* Game server successfully exports metrics, traces, and logs via OpenTelemetry SDK
+* Observability backends (selected via future ADRs) receive and display telemetry data correctly
+* Developer experience for adding custom instrumentation is straightforward
+* Performance overhead of instrumentation is acceptable (< 5% CPU/memory impact)
+* We can successfully switch between different backend providers without code changes
 
 ## Pros and Cons of the Options
 
