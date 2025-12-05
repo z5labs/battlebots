@@ -69,6 +69,47 @@ Chosen option: **Open-Source Observability Stack with Grafana Ecosystem**
 
 This combination provides a fully open-source, vendor-neutral observability stack that leverages the Grafana ecosystem for seamless integration across all three signals. The stack prioritizes cost-effectiveness (object storage for all backends), operational simplicity (unified Grafana Labs components), and maintains flexibility to swap individual components as needs evolve.
 
+### Architecture Diagram
+
+```mermaid
+architecture-beta
+    group applications(cloud)[Battle Bots Applications]
+
+    service gameserver(server)[Game Server] in applications
+    service botruntime(server)[Bot Runtime] in applications
+    service battleviz(server)[Battle Visualization] in applications
+
+    group ingestion(cloud)[Ingestion Layer]
+    service otelcollector(server)[OpenTelemetry Collector] in ingestion
+
+    group storage(database)[Storage Backends]
+    service tempo(database)[Tempo] in storage
+    service mimir(database)[Mimir] in storage
+    service loki(database)[Loki] in storage
+
+    group objectstorage(disk)[Object Storage]
+    service s3(disk)[S3-Compatible Storage] in objectstorage
+
+    group visualization(internet)[Visualization Layer]
+    service grafana(internet)[Grafana] in visualization
+
+    gameserver:R --> L:otelcollector
+    botruntime:R --> L:otelcollector
+    battleviz:R --> L:otelcollector
+
+    otelcollector:R --> L:tempo
+    otelcollector:R --> L:mimir
+    otelcollector:R --> L:loki
+
+    tempo:B --> T:s3
+    mimir:B --> T:s3
+    loki:B --> T:s3
+
+    grafana:L --> R:tempo
+    grafana:L --> R:mimir
+    grafana:L --> R:loki
+```
+
 ### Consequences
 
 * Good, because all components are open-source, avoiding vendor lock-in and licensing costs
