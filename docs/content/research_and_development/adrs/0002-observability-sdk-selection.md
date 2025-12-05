@@ -1,7 +1,8 @@
 ---
 type: docs
-title: "ADR-0002: Observability SDK Selection"
-linkTitle: "ADR-0002: Observability SDK"
+title: "[0002] Observability SDK Selection"
+description: >
+    Select OpenTelemetry as the observability SDK for instrumenting metrics, traces, and logs across the Battle Bots platform.
 weight: 2
 date: 2025-12-05
 status: "accepted"
@@ -10,8 +11,6 @@ deciders: []
 consulted: []
 informed: []
 ---
-
-# Observability SDK Selection
 
 ## Context and Problem Statement
 

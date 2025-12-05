@@ -1,7 +1,8 @@
 ---
 type: docs
-title: "ADR-0003: Observability Stack Architecture"
-linkTitle: "ADR-0003: Observability Stack"
+title: "[0003] Observability Stack Architecture"
+description: >
+    Deploy an OpenTelemetry Collector with Tempo for traces, Prometheus for metrics, and Loki for logs, unified by Grafana for visualization.
 weight: 3
 date: 2025-12-05
 status: "accepted"
@@ -10,8 +11,6 @@ deciders: []
 consulted: []
 informed: []
 ---
-
-# Observability Stack Architecture
 
 ## Context and Problem Statement
 
