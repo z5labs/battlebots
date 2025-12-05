@@ -62,6 +62,37 @@ Includes detailed analysis of:
 - OTLP compatibility and OTel Collector integration
 - Label strategy and performance considerations
 
+### [Metrics Storage](metrics/)
+
+Analysis of metrics storage backends for the BattleBots observability stack, focusing on systems that integrate with the OpenTelemetry Collector.
+
+Metrics storage is essential for:
+- Real-time monitoring of battle events and game state
+- Historical analysis of bot performance and system behavior
+- Capacity planning and infrastructure optimization
+- Alerting on critical system conditions
+- Long-term trend analysis and reporting
+
+#### [Grafana Mimir](metrics/mimir/)
+
+Research on Grafana Mimir, a horizontally scalable, highly available, multi-tenant metrics storage system for long-term Prometheus data retention.
+
+Mimir transforms Prometheus from a single-server monitoring system into a distributed platform capable of handling over 1 billion active time series, providing:
+- Native OTLP support for direct integration with OpenTelemetry Collector
+- Horizontal scalability through independent scaling of write path, read path, and backend components
+- Long-term storage using object storage backends (S3, GCS, MinIO) with months to years of retention
+- Built-in multi-tenancy with per-tenant resource limits and isolation
+- Full Prometheus (PromQL) compatibility for queries, dashboards, and alerts
+- High availability through replication and distributed architecture
+
+Includes detailed analysis of:
+- Architecture components (distributor, ingester, querier, store-gateway, compactor) and deployment modes
+- Native OTLP ingestion endpoints and OpenTelemetry Collector integration (otlphttp and prometheusremotewrite exporters)
+- Object storage backends, blocks storage architecture, and retention policies
+- Multi-tenancy setup, cardinality management, and label strategy
+- Comparison with Prometheus, Thanos, and Cortex
+- Production deployment patterns, resource requirements, and operational best practices
+
 ## Future ADR Dependencies
 
 This analysis will inform:
