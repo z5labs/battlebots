@@ -253,9 +253,9 @@ From User Journey [0001] Proof of Concept - 1v1 Battle:
 
 ### Further Reading
 
-- [gRPC Protocol Analysis](../analysis/protocols/grpc/) - Detailed gRPC evaluation
-- [HTTP-based Protocols Analysis](../analysis/protocols/http/) - WebSocket and SSE analysis
-- [Custom Protocols Analysis](../analysis/protocols/custom/) - TCP/UDP evaluation
+- [gRPC Protocol Analysis]({{< relref "../analysis/protocols/grpc/" >}}) - Detailed gRPC evaluation
+- [HTTP-based Protocols Analysis]({{< relref "../analysis/protocols/http/" >}}) - WebSocket and SSE analysis
+- [Custom Protocols Analysis]({{< relref "../analysis/protocols/custom/" >}}) - TCP/UDP evaluation
 - [gRPC Official Documentation](https://grpc.io/docs/)
 - [Protocol Buffers Language Guide](https://protobuf.dev/programming-guides/proto3/)
 - [OpenTelemetry gRPC Instrumentation](https://opentelemetry.io/docs/instrumentation/)
