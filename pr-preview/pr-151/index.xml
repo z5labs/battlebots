@@ -1,28 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Battle Bots on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/</link><description>Recent content in Battle Bots on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 05 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/index.xml" rel="self" type="application/rss+xml"/><item><title>gRPC Protocol Analysis</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/grpc/grpc-analysis/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/grpc/grpc-analysis/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
-&lt;p&gt;gRPC is a modern, open-source, high-performance Remote Procedure Call (RPC) framework developed by Google. It uses HTTP/2 for transport, Protocol Buffers as the interface description language, and provides features like authentication, bidirectional streaming, and flow control. This analysis evaluates gRPC&amp;rsquo;s suitability for the Battle Bots bot-to-server communication interface.&lt;/p&gt;
-&lt;h2 id="performance-characteristics"&gt;Performance Characteristics&lt;/h2&gt;
-&lt;h3 id="latency"&gt;Latency&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Unary RPC&lt;/strong&gt;: Typically 1-2ms for local networks, comparable to optimized REST&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Streaming RPC&lt;/strong&gt;: Near-zero latency for subsequent messages after connection establishment&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;HTTP/2 multiplexing&lt;/strong&gt;: Multiple streams over single TCP connection reduces overhead&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Binary protocol&lt;/strong&gt;: Faster parsing than JSON/XML text protocols&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="throughput"&gt;Throughput&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Bidirectional streaming&lt;/strong&gt;: Can handle thousands of messages per second&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Flow control&lt;/strong&gt;: Built-in backpressure prevents overwhelming slower clients&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Compression&lt;/strong&gt;: gzip compression available for larger payloads&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Connection reuse&lt;/strong&gt;: HTTP/2 persistent connections reduce handshake overhead&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="resource-overhead"&gt;Resource Overhead&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Memory&lt;/strong&gt;: Protocol Buffer deserialization is memory-efficient&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;CPU&lt;/strong&gt;: Binary encoding/decoding faster than JSON parsing&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Network&lt;/strong&gt;: Compact binary format reduces bandwidth usage by 30-50% vs JSON&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="benchmarks"&gt;Benchmarks&lt;/h3&gt;
-&lt;p&gt;Industry benchmarks show gRPC typically delivers:&lt;/p&gt;</description></item><item><title>[0001] Proof of Concept - 1v1 Battle</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/user-journeys/0001-poc/</link><pubDate>Wed, 03 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/user-journeys/0001-poc/</guid><description>&lt;h2 id="idea"&gt;Idea&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Battle Bots on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/</link><description>Recent content in Battle Bots on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 05 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/index.xml" rel="self" type="application/rss+xml"/><item><title>[0001] Proof of Concept - 1v1 Battle</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/user-journeys/0001-poc/</link><pubDate>Wed, 03 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/user-journeys/0001-poc/</guid><description>&lt;h2 id="idea"&gt;Idea&lt;/h2&gt;
 &lt;p&gt;This proof of concept demonstrates containerized bots battling each other in a 1v1 match within a 2-dimensional space. To evaluate the optimal architecture for the final BattleBots platform, both a client/server implementation and a peer-to-peer implementation will be completed and compared.&lt;/p&gt;
 &lt;h2 id="requirements"&gt;Requirements&lt;/h2&gt;
 &lt;h3 id="clientserver-architecture"&gt;Client/Server Architecture&lt;/h3&gt;
@@ -57,37 +33,9 @@ ADR Categories:
 &lt;li&gt;Sentry SDK&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id="decision-outcome"&gt;Decision Outcome&lt;/h2&gt;
-&lt;p&gt;Chosen option: &lt;strong&gt;OpenTelemetry&lt;/strong&gt;, because it is an open standard that prevents vendor lock-in and aligns with the open-source nature of the Battle Bots project. As a CNCF-graduated project, it provides long-term sustainability and broad industry adoption while maintaining flexibility to switch observability backends without re-instrumentation.&lt;/p&gt;</description></item><item><title>HTTP-based Protocols Analysis</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/http-analysis/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/http-analysis/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
-&lt;p&gt;HTTP-based protocols represent the most widely-adopted communication patterns on the web. This analysis evaluates three approaches for Battle Bots bot-to-server communication:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;HTTP/REST&lt;/strong&gt; - Request/response pattern with polling or long-polling&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;WebSockets&lt;/strong&gt; - Full-duplex bidirectional communication over TCP&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Server-Sent Events (SSE)&lt;/strong&gt; - Unidirectional server-to-client streaming&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Each approach offers different trade-offs in complexity, performance, and developer familiarity.&lt;/p&gt;
-&lt;h2 id="httprest-analysis"&gt;HTTP/REST Analysis&lt;/h2&gt;
-&lt;h3 id="architecture-pattern"&gt;Architecture Pattern&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Traditional Request/Response:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;Bot → POST /battles/{id}/actions → Server
-Bot ← 200 OK {result} ← Server
-
-Bot → GET /battles/{id}/state → Server
-Bot ← 200 OK {gameState} ← Server
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;RESTful API Design:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>[0003] Observability Stack Architecture</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0003-observability-stack-architecture/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0003-observability-stack-architecture/</guid><description>&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;Chosen option: &lt;strong&gt;OpenTelemetry&lt;/strong&gt;, because it is an open standard that prevents vendor lock-in and aligns with the open-source nature of the Battle Bots project. As a CNCF-graduated project, it provides long-term sustainability and broad industry adoption while maintaining flexibility to switch observability backends without re-instrumentation.&lt;/p&gt;</description></item><item><title>[0003] Observability Stack Architecture</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0003-observability-stack-architecture/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0003-observability-stack-architecture/</guid><description>&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
 &lt;p&gt;Following the decision to adopt OpenTelemetry as our observability SDK (ADR-0002), we need to select the backend components for our observability stack. The stack must handle three distinct observability signals: traces, metrics, and logs. We need to decide on the ingestion mechanism for telemetry data, the storage backends for each signal type, and the visualization layer for unified observability.&lt;/p&gt;
-&lt;p&gt;Which combination of ingestion, backend, and visualization components should we deploy for the Battle Bots observability stack?&lt;/p&gt;</description></item><item><title>Custom TCP/UDP Protocol Analysis</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/tcp-udp-analysis/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/tcp-udp-analysis/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
-&lt;p&gt;Custom TCP and UDP protocols offer maximum control and potential performance optimization for game networking. This analysis evaluates whether the complexity and development cost of custom protocols is justified for Battle Bots, drawing on lessons from game industry networking.&lt;/p&gt;
-&lt;h2 id="tcp-custom-protocol-analysis"&gt;TCP Custom Protocol Analysis&lt;/h2&gt;
-&lt;h3 id="protocol-design"&gt;Protocol Design&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Message Format Example:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;[4 bytes: magic number 0x42544C00]
-[2 bytes: protocol version]
-[2 bytes: message type]
-[4 bytes: message length]
-[4 bytes: sequence number]
-[N bytes: payload (JSON, MessagePack, Protobuf)]
-[4 bytes: CRC32 checksum]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Connection-Oriented Characteristics:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>[0004] Bot to Battle Server Communication Protocol</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0004-bot-battle-server-interface/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0004-bot-battle-server-interface/</guid><description>&lt;!--
+&lt;p&gt;Which combination of ingestion, backend, and visualization components should we deploy for the Battle Bots observability stack?&lt;/p&gt;</description></item><item><title>[0004] Bot to Battle Server Communication Protocol</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0004-bot-battle-server-interface/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/adrs/0004-bot-battle-server-interface/</guid><description>&lt;!--
 ADR Categories:
 - strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
 - user-journey: Solutions for specific user journey problems (feature implementation approaches)

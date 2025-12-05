@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>HTTP-based Protocols on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/</link><description>Recent content in HTTP-based Protocols on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 05 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/index.xml" rel="self" type="application/rss+xml"/><item><title>HTTP-based Protocols Analysis</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/http-analysis/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/http-analysis/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
-&lt;p&gt;HTTP-based protocols represent the most widely-adopted communication patterns on the web. This analysis evaluates three approaches for Battle Bots bot-to-server communication:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;HTTP/REST&lt;/strong&gt; - Request/response pattern with polling or long-polling&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;WebSockets&lt;/strong&gt; - Full-duplex bidirectional communication over TCP&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Server-Sent Events (SSE)&lt;/strong&gt; - Unidirectional server-to-client streaming&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Each approach offers different trade-offs in complexity, performance, and developer familiarity.&lt;/p&gt;
-&lt;h2 id="httprest-analysis"&gt;HTTP/REST Analysis&lt;/h2&gt;
-&lt;h3 id="architecture-pattern"&gt;Architecture Pattern&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Traditional Request/Response:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;Bot → POST /battles/{id}/actions → Server
-Bot ← 200 OK {result} ← Server
-
-Bot → GET /battles/{id}/state → Server
-Bot ← 200 OK {gameState} ← Server
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;RESTful API Design:&lt;/strong&gt;&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>HTTP-based Protocols Analysis on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/</link><description>Recent content in HTTP-based Protocols Analysis on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate/><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/http/index.xml" rel="self" type="application/rss+xml"/></channel></rss>

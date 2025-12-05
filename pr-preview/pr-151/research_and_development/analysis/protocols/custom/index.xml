@@ -1,13 +1,1 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Custom TCP/UDP on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/</link><description>Recent content in Custom TCP/UDP on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 05 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/index.xml" rel="self" type="application/rss+xml"/><item><title>Custom TCP/UDP Protocol Analysis</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/tcp-udp-analysis/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/tcp-udp-analysis/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
-&lt;p&gt;Custom TCP and UDP protocols offer maximum control and potential performance optimization for game networking. This analysis evaluates whether the complexity and development cost of custom protocols is justified for Battle Bots, drawing on lessons from game industry networking.&lt;/p&gt;
-&lt;h2 id="tcp-custom-protocol-analysis"&gt;TCP Custom Protocol Analysis&lt;/h2&gt;
-&lt;h3 id="protocol-design"&gt;Protocol Design&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Message Format Example:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex="0"&gt;&lt;code&gt;[4 bytes: magic number 0x42544C00]
-[2 bytes: protocol version]
-[2 bytes: message type]
-[4 bytes: message length]
-[4 bytes: sequence number]
-[N bytes: payload (JSON, MessagePack, Protobuf)]
-[4 bytes: CRC32 checksum]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Connection-Oriented Characteristics:&lt;/strong&gt;&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Custom TCP/UDP Protocol Analysis on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/</link><description>Recent content in Custom TCP/UDP Protocol Analysis on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate/><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/custom/index.xml" rel="self" type="application/rss+xml"/></channel></rss>
