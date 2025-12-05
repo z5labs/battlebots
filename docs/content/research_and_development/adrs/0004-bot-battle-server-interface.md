@@ -103,7 +103,7 @@ Implementation compliance will be verified through:
 
 **Description:** HTTP/2-based RPC framework with Protocol Buffers for serialization and bidirectional streaming for real-time communication.
 
-**Detailed Analysis:** See [gRPC Protocol Analysis](/battlebots/research_and_development/analysis/protocols/grpc/grpc-analysis/)
+**Detailed Analysis:** See [gRPC Protocol Analysis](/battlebots/research_and_development/analysis/protocols/grpc/)
 
 **Pros:**
 * ✅ **Native OpenTelemetry support** - Automatic trace propagation, span creation, and metrics collection integrate seamlessly with ADR-0002 observability stack
@@ -131,7 +131,7 @@ Implementation compliance will be verified through:
 
 **Description:** Full-duplex bidirectional communication over persistent TCP connection with JSON or binary serialization.
 
-**Detailed Analysis:** See [HTTP-based Protocols Analysis](/battlebots/research_and_development/analysis/protocols/http/http-analysis/)
+**Detailed Analysis:** See [HTTP-based Protocols Analysis](/battlebots/research_and_development/analysis/protocols/http/)
 
 **Pros:**
 * ✅ **True bidirectional** - Full-duplex communication without polling
@@ -157,7 +157,7 @@ Implementation compliance will be verified through:
 
 **Description:** Hybrid approach using HTTP POST for bot actions and SSE for server-to-bot event streaming.
 
-**Detailed Analysis:** See [HTTP-based Protocols Analysis](/battlebots/research_and_development/analysis/protocols/http/http-analysis/)
+**Detailed Analysis:** See [HTTP-based Protocols Analysis](/battlebots/research_and_development/analysis/protocols/http/)
 
 **Pros:**
 * ✅ **Automatic reconnection** - SSE handles reconnect with Last-Event-ID resume
@@ -182,7 +182,7 @@ Implementation compliance will be verified through:
 
 **Description:** Application-specific binary protocol over raw TCP sockets with custom message framing.
 
-**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis](/battlebots/research_and_development/analysis/protocols/custom/tcp-udp-analysis/)
+**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis](/battlebots/research_and_development/analysis/protocols/custom/)
 
 **Pros:**
 * ✅ **Maximum control** - Full control over wire format and protocol behavior
@@ -206,7 +206,7 @@ Implementation compliance will be verified through:
 
 **Description:** Connectionless packet-based protocol with custom reliability layer for critical messages.
 
-**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis](/battlebots/research_and_development/analysis/protocols/custom/tcp-udp-analysis/)
+**Detailed Analysis:** See [Custom TCP/UDP Protocol Analysis](/battlebots/research_and_development/analysis/protocols/custom/)
 
 **Pros:**
 * ✅ **Lowest latency** - 2-10ms potential vs 5-20ms for TCP
@@ -227,215 +227,6 @@ Implementation compliance will be verified through:
 
 **Verdict:** ❌ **Rejected for POC** - Re-evaluate only if client/server POC demonstrates that TCP-based protocols cannot meet latency requirements (evidence currently absent).
 
-## Interface Specification
-
-### Protocol Buffer Schema
-
-**Core Message Types:**
-
-```protobuf
-syntax = "proto3";
-
-package battlebots.v1;
-
-// Battle service defining bot-to-server interaction
-service Battle {
-  // Bidirectional streaming for real-time battle
-  rpc Stream(stream BotMessage) returns (stream ServerMessage);
-  
-  // Unary RPC for initial connection handshake
-  rpc Connect(ConnectRequest) returns (ConnectResponse);
-}
-
-// Bot → Server messages
-message BotMessage {
-  string bot_id = 1;
-  int64 timestamp = 2;
-  
-  oneof payload {
-    MoveAction move = 10;
-    AttackAction attack = 11;
-    DefendAction defend = 12;
-    Heartbeat heartbeat = 13;
-  }
-}
-
-message MoveAction {
-  Position target = 1;
-}
-
-message AttackAction {
-  string target_bot_id = 1;
-  int32 weapon_id = 2;
-}
-
-message DefendAction {
-  bool active = 1;
-}
-
-message Heartbeat {
-  int64 client_tick = 1;
-}
-
-// Server → Bot messages
-message ServerMessage {
-  int64 server_tick = 1;
-  
-  oneof payload {
-    GameState state = 10;
-    ActionResult result = 11;
-    BattleEvent event = 12;
-  }
-}
-
-message GameState {
-  repeated BotState bots = 1;
-  repeated Projectile projectiles = 2;
-  int32 tick = 3;
-}
-
-message BotState {
-  string bot_id = 1;
-  Position position = 2;
-  int32 health = 3;
-  int32 energy = 4;
-}
-
-message ActionResult {
-  bool success = 1;
-  string error = 2;
-}
-
-message BattleEvent {
-  enum Type {
-    BOT_DAMAGED = 0;
-    BOT_DESTROYED = 1;
-    BATTLE_ENDED = 2;
-  }
-  Type type = 1;
-  map<string, string> metadata = 2;
-}
-
-// Common types
-message Position {
-  float x = 1;
-  float y = 2;
-}
-
-message Projectile {
-  string id = 1;
-  Position position = 2;
-  Position velocity = 3;
-}
-
-message ConnectRequest {
-  string bot_id = 1;
-  string api_token = 2;
-}
-
-message ConnectResponse {
-  bool success = 1;
-  string session_id = 2;
-}
-```
-
-### Connection Lifecycle
-
-**Client/Server Mode:**
-
-1. **Connection**: Bot initiates gRPC connection to battle server
-   ```go
-   conn, err := grpc.Dial("battle-server:50051", grpc.WithInsecure())
-   client := battlebots.NewBattleClient(conn)
-   ```
-
-2. **Authentication**: Unary `Connect()` RPC with API token
-   ```go
-   resp, err := client.Connect(ctx, &ConnectRequest{
-       BotId: "bot-123",
-       ApiToken: "secret-token",
-   })
-   ```
-
-3. **Streaming**: Bidirectional `Stream()` RPC for battle duration
-   ```go
-   stream, err := client.Stream(ctx)
-   
-   // Send actions
-   go func() {
-       stream.Send(&BotMessage{Action: moveAction})
-   }()
-   
-   // Receive state
-   for {
-       msg, err := stream.Recv()
-       // Process game state
-   }
-   ```
-
-4. **Disconnection**: Close stream gracefully or handle abrupt disconnect
-
-**P2P Mode:**
-
-1. **Rendezvous**: Bots connect to coordination server to exchange endpoints
-2. **Server Setup**: Each bot runs gRPC server on known port
-   ```go
-   listener, _ := net.Listen("tcp", ":50051")
-   grpcServer := grpc.NewServer()
-   battlebots.RegisterBattleServer(grpcServer, &botServer{})
-   grpcServer.Serve(listener)
-   ```
-
-3. **Peer Connection**: Bots connect to each other as gRPC clients
-4. **Bidirectional Streaming**: Use `Stream()` RPC for bot-to-bot communication
-5. **Consensus**: Application-level consensus for game state (future ADR)
-
-### Error Handling
-
-**gRPC Status Codes:**
-- `OK` - Action succeeded
-- `INVALID_ARGUMENT` - Malformed bot action
-- `UNAUTHENTICATED` - Invalid API token
-- `RESOURCE_EXHAUSTED` - Rate limit exceeded
-- `UNAVAILABLE` - Server temporarily unavailable
-- `DEADLINE_EXCEEDED` - Action timeout
-
-**Client Retry Strategy:**
-- Exponential backoff: 100ms, 200ms, 400ms, 800ms, 1600ms
-- Max retries: 5
-- Reconnect on stream errors
-
-### Versioning Strategy
-
-**Protocol Buffers Backward Compatibility:**
-- Never change field numbers
-- Mark deprecated fields with `[deprecated = true]`
-- Add new fields with unique numbers
-- Use `reserved` for removed fields
-
-**Service Versioning:**
-- Package naming: `battlebots.v1`, `battlebots.v2`
-- Server supports multiple versions simultaneously
-- Clients specify version in package import
-
-**Example Evolution:**
-```protobuf
-// v1
-message BotMessage {
-  string bot_id = 1;
-  MoveAction move = 2;
-}
-
-// v2 - add new action type
-message BotMessage {
-  string bot_id = 1;
-  MoveAction move = 2;
-  TeleportAction teleport = 3; // New field
-}
-```
-
-Old clients continue working (ignore unknown fields), new clients use new features.
-
 ## More Information
 
 ### Related ADRs
@@ -453,42 +244,6 @@ From User Journey [0001] Proof of Concept - 1v1 Battle:
 - Observability signals capture
 - Real-time battle visualization
 
-### Implementation Guidance
-
-**Getting Started for Bot Developers:**
-
-1. Install protoc compiler and gRPC plugin for your language
-2. Clone battle bots repository with `.proto` definitions
-3. Generate client code: `protoc --go_out=. --go-grpc_out=. battle.proto`
-4. Implement bot logic using generated stubs
-5. Connect to battle server and participate in battles
-
-**Example Bot (Python):**
-```python
-import grpc
-from battlebots.v1 import battle_pb2, battle_pb2_grpc
-
-channel = grpc.insecure_channel('battle-server:50051')
-stub = battle_pb2_grpc.BattleStub(channel)
-
-# Connect
-response = stub.Connect(battle_pb2.ConnectRequest(
-    bot_id='my-bot',
-    api_token='secret'
-))
-
-# Stream battle
-stream = stub.Stream(iter([
-    battle_pb2.BotMessage(
-        bot_id='my-bot',
-        move=battle_pb2.MoveAction(target=battle_pb2.Position(x=10, y=20))
-    )
-]))
-
-for server_msg in stream:
-    print(f"Game state: {server_msg.state}")
-```
-
 ### Open Questions
 
 1. **Tick Rate**: What is the target game tick rate? (Informs whether gRPC performance is sufficient)
@@ -498,9 +253,9 @@ for server_msg in stream:
 
 ### Further Reading
 
-- [gRPC Protocol Analysis](../analysis/protocols/grpc/grpc-analysis.md) - Detailed gRPC evaluation
-- [HTTP-based Protocols Analysis](../analysis/protocols/http/http-analysis.md) - WebSocket and SSE analysis
-- [Custom Protocols Analysis](../analysis/protocols/custom/tcp-udp-analysis.md) - TCP/UDP evaluation
+- [gRPC Protocol Analysis](../analysis/protocols/grpc/) - Detailed gRPC evaluation
+- [HTTP-based Protocols Analysis](../analysis/protocols/http/) - WebSocket and SSE analysis
+- [Custom Protocols Analysis](../analysis/protocols/custom/) - TCP/UDP evaluation
 - [gRPC Official Documentation](https://grpc.io/docs/)
 - [Protocol Buffers Language Guide](https://protobuf.dev/programming-guides/proto3/)
 - [OpenTelemetry gRPC Instrumentation](https://opentelemetry.io/docs/instrumentation/)
