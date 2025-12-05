@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>gRPC on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/grpc/</link><description>Recent content in gRPC on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 05 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/grpc/index.xml" rel="self" type="application/rss+xml"/><item><title>gRPC Protocol Analysis</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/grpc/grpc-analysis/</link><pubDate>Fri, 05 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-151/research_and_development/analysis/protocols/grpc/grpc-analysis/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
+&lt;p&gt;gRPC is a modern, open-source, high-performance Remote Procedure Call (RPC) framework developed by Google. It uses HTTP/2 for transport, Protocol Buffers as the interface description language, and provides features like authentication, bidirectional streaming, and flow control. This analysis evaluates gRPC&amp;rsquo;s suitability for the Battle Bots bot-to-server communication interface.&lt;/p&gt;
+&lt;h2 id="performance-characteristics"&gt;Performance Characteristics&lt;/h2&gt;
+&lt;h3 id="latency"&gt;Latency&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Unary RPC&lt;/strong&gt;: Typically 1-2ms for local networks, comparable to optimized REST&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Streaming RPC&lt;/strong&gt;: Near-zero latency for subsequent messages after connection establishment&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;HTTP/2 multiplexing&lt;/strong&gt;: Multiple streams over single TCP connection reduces overhead&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Binary protocol&lt;/strong&gt;: Faster parsing than JSON/XML text protocols&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="throughput"&gt;Throughput&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Bidirectional streaming&lt;/strong&gt;: Can handle thousands of messages per second&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Flow control&lt;/strong&gt;: Built-in backpressure prevents overwhelming slower clients&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Compression&lt;/strong&gt;: gzip compression available for larger payloads&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Connection reuse&lt;/strong&gt;: HTTP/2 persistent connections reduce handshake overhead&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="resource-overhead"&gt;Resource Overhead&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Memory&lt;/strong&gt;: Protocol Buffer deserialization is memory-efficient&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;CPU&lt;/strong&gt;: Binary encoding/decoding faster than JSON parsing&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Network&lt;/strong&gt;: Compact binary format reduces bandwidth usage by 30-50% vs JSON&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="benchmarks"&gt;Benchmarks&lt;/h3&gt;
+&lt;p&gt;Industry benchmarks show gRPC typically delivers:&lt;/p&gt;</description></item></channel></rss>
