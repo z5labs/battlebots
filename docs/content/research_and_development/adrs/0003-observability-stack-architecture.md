@@ -73,41 +73,43 @@ This combination provides a fully open-source, vendor-neutral observability stac
 
 ```mermaid
 architecture-beta
-    group applications(cloud)[Battle Bots Applications]
+    service gameserver(server)[Game Server]
+    service botruntime(server)[Bot Runtime]
+    service battleviz(server)[Battle Visualization]
+    service otelcollector(server)[OpenTelemetry Collector]
+    service tempo(database)[Tempo]
+    service mimir(database)[Mimir]
+    service loki(database)[Loki]
+    service grafana(internet)[Grafana]
+    junction ingest
+    junction export
+    junction juncTempo1
+    junction juncTempo2
+    junction juncMimir
+    junction juncLoki1
+    junction juncLoki2
 
-    service gameserver(server)[Game Server] in applications
-    service botruntime(server)[Bot Runtime] in applications
-    service battleviz(server)[Battle Visualization] in applications
+    gameserver:B -- T:ingest
+    botruntime:R -- L:ingest
+    battleviz:T -- B:ingest
 
-    group ingestion(cloud)[Ingestion Layer]
-    service otelcollector(server)[OpenTelemetry Collector] in ingestion
+    ingest:R --> L:otelcollector
+    otelcollector:R -- L:export
 
-    group storage(database)[Storage Backends]
-    service tempo(database)[Tempo] in storage
-    service mimir(database)[Mimir] in storage
-    service loki(database)[Loki] in storage
+    export:T --> B:tempo
+    export:R --> L:mimir
+    export:B --> T:loki
 
-    group objectstorage(disk)[Object Storage]
-    service s3(disk)[S3-Compatible Storage] in objectstorage
+    tempo:R <-- L:juncTempo1
+    mimir:R <-- L:juncMimir
+    loki:R <-- L:juncLoki1
 
-    group visualization(internet)[Visualization Layer]
-    service grafana(internet)[Grafana] in visualization
+    juncTempo1:R -- L:juncTempo2
+    juncLoki1:R -- L:juncLoki2
 
-    gameserver:R --> L:otelcollector
-    botruntime:R --> L:otelcollector
-    battleviz:R --> L:otelcollector
-
-    otelcollector:R --> L:tempo
-    otelcollector:R --> L:mimir
-    otelcollector:R --> L:loki
-
-    tempo:B --> T:s3
-    mimir:B --> T:s3
-    loki:B --> T:s3
-
-    grafana:L --> R:tempo
-    grafana:L --> R:mimir
-    grafana:L --> R:loki
+    grafana:T -- B:juncTempo2
+    grafana:L -- R:juncMimir
+    grafana:B -- T:juncLoki2
 ```
 
 ### Consequences
