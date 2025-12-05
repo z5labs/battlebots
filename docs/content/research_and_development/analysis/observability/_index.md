@@ -93,6 +93,37 @@ Includes detailed analysis of:
 - Comparison with Prometheus, Thanos, and Cortex
 - Production deployment patterns, resource requirements, and operational best practices
 
+### [Traces Storage](traces/)
+
+Analysis of distributed tracing storage backends for the BattleBots observability stack, focusing on systems that integrate with the OpenTelemetry Collector.
+
+Traces storage is essential for:
+- Tracking end-to-end request flow through distributed game servers and services
+- Debugging performance bottlenecks and latency issues in battle workflows
+- Understanding service dependencies and call patterns
+- Root cause analysis when correlating with metrics and logs
+- Visualizing complete battle lifecycles from matchmaking to results
+
+#### [Grafana Tempo](traces/tempo/)
+
+Research on Grafana Tempo, a high-volume, minimal dependency distributed tracing backend designed for cost-efficiency and operational simplicity.
+
+Tempo uses an object storage-only architecture that eliminates complex database dependencies, providing:
+- Native OTLP support (gRPC port 4317, HTTP port 4318) for seamless OpenTelemetry Collector integration
+- Cost-effective storage using object storage backends (S3, GCS, MinIO) with 10x+ cost reduction compared to traditional tracing systems
+- TraceQL query language for powerful trace filtering and analysis
+- Horizontal scalability through microservices architecture
+- Seamless correlation with Grafana, Loki, and Mimir through exemplars and trace IDs for unified observability
+- Multi-protocol support (OTLP, Jaeger, Zipkin, OpenCensus) for flexible integration
+
+Includes detailed analysis of:
+- Architecture components (distributor, ingester, querier, compactor, metrics-generator) and deployment modes
+- Native OTLP ingestion endpoints and OpenTelemetry Collector integration (otlp and otlphttp exporters)
+- Object storage backends, blocks storage architecture, and sampling strategies
+- TraceQL query language and trace-to-metrics-to-logs correlation
+- Comparison with Jaeger, Zipkin, and Elastic APM
+- Production deployment patterns, resource requirements, and operational best practices
+
 ## Future ADR Dependencies
 
 This analysis will inform:
