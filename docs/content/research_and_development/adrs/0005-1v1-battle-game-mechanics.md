@@ -51,11 +51,37 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 
 ### Core Mechanics Framework
 
+**Bot Classes** (role-based archetypes):
+
+Each bot belongs to a class that determines:
+- **Base Characteristics**: Starting values for Health, Speed, Defense, and base Mass (chassis weight)
+- **Equipment Restrictions**: Whitelist of allowed weapons, armor, and modules for strategic differentiation
+
+*Initial Classes (2)*:
+- **Assault**: Fast striker class
+  - Base Health: 200 (TBD)
+  - Base Speed: 8 (TBD)
+  - Base Defense: 2 (TBD)
+  - Base Mass: 10 (TBD, light chassis)
+  - Equipment Access: Light weapons (Laser, Plasma), Light/Medium armor, Mobility modules (Boost Engine, Sensors)
+
+- **Support**: Durable tank class
+  - Base Health: 400 (TBD)
+  - Base Speed: 3 (TBD)
+  - Base Defense: 8 (TBD)
+  - Base Mass: 30 (TBD, heavy chassis)
+  - Equipment Access: Defensive weapons (EMP), Heavy armor, Utility modules (Shield Generator, Repair Kit)
+
+*Future Expansion*: Additional classes (Scout, Engineer, Balanced) can be added after initial validation.
+
 **Bot Characteristics** (4 core attributes):
-- **Health**: HP pool (100-500 TBD), determines survivability, bot destroyed at 0
-- **Speed**: Movement rate (1-10 units/tick TBD), affects positioning and tactical options
-- **Defense**: Damage reduction (1-10 TBD), mitigates incoming damage
-- **Mass**: Derived from equipped items, reduces effective Speed (equipment weight impacts mobility)
+- **Health**: HP pool, determines survivability, bot destroyed at 0 (class defines base value)
+- **Speed**: Movement rate in units/tick, affects positioning and tactical options (class defines base value)
+- **Defense**: Damage reduction, mitigates incoming damage (class defines base value)
+- **Mass**: Combined weight of chassis and equipment, reduces effective Speed
+  - Base Mass from class (chassis weight)
+  - Equipment Mass added on top
+  - Total Mass impacts mobility (heavier bots move slower)
 
 **Bot Actions** (organized by category):
 - **Movement**: Move (0 cooldown), Rotate (0 cooldown), Dash (3 tick cooldown) - all TBD
@@ -68,7 +94,8 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 - **Armor**: Provide Defense bonuses (Light, Medium, Heavy, Reactive), heavier armor increases Mass
 - **Modules**: Enable utility functions (Shield Generator, Boost Engine, Repair Kit, Sensors, Stealth), each contributes Mass
 - **Loadout**: 1 weapon slot, 1 armor slot, 2 module slots (all TBD)
-- **Mass Calculation**: Total Mass = Weapon Mass + Armor Mass + Module Mass (sum), affects effective Speed
+- **Class Restrictions**: Each class has a whitelist of allowed equipment (see Bot Classes above)
+- **Mass Calculation**: Total Mass = Class Base Mass + Weapon Mass + Armor Mass + Module Mass, affects effective Speed
 
 **Battle Space**:
 - 2D rectangular arena with Cartesian coordinates (100x100 units TBD)
@@ -91,26 +118,33 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 ### Consequences
 
 * Good, because the framework provides clear structure for bot developers to understand what their bots can do
-* Good, because equipment customization enables diverse strategies (DPS, Tank, Balanced, Utility builds)
+* Good, because class system provides immediate role identity (Assault vs Support) that's easy to understand
+* Good, because equipment restrictions per class create meaningful strategic differentiation between classes
+* Good, because base Mass per class (chassis weight) creates natural class identity beyond just stats
+* Good, because customization within class restrictions balances accessibility with strategic depth
 * Good, because real-time continuous gameplay integrates naturally with gRPC bidirectional streaming (ADR-0004)
 * Good, because moderate complexity is accessible while still supporting strategic depth
 * Good, because all game events (actions, damage, state changes) are observable for visualization and debugging
 * Good, because cooldown-only system simplifies bot logic (no resource pool management)
-* Good, because Mass as derived stat creates natural tradeoffs between equipment power and mobility
+* Good, because Mass calculation (chassis + equipment) creates natural tradeoffs between equipment power and mobility
+* Good, because starting with 2 classes allows validation before expanding to more classes
 * Neutral, because placeholder values require extensive playtesting and balance iteration before finalization
-* Neutral, because the 4-stat system with equipment-based Mass is more complex than arcade-style but simpler than deep simulation
+* Neutral, because the 4-stat system with class-based Mass is more complex than arcade-style but simpler than deep simulation
 * Neutral, because cooldown-only system may allow action spam in some scenarios (requires careful cooldown tuning)
+* Neutral, because class restrictions limit total build variety compared to unrestricted customization
 * Bad, because moderate complexity has a higher learning curve than simple arcade-style mechanics
-* Bad, because equipment dependencies create validation requirements in the protocol and game server
+* Bad, because equipment dependencies and class restrictions create additional validation requirements in the protocol and game server
+* Bad, because class balance becomes critical (one class being significantly stronger creates unfair matches)
 
 ### Confirmation
 
 The decision will be confirmed through:
-1. Implementation of game server mechanics following this framework
-2. Creation of bot SDK that exposes these actions and characteristics
-3. Playtesting with sample bots demonstrating different equipment loadouts
-4. Balance iteration and adjustment of TBD placeholder values
-5. Successful integration with the gRPC protocol defined in ADR-0004
+1. Implementation of game server mechanics following this framework including class system
+2. Creation of bot SDK that exposes class selection, actions, and characteristics
+3. Playtesting with sample bots of both Assault and Support classes demonstrating different equipment loadouts
+4. Class balance validation ensuring both classes are competitively viable
+5. Balance iteration and adjustment of TBD placeholder values (class stats, equipment values, cooldowns)
+6. Successful integration with the gRPC protocol defined in ADR-0004 including class selection
 
 ## Pros and Cons of the Options
 
@@ -176,11 +210,14 @@ Move + shoot only, minimal stats (health, speed), no equipment customization.
 All numeric values in this ADR are marked TBD (To Be Determined) and serve as placeholder values to establish the framework structure. These values will be refined through:
 
 1. Mathematical modeling and simulation
-2. Playtesting with real bot implementations
-3. Balance analysis and competitive meta observation
-4. Performance testing and optimization requirements
+2. Playtesting with real bot implementations (both Assault and Support classes)
+3. Class balance analysis ensuring competitive viability of both classes
+4. Balance analysis and competitive meta observation
+5. Performance testing and optimization requirements
 
 The framework separates **WHAT** mechanics exist (this ADR) from **HOW** they are implemented (future Game Runtime Architecture ADR). This allows independent iteration on game balance and implementation details.
+
+**Class System Notes**: Starting with 2 classes (Assault and Support) allows validation of the class framework before expanding. Additional classes can be added incrementally once the base system proves balanced and implementable.
 
 ### Design Principles
 
