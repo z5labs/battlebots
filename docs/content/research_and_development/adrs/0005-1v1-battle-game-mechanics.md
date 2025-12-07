@@ -42,7 +42,7 @@ Without well-defined game mechanics, we cannot:
 ## Considered Options
 
 * **Option 1: Simple Arcade-Style** - Move + shoot only, minimal stats (health, speed), no equipment customization
-* **Option 2: Moderate with Customization** - 3-5 core stats, equipment loadouts, varied action catalog
+* **Option 2: Moderate with Customization** - 4 core stats (with equipment-derived Mass), equipment loadouts, varied action catalog
 * **Option 3: Deep Simulation-Style** - 10+ stats, complex resource management, many abilities and systems
 
 ## Decision Outcome
@@ -51,24 +51,24 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 
 ### Core Mechanics Framework
 
-**Bot Characteristics** (5 core attributes):
+**Bot Characteristics** (4 core attributes):
 - **Health**: HP pool (100-500 TBD), determines survivability, bot destroyed at 0
-- **Energy**: Action fuel pool (100-1000 TBD), regenerates per tick, all actions consume energy
 - **Speed**: Movement rate (1-10 units/tick TBD), affects positioning and tactical options
-- **Power**: Damage multiplier (1-10 TBD), scales attack damage output
 - **Defense**: Damage reduction (1-10 TBD), mitigates incoming damage
+- **Mass**: Derived from equipped items, reduces effective Speed (equipment weight impacts mobility)
 
 **Bot Actions** (organized by category):
-- **Movement**: Move (5 energy, 0 cooldown), Rotate (2 energy), Dash (15 energy, 3 tick cooldown) - all TBD
-- **Combat**: BasicAttack (10 energy, 1 tick cooldown), LaserShot (25 energy, 2 tick cooldown, requires Laser), HeavyBlow (30 energy, 4 tick cooldown) - all TBD
-- **Defensive**: Block (10 energy, 2 tick cooldown), Evade (15 energy), Shield (20 energy, sustained) - all TBD
-- **Utility**: Scan (5 energy), Charge (energy regen boost) - all TBD
+- **Movement**: Move (0 cooldown), Rotate (0 cooldown), Dash (3 tick cooldown) - all TBD
+- **Combat**: BasicAttack (1 tick cooldown), LaserShot (2 tick cooldown, requires Laser), HeavyBlow (4 tick cooldown) - all TBD
+- **Defensive**: Block (2 tick cooldown), Evade (3 tick cooldown), Shield (5 tick cooldown, duration-based) - all TBD
+- **Utility**: Scan (2 tick cooldown), RepairKit (10 tick cooldown, requires Repair Kit module) - all TBD
 
 **Equipment System** (3 types in fixed slots):
-- **Weapons**: Enable combat actions (Laser, Missile, Plasma, EMP) and modify stats
-- **Armor**: Provide defense bonuses (Light, Medium, Heavy, Reactive) with speed tradeoffs
-- **Modules**: Enable utility functions (Shield Generator, Boost Engine, Repair Kit, Sensors, Stealth, Energy Cell)
+- **Weapons**: Enable combat actions (Laser, Missile, Plasma, EMP), each has Mass value affecting mobility
+- **Armor**: Provide Defense bonuses (Light, Medium, Heavy, Reactive), heavier armor increases Mass
+- **Modules**: Enable utility functions (Shield Generator, Boost Engine, Repair Kit, Sensors, Stealth), each contributes Mass
 - **Loadout**: 1 weapon slot, 1 armor slot, 2 module slots (all TBD)
+- **Mass Calculation**: Total Mass = Weapon Mass + Armor Mass + Module Mass (sum), affects effective Speed
 
 **Battle Space**:
 - 2D rectangular arena with Cartesian coordinates (100x100 units TBD)
@@ -82,11 +82,11 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 - **Draw**: Mutual destruction, equal health at timeout
 - **Time Limit**: 5 minutes (TBD)
 
-**Energy & Cooldown Systems**:
-- Actions cost energy from the bot's energy pool
-- Energy regenerates per game tick at a fixed rate (TBD)
+**Cooldown System**:
 - Actions have cooldown periods measured in game ticks to prevent spam
-- Resource management creates tactical decisions
+- Cooldowns create tactical timing decisions (when to use powerful abilities)
+- Basic actions (Move, Rotate) have no cooldown for fluid movement
+- Powerful actions (Dash, HeavyBlow, Shield) have longer cooldowns for balance
 
 ### Consequences
 
@@ -95,8 +95,11 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 * Good, because real-time continuous gameplay integrates naturally with gRPC bidirectional streaming (ADR-0004)
 * Good, because moderate complexity is accessible while still supporting strategic depth
 * Good, because all game events (actions, damage, state changes) are observable for visualization and debugging
+* Good, because cooldown-only system simplifies bot logic (no resource pool management)
+* Good, because Mass as derived stat creates natural tradeoffs between equipment power and mobility
 * Neutral, because placeholder values require extensive playtesting and balance iteration before finalization
-* Neutral, because the 5-stat system is more complex than arcade-style but simpler than deep simulation
+* Neutral, because the 4-stat system with equipment-based Mass is more complex than arcade-style but simpler than deep simulation
+* Neutral, because cooldown-only system may allow action spam in some scenarios (requires careful cooldown tuning)
 * Bad, because moderate complexity has a higher learning curve than simple arcade-style mechanics
 * Bad, because equipment dependencies create validation requirements in the protocol and game server
 
@@ -125,7 +128,7 @@ Move + shoot only, minimal stats (health, speed), no equipment customization.
 
 ### Option 2: Moderate with Customization
 
-3-5 core stats, equipment loadouts, varied action catalog (CHOSEN).
+4 core stats (with equipment-derived Mass), equipment loadouts, varied action catalog (CHOSEN).
 
 * Good, because strategic depth through stat allocation and equipment choices
 * Good, because multiple viable builds and playstyles (DPS, Tank, Utility, Balanced)
@@ -133,7 +136,7 @@ Move + shoot only, minimal stats (health, speed), no equipment customization.
 * Good, because complexity is manageable and learnable
 * Good, because equipment enables action variety without protocol bloat
 * Neutral, because requires balance tuning but not excessively complex
-* Neutral, because 5 stats hit a sweet spot between simple and overwhelming
+* Neutral, because 4 stats hit a sweet spot between simple and overwhelming
 * Bad, because more complex than arcade-style to implement and explain
 * Bad, because equipment validation adds implementation overhead
 
@@ -157,7 +160,7 @@ Move + shoot only, minimal stats (health, speed), no equipment customization.
 
 - **[Game Mechanics Analysis](../analysis/game-mechanics/)**: Detailed framework documentation including:
   - [Battle Space](../analysis/game-mechanics/battle-space/): 2D arena definition
-  - [Bot Characteristics](../analysis/game-mechanics/characteristics/): 5-stat system details
+  - [Bot Characteristics](../analysis/game-mechanics/characteristics/): 4-stat system details
   - [Equipment System](../analysis/game-mechanics/equipment/): Weapons, armor, modules
   - [Bot Actions](../analysis/game-mechanics/actions/): Complete action catalog
   - [Win Conditions](../analysis/game-mechanics/win-conditions/): Battle resolution rules

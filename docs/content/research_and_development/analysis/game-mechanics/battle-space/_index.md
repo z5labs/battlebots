@@ -64,6 +64,57 @@ Collision detection uses simple circle-to-circle distance calculations:
 
 3. **Collision Resolution**: When a collision is detected, the movement is adjusted to place the bot in contact with the obstacle without overlapping
 
+## Friction and Movement Physics
+
+The battle space applies friction to all moving bots, which affects their velocity and movement behavior. Friction provides realistic physics that require bots to continuously apply force to maintain movement, and it enables the possibility of variable terrain types with different surface properties.
+
+### Friction Mechanics
+
+1. **Friction Force**: Opposes the direction of bot movement, proportional to velocity
+2. **Friction Coefficient (μ)**: Determines the strength of friction applied to a bot
+   - **Default Coefficient**: **0.1** (TBD - subject to balance tuning)
+   - **Range**: 0.0 (frictionless) to 1.0 (maximum friction)
+3. **Velocity Decay**: Each update tick, a bot's velocity is reduced by the friction force
+4. **Natural Stopping**: Without continuous thrust, a bot will gradually slow to a stop due to friction
+
+### Friction Calculation
+
+The friction force applied to a moving bot is calculated as:
+
+```
+friction_force = -μ × velocity
+new_velocity = velocity + friction_force
+```
+
+Where:
+- `μ` is the friction coefficient at the bot's current position
+- `velocity` is the bot's current velocity vector
+- The negative sign indicates friction opposes the direction of movement
+
+### Variable Friction Zones
+
+The battle space supports different friction coefficients across different areas, enabling terrain variety:
+
+1. **Uniform Friction**: By default, the entire battle space has a uniform friction coefficient
+2. **Friction Zones**: Specific rectangular or circular areas may define different friction values
+   - **Low Friction** (μ < 0.1): "Slippery" surfaces where bots slide more easily
+   - **Standard Friction** (μ = 0.1): Normal battle space surface
+   - **High Friction** (μ > 0.1): "Rough" surfaces that slow bot movement more quickly
+
+3. **Zone Priority**: When friction zones overlap, the highest friction coefficient applies
+4. **Transition Behavior**: Moving between friction zones immediately applies the new coefficient (no gradual transition)
+
+### Tactical Implications
+
+Friction creates several tactical considerations:
+
+- **Movement Planning**: Bots must account for deceleration when planning movements
+- **Pursuit and Evasion**: Understanding friction helps predict opponent stopping distances
+- **Zone Control**: High-friction zones can limit mobility, while low-friction zones enable faster repositioning
+- **Energy Management**: Continuous thrust is required to maintain velocity, affecting energy/turn economy
+
+This friction system provides a foundation for diverse terrain types and strategic positioning while maintaining simple, predictable physics.
+
 ## Line of Sight
 
 Line of sight determines whether one bot can "see" or target another bot, which is essential for ranged attacks and targeting systems.
@@ -114,7 +165,8 @@ The following spatial rules govern bot behavior within the battle space:
 The following spatial features may be added in future iterations:
 
 - **Obstacles**: Static or dynamic obstacles within the arena that block movement and line of sight
-- **Terrain Types**: Areas with different movement speeds or effects (e.g., slowing zones, damage zones)
+- **Advanced Terrain Effects**: Beyond friction, areas could have additional effects (e.g., damage-over-time zones, healing zones, vision-reducing fog)
+- **Complex Friction Patterns**: Non-rectangular friction zones with gradual transitions between coefficients
 - **Vertical Dimension**: Elevation or z-axis for flying bots or multi-level arenas
 - **Dynamic Boundaries**: Shrinking play areas or moving walls to force engagement
 - **Variable Arena Sizes**: Different battle modes with different arena dimensions

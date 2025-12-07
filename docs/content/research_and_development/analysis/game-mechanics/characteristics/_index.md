@@ -8,13 +8,12 @@ date: 2025-12-05
 
 ## Overview
 
-Bot characteristics are the foundational attributes that define a bot's capabilities in battle. The game uses a five-stat system that determines how bots interact with the environment and each other:
+Bot characteristics are the foundational attributes that define a bot's capabilities in battle. The game uses a four-stat system that determines how bots interact with the environment and each other:
 
 - **Health**: Survivability and damage capacity
-- **Energy**: Resource pool for performing actions
 - **Speed**: Movement capability and positioning advantage
-- **Power**: Offensive damage output
 - **Defense**: Damage mitigation and resistance
+- **Mass**: Physical weight determined by equipped items
 
 Each characteristic directly impacts gameplay mechanics and creates strategic tradeoffs during bot design. Bots must balance their stat allocation to match their intended combat strategy.
 
@@ -34,23 +33,6 @@ Health (HP) represents a bot's survivability in combat. This is the primary reso
 - Must be balanced against offensive capabilities to ensure threat viability
 - Low Health bots must rely on Speed and tactical positioning to survive
 
-## Energy
-
-Energy is the fuel resource that powers all bot actions. Every action in combat consumes Energy, making it a critical limiting factor in bot performance.
-
-**Key Properties**:
-- **Energy Pool**: Maximum stored Energy available (TBD: placeholder 100-1000 range)
-- **Regeneration Rate**: Energy restored per game tick (TBD)
-- **Action Cost**: All actions (movement, attacks, abilities) consume Energy
-- **Depletion Impact**: Bots cannot perform actions when Energy is insufficient
-
-**Gameplay Impact**:
-- Determines action frequency and sustained combat capability
-- High Energy pools enable aggressive, action-intensive strategies
-- Regeneration rate affects recovery time between action bursts
-- Energy management becomes a core tactical consideration
-- Low Energy bots must be more selective about action timing
-
 ## Speed
 
 Speed determines how quickly a bot can move through the 2D battle space. This stat directly affects positioning, engagement control, and evasion capabilities.
@@ -68,23 +50,6 @@ Speed determines how quickly a bot can move through the 2D battle space. This st
 - Low Speed bots must rely on durability or zone control
 - Speed differences create natural predator/prey dynamics between bot types
 
-## Power
-
-Power is the damage multiplier that determines a bot's offensive output. This stat scales the base damage of attacks and offensive abilities.
-
-**Key Properties**:
-- **Damage Multiplier**: Scaling factor applied to attack damage (TBD: placeholder 1-10)
-- **Offensive Scaling**: Higher Power means more damage per hit
-- **No Energy Cost Reduction**: Power affects damage, not action efficiency
-- **Applies to All Damage**: Affects basic attacks and damage-based abilities
-
-**Gameplay Impact**:
-- High Power enables burst damage strategies and quick eliminations
-- Critical for glass cannon builds (high damage, low survivability)
-- Must be balanced against Energy costs for sustained damage output
-- Low Power bots may focus on attrition or support strategies
-- Power differential determines time-to-kill in direct engagements
-
 ## Defense
 
 Defense represents a bot's ability to mitigate incoming damage. This stat reduces the effective damage from enemy attacks.
@@ -101,7 +66,32 @@ Defense represents a bot's ability to mitigate incoming damage. This stat reduce
 - Critical for front-line and damage-absorbing playstyles
 - Low Defense bots must rely on Speed for damage avoidance
 - Defense vs. Health allocation creates build optimization choices
-- Counters high Power strategies through damage nullification
+- Reduces effective damage from enemy attacks
+
+## Mass
+
+Mass represents the total physical weight of a bot, determined by the equipment and components it carries. Unlike other characteristics, Mass is not directly allocated but is the cumulative result of loadout choices.
+
+**Key Properties**:
+- **Equipment-Derived**: Mass is calculated from the sum of all equipped items
+- **Dynamic Value**: Changes based on equipped weapons, armor, and components
+- **Movement Impact**: Higher Mass reduces effective Speed
+- **Momentum Effects**: Mass affects collision physics and knockback resistance (TBD)
+- **No Direct Damage Scaling**: Mass affects mobility, not offensive capability
+
+**Gameplay Impact**:
+- Heavy equipment loadouts reduce mobility through increased Mass
+- Creates natural tradeoff between firepower/protection and Speed
+- Light bots sacrifice durability for superior maneuverability
+- Mass cannot be optimized independently - it's a consequence of equipment choices
+- Forces strategic decisions between powerful equipment and tactical mobility
+- May affect collision mechanics and position displacement (future mechanics)
+
+**Equipment Examples** (TBD):
+- Weapons: Heavy weapons (high Mass) vs. light weapons (low Mass)
+- Armor: Heavy plating (high Mass) vs. light armor (low Mass)
+- Components: Power cores, sensors, and systems each contribute Mass
+- Loadout variety creates diverse Mass profiles across bot builds
 
 ## Stat Interactions
 
@@ -113,31 +103,33 @@ Health and Defense combine to determine true survivability:
 - High Defense multiplies the value of each Health point
 - Balanced allocation is more efficient than single-stat stacking
 
-### Damage Output Over Time
-Power and Energy determine sustained damage capability:
-- High Power with low Energy = burst damage, limited sustain
-- Low Power with high Energy = sustained damage over time
-- Action costs create natural balance between power and frequency
+### Mass and Mobility
+Mass directly impacts effective movement capability:
+- **Effective Speed** = Base Speed / Mass modifier
+- Heavy equipment reduces Speed, creating mobility-firepower tradeoffs
+- Light loadouts maximize Speed at the cost of offensive/defensive power
+- Equipment choices fundamentally alter tactical capabilities
 
-### Combat Range Control
-Speed and Energy enable positioning strategies:
-- Speed determines range closing/opening capability
-- Energy enables sustained movement for kiting or pursuit
-- Speed without Energy limits repositioning options
+### Combat Positioning
+Speed enables tactical positioning and engagement control:
+- High Speed allows kiting, pursuit, and disengagement
+- Speed advantage determines range control in combat
+- Mass penalties from equipment reduce positioning flexibility
+- Lightweight builds gain tactical mobility at the cost of durability
 
-### Time-to-Kill vs. Time-to-Die
-The relationship between offensive and defensive stats determines engagement outcomes:
-- **Attacker TTK** = Defender Health / (Attacker Power - Defender Defense)
-- **Defender TTK** = Attacker Health / (Defender Power - Attacker Defense)
-- Favorable TTK ratios determine engagement winners
-- Speed can modify these ratios by controlling engagement duration
+### Survivability Tradeoffs
+Defensive investment creates complex build choices:
+- High Health + Low Defense = vulnerable to sustained damage
+- Low Health + High Defense = vulnerable to burst damage
+- Mass from defensive equipment reduces evasion capability
+- Optimal defensive strategy depends on threat profile
 
-### Resource Efficiency
-All stats compete for allocation during bot design:
-- Specialization (high single stat) vs. Generalization (balanced stats)
-- Each stat point has opportunity cost in other areas
-- Optimal builds depend on game mechanics and opponent meta
-- No single dominant strategy (intended design goal)
+### Loadout Optimization
+Equipment choices create cascading effects across all characteristics:
+- Heavy weapons increase offensive capability but reduce Speed through Mass
+- Armor improves Defense but adds Mass that limits mobility
+- Lightweight builds sacrifice protection for superior positioning
+- No equipment configuration dominates all scenarios (intended design goal)
 
 ---
 
