@@ -42,7 +42,7 @@ Without well-defined game mechanics, we cannot:
 ## Considered Options
 
 * **Option 1: Simple Arcade-Style** - Move + shoot only, minimal stats (health, speed), no equipment customization
-* **Option 2: Moderate with Customization** - 4 core stats (with equipment-derived Mass), equipment loadouts, varied action catalog
+* **Option 2: Moderate with Customization** - 5 core stats (Health, Speed, Defense, Attack, Energy), equipment loadouts with stat modifications, varied action catalog with energy costs
 * **Option 3: Deep Simulation-Style** - 10+ stats, complex resource management, many abilities and systems
 
 ## Decision Outcome
@@ -51,51 +51,38 @@ Chosen option: "**Option 2: Moderate with Customization**", because it provides 
 
 ### Core Mechanics Framework
 
-**Bot Classes** (role-based archetypes):
-
-Each bot belongs to a class that determines:
-- **Base Characteristics**: Starting values for Health, Speed, Defense, and base Mass (chassis weight)
-- **Equipment Restrictions**: Whitelist of allowed weapons, armor, and modules for strategic differentiation
-
-*Initial Classes (2)*:
-- **Assault**: Fast striker class
-  - Base Health: 200 (TBD)
-  - Base Speed: 8 (TBD)
-  - Base Defense: 2 (TBD)
-  - Base Mass: 10 (TBD, light chassis)
-  - Equipment Access: Light weapons (Laser, Plasma), Light/Medium armor, Mobility modules (Boost Engine, Sensors)
-
-- **Support**: Durable tank class
-  - Base Health: 400 (TBD)
-  - Base Speed: 3 (TBD)
-  - Base Defense: 8 (TBD)
-  - Base Mass: 30 (TBD, heavy chassis)
-  - Equipment Access: Defensive weapons (EMP), Heavy armor, Utility modules (Shield Generator, Repair Kit)
-
-*Future Expansion*: Additional classes (Scout, Engineer, Balanced) can be added after initial validation.
-
-**Bot Characteristics** (4 core attributes):
-- **Health**: HP pool, determines survivability, bot destroyed at 0 (class defines base value)
-- **Speed**: Movement rate in units/tick, affects positioning and tactical options (class defines base value)
-- **Defense**: Damage reduction, mitigates incoming damage (class defines base value)
-- **Mass**: Combined weight of chassis and equipment, reduces effective Speed
-  - Base Mass from class (chassis weight)
-  - Equipment Mass added on top
-  - Total Mass impacts mobility (heavier bots move slower)
+**Bot Characteristics** (5 core attributes):
+- **Health**: HP pool, determines survivability, bot destroyed at 0 (TBD base value)
+- **Speed**: Movement rate in units/tick, affects positioning and tactical options (TBD base value)
+- **Defense**: Damage reduction, mitigates incoming damage (TBD base value)
+- **Attack**: Offensive power, affects damage output (TBD base value)
+- **Energy**: Resource pool for performing actions, regenerates over time (TBD base value and regen rate)
+  - All actions consume energy from this pool
+  - Insufficient energy prevents action execution
+  - Energy regeneration rate determines action frequency
 
 **Bot Actions** (organized by category):
-- **Movement**: Move (0 cooldown), Rotate (0 cooldown), Dash (3 tick cooldown) - all TBD
-- **Combat**: BasicAttack (1 tick cooldown), LaserShot (2 tick cooldown, requires Laser), HeavyBlow (4 tick cooldown) - all TBD
-- **Defensive**: Block (2 tick cooldown), Evade (3 tick cooldown), Shield (5 tick cooldown, duration-based) - all TBD
-- **Utility**: Scan (2 tick cooldown), RepairKit (10 tick cooldown, requires Repair Kit module) - all TBD
+- **Movement**: Move (5 energy cost, 0 cooldown) - TBD values
+- **Combat**: RifleShot (15 energy, 1 tick cooldown, requires Rifle), ShotgunBlast (20 energy, 2 tick cooldown, requires Shotgun) - all TBD values
+- **Defensive**: Block (10 energy, 2 tick cooldown), Evade (15 energy, variable cooldown), Shield (20 energy, variable cooldown, duration-based) - all TBD values
+- **Utility**: Scan (5 energy, variable cooldown), Charge (variable energy cost, variable cooldown, boosts energy regen) - all TBD values
+- **Equipment-Dependent**: Boost (requires Boost Engine module), Repair (requires Repair Kit module), Cloak (requires Stealth Module) - all TBD costs and cooldowns
 
 **Equipment System** (3 types in fixed slots):
-- **Weapons**: Enable combat actions (Laser, Missile, Plasma, EMP), each has Mass value affecting mobility
-- **Armor**: Provide Defense bonuses (Light, Medium, Heavy, Reactive), heavier armor increases Mass
-- **Modules**: Enable utility functions (Shield Generator, Boost Engine, Repair Kit, Sensors, Stealth), each contributes Mass
+- **Weapons**: Enable combat actions, modify stats
+  - Rifle: Baseline weapon, no stat modifications (TBD)
+  - Shotgun: -1 Speed (weight penalty), -1 Range, high close-range damage (TBD)
+- **Armor**: Provide Defense bonuses with Speed tradeoffs
+  - Light Armor: +1 Defense, +0 Speed (TBD)
+  - Medium Armor: +2 Defense, -1 Speed (TBD)
+  - Heavy Armor: +3 Defense, -2 Speed (TBD)
+- **Modules**: Enable utility functions and provide stat effects
+  - Boost Engine: +1 Max Speed, -1 Energy Capacity (TBD)
+  - Repair Kit: Action-based healing, restore HP during combat (TBD)
+  - Sensor Array: +2 Detection Range (TBD)
+  - Stealth Module: -2 Enemy Detection Range, -1 Defense (TBD)
 - **Loadout**: 1 weapon slot, 1 armor slot, 2 module slots (all TBD)
-- **Class Restrictions**: Each class has a whitelist of allowed equipment (see Bot Classes above)
-- **Mass Calculation**: Total Mass = Class Base Mass + Weapon Mass + Armor Mass + Module Mass, affects effective Speed
+- **Stat Calculation**: Final Stat = Base Stat + Weapon Modifier + Armor Modifier + Module Modifiers
 
 **Battle Space**:
 - 2D rectangular arena with Cartesian coordinates (100x100 units TBD)
@@ -109,42 +96,43 @@ Each bot belongs to a class that determines:
 - **Draw**: Mutual destruction, equal health at timeout
 - **Time Limit**: 5 minutes (TBD)
 
-**Cooldown System**:
-- Actions have cooldown periods measured in game ticks to prevent spam
+**Resource Management System**:
+- **Energy Pool**: All actions consume energy from a limited pool that regenerates over time
+- **Cooldowns**: Actions have cooldown periods measured in game ticks to prevent spam
+- **Dual Constraints**: Both energy availability and cooldown status must be satisfied to perform actions
+- Energy creates strategic resource management (choosing when to spend energy)
 - Cooldowns create tactical timing decisions (when to use powerful abilities)
-- Basic actions (Move, Rotate) have no cooldown for fluid movement
-- Powerful actions (Dash, HeavyBlow, Shield) have longer cooldowns for balance
+- Basic actions (Move) have low energy cost and no cooldown for fluid movement
+- Powerful actions (Shield, ShotgunBlast) have higher energy costs and longer cooldowns for balance
 
 ### Consequences
 
 * Good, because the framework provides clear structure for bot developers to understand what their bots can do
-* Good, because class system provides immediate role identity (Assault vs Support) that's easy to understand
-* Good, because equipment restrictions per class create meaningful strategic differentiation between classes
-* Good, because base Mass per class (chassis weight) creates natural class identity beyond just stats
-* Good, because customization within class restrictions balances accessibility with strategic depth
+* Good, because equipment customization creates meaningful strategic differentiation between bot builds
+* Good, because direct stat modification system is easy to understand and calculate
 * Good, because real-time continuous gameplay integrates naturally with gRPC bidirectional streaming (ADR-0004)
 * Good, because moderate complexity is accessible while still supporting strategic depth
 * Good, because all game events (actions, damage, state changes) are observable for visualization and debugging
-* Good, because cooldown-only system simplifies bot logic (no resource pool management)
-* Good, because Mass calculation (chassis + equipment) creates natural tradeoffs between equipment power and mobility
-* Good, because starting with 2 classes allows validation before expanding to more classes
+* Good, because energy + cooldown system creates both resource management and tactical timing decisions
+* Good, because equipment stat tradeoffs (Defense vs Speed) create natural choices between power and mobility
+* Good, because 5-stat system (Health, Speed, Defense, Attack, Energy) provides diverse optimization paths
 * Neutral, because placeholder values require extensive playtesting and balance iteration before finalization
-* Neutral, because the 4-stat system with class-based Mass is more complex than arcade-style but simpler than deep simulation
-* Neutral, because cooldown-only system may allow action spam in some scenarios (requires careful cooldown tuning)
-* Neutral, because class restrictions limit total build variety compared to unrestricted customization
+* Neutral, because the 5-stat system with energy management is more complex than arcade-style but simpler than deep simulation
+* Neutral, because dual resource system (energy + cooldowns) requires careful tuning to avoid action spam or stagnation
+* Neutral, because equipment dependencies create validation requirements in the protocol and game server
 * Bad, because moderate complexity has a higher learning curve than simple arcade-style mechanics
-* Bad, because equipment dependencies and class restrictions create additional validation requirements in the protocol and game server
-* Bad, because class balance becomes critical (one class being significantly stronger creates unfair matches)
+* Bad, because energy management adds cognitive load for bot developers beyond simple cooldown tracking
+* Bad, because equipment balance becomes critical (ensuring no single loadout dominates all scenarios)
 
 ### Confirmation
 
 The decision will be confirmed through:
-1. Implementation of game server mechanics following this framework including class system
-2. Creation of bot SDK that exposes class selection, actions, and characteristics
-3. Playtesting with sample bots of both Assault and Support classes demonstrating different equipment loadouts
-4. Class balance validation ensuring both classes are competitively viable
-5. Balance iteration and adjustment of TBD placeholder values (class stats, equipment values, cooldowns)
-6. Successful integration with the gRPC protocol defined in ADR-0004 including class selection
+1. Implementation of game server mechanics following this framework including energy and stat systems
+2. Creation of bot SDK that exposes actions, characteristics, and equipment customization
+3. Playtesting with sample bots demonstrating different equipment loadouts (DPS, Tank, Balanced, Stealth builds)
+4. Equipment balance validation ensuring diverse loadouts are competitively viable
+5. Balance iteration and adjustment of TBD placeholder values (base stats, equipment values, energy costs, cooldowns)
+6. Successful integration with the gRPC protocol defined in ADR-0004 including equipment selection and energy management
 
 ## Pros and Cons of the Options
 
@@ -162,17 +150,19 @@ Move + shoot only, minimal stats (health, speed), no equipment customization.
 
 ### Option 2: Moderate with Customization
 
-4 core stats (with equipment-derived Mass), equipment loadouts, varied action catalog (CHOSEN).
+5 core stats (Health, Speed, Defense, Attack, Energy), equipment loadouts with stat modifications, varied action catalog with energy costs and cooldowns (CHOSEN).
 
 * Good, because strategic depth through stat allocation and equipment choices
 * Good, because multiple viable builds and playstyles (DPS, Tank, Utility, Balanced)
 * Good, because customization creates interesting pre-battle decisions
 * Good, because complexity is manageable and learnable
 * Good, because equipment enables action variety without protocol bloat
+* Good, because energy system creates resource management decisions
 * Neutral, because requires balance tuning but not excessively complex
-* Neutral, because 4 stats hit a sweet spot between simple and overwhelming
+* Neutral, because 5 stats + energy hit a sweet spot between simple and overwhelming
 * Bad, because more complex than arcade-style to implement and explain
 * Bad, because equipment validation adds implementation overhead
+* Bad, because energy management adds complexity for bot developers
 
 ### Option 3: Deep Simulation-Style
 
@@ -210,14 +200,15 @@ Move + shoot only, minimal stats (health, speed), no equipment customization.
 All numeric values in this ADR are marked TBD (To Be Determined) and serve as placeholder values to establish the framework structure. These values will be refined through:
 
 1. Mathematical modeling and simulation
-2. Playtesting with real bot implementations (both Assault and Support classes)
-3. Class balance analysis ensuring competitive viability of both classes
-4. Balance analysis and competitive meta observation
-5. Performance testing and optimization requirements
+2. Playtesting with real bot implementations across different equipment loadouts
+3. Equipment balance analysis ensuring competitive viability of diverse builds
+4. Energy economy tuning (energy costs, regeneration rates, pool sizes)
+5. Balance analysis and competitive meta observation
+6. Performance testing and optimization requirements
 
 The framework separates **WHAT** mechanics exist (this ADR) from **HOW** they are implemented (future Game Runtime Architecture ADR). This allows independent iteration on game balance and implementation details.
 
-**Class System Notes**: Starting with 2 classes (Assault and Support) allows validation of the class framework before expanding. Additional classes can be added incrementally once the base system proves balanced and implementable.
+**Energy System Notes**: The dual-constraint system (energy + cooldowns) requires careful balancing to ensure meaningful choices without creating frustrating resource starvation or trivial resource abundance.
 
 ### Design Principles
 

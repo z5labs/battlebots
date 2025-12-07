@@ -22,10 +22,8 @@ Equipment falls into three primary categories, each serving a distinct role in b
 
 Weapons enable combat actions and determine a bot's offensive capabilities. Each weapon unlocks specific attack actions with unique characteristics:
 
-- **Laser Weapon**: Enables precise, instant-hit attacks with moderate damage (TBD exact values)
-- **Missile Launcher**: Enables high-damage projectile attacks with travel time and potential area effects (TBD)
-- **Plasma Cannon**: Enables close-range, high-damage attacks with energy management considerations (TBD)
-- **EMP Device**: Enables disruption attacks that may disable enemy systems temporarily (TBD mechanics)
+- **Rifle**: Enables single-shot, precise attacks with moderate damage (TBD exact values)
+- **Shotgun**: Enables spray of projectiles attack with damage falloff based on distance (TBD)
 
 Weapon selection directly determines which offensive actions are available to a bot during combat. A bot without a weapon equipped cannot perform any attack actions.
 
@@ -36,7 +34,6 @@ Armor provides defensive bonuses and damage mitigation. Different armor types of
 - **Light Armor**: Minimal defense bonus, no speed penalty - suitable for fast, evasive builds (TBD values)
 - **Medium Armor**: Balanced defense bonus with minor speed penalty - versatile option for most builds (TBD values)
 - **Heavy Armor**: Significant defense bonus with substantial speed penalty - maximizes survivability (TBD values)
-- **Reactive Armor**: Moderate defense with special damage reflection properties (TBD mechanics)
 
 Armor affects how much damage a bot takes when hit and may influence movement speed and energy consumption.
 
@@ -44,12 +41,10 @@ Armor affects how much damage a bot takes when hit and may influence movement sp
 
 Modules provide utility functions, special abilities, and tactical advantages beyond direct combat:
 
-- **Shield Generator**: Provides temporary energy shields that absorb damage (TBD capacity and recharge)
 - **Boost Engine**: Enables temporary speed increases for repositioning or escape (TBD duration and cooldown)
 - **Repair Kit**: Allows limited self-repair during combat (TBD healing amount and usage limits)
 - **Sensor Array**: Increases detection range and provides tactical information (TBD range and intel bonuses)
 - **Stealth Module**: Reduces detection range by enemies (TBD effectiveness and duration)
-- **Energy Cell**: Increases energy capacity for energy-dependent systems (TBD capacity bonus)
 
 Modules enable tactical flexibility and allow bots to adapt to different combat scenarios. Module selection determines which utility actions are available during battle.
 
@@ -78,10 +73,8 @@ Equipment modifies a bot's base characteristics, creating different performance 
 
 Weapons primarily enable actions but may also modify stats:
 
-- **Laser Weapon**: No stat modifications (baseline weapon)
-- **Missile Launcher**: -1 Speed (weight penalty), +1 Range (TBD)
-- **Plasma Cannon**: -2 Energy Capacity (high consumption), +2 Damage (TBD)
-- **EMP Device**: -1 Defense (exposed systems), +1 Utility (TBD)
+- **Rifle**: No stat modifications (baseline weapon)
+- **Shotgun**: -1 Speed (weight penalty), -1 Range (close-range weapon) (TBD)
 
 ### Armor Stat Effects
 
@@ -90,18 +83,15 @@ Armor provides defense at the cost of mobility:
 - **Light Armor**: +1 Defense, +0 Speed (TBD)
 - **Medium Armor**: +2 Defense, -1 Speed (TBD)
 - **Heavy Armor**: +3 Defense, -2 Speed (TBD)
-- **Reactive Armor**: +2 Defense, -1 Speed, Special: 10% damage reflection (TBD)
 
 ### Module Stat Effects
 
 Modules provide diverse effects beyond simple stat changes:
 
-- **Shield Generator**: +2 Effective HP (shield capacity), -1 Energy Regen (TBD)
 - **Boost Engine**: +1 Max Speed, -1 Energy Capacity (TBD)
 - **Repair Kit**: +0 continuous stats, Action: Restore 20 HP (TBD usage limits)
 - **Sensor Array**: +2 Detection Range, +0 other stats (TBD)
 - **Stealth Module**: -2 Enemy Detection Range, -1 Defense (exposed systems) (TBD)
-- **Energy Cell**: +2 Energy Capacity, +0 other stats (TBD)
 
 ### Stat Calculation
 
@@ -125,16 +115,13 @@ Certain actions require specific equipment to be used. This creates a direct lin
 
 ### Weapon-Dependent Actions
 
-- **LaserShot**: Requires Laser Weapon equipped
-- **MissileLaunch**: Requires Missile Launcher equipped
-- **PlasmaBurst**: Requires Plasma Cannon equipped
-- **EMPBlast**: Requires EMP Device equipped
+- **RifleShot**: Requires Rifle equipped
+- **ShotgunBlast**: Requires Shotgun equipped
 
 Without the appropriate weapon, these actions are unavailable in the bot's action set.
 
 ### Module-Dependent Actions
 
-- **ActivateShield**: Requires Shield Generator module
 - **Boost**: Requires Boost Engine module
 - **Repair**: Requires Repair Kit module
 - **Scan**: Requires Sensor Array module
@@ -159,38 +146,38 @@ The following example loadouts demonstrate the range of viable bot configuration
 **Philosophy**: Maximize offensive capability and damage output. Accept lower survivability in exchange for high burst damage potential.
 
 **Equipment**:
-- **Weapon**: Plasma Cannon (high damage, close range)
+- **Weapon**: Shotgun (high damage spray at close range)
 - **Armor**: Light Armor (minimal defense, maintain mobility)
-- **Module 1**: Energy Cell (support high energy weapon consumption)
-- **Module 2**: Boost Engine (enable repositioning for close-range attacks)
+- **Module 1**: Boost Engine (enable repositioning for close-range attacks)
+- **Module 2**: Sensor Array (track enemies for optimal engagement range)
 
 **Stat Profile** (TBD values):
 - Attack: 12 (high)
 - Defense: 6 (low)
-- Speed: 11 (high)
-- Energy: 14 (high capacity for sustained attacks)
+- Speed: 10 (good)
+- Energy: 10 (average)
 
-**Strategy**: Close distance quickly using Boost, deliver devastating Plasma Burst attacks, rely on speed and positioning to avoid counterattacks. High risk, high reward playstyle.
+**Strategy**: Close distance quickly using Boost, deliver devastating shotgun blasts at close range, use sensors to track enemy positions for optimal engagement. High risk, high reward playstyle.
 
-**Weaknesses**: Vulnerable to sustained fire, limited survivability if caught in poor position.
+**Weaknesses**: Vulnerable to sustained fire, limited survivability if caught in poor position, ineffective at long range.
 
 ### Tank Build
 
 **Philosophy**: Maximum survivability and staying power. Control space through defensive presence and outlast opponents.
 
 **Equipment**:
-- **Weapon**: Laser Weapon (reliable baseline offense)
+- **Weapon**: Rifle (reliable baseline offense)
 - **Armor**: Heavy Armor (maximum damage reduction)
-- **Module 1**: Shield Generator (additional damage absorption)
-- **Module 2**: Repair Kit (self-sustain during extended engagements)
+- **Module 1**: Repair Kit (self-sustain during extended engagements)
+- **Module 2**: Sensor Array (maintain awareness despite low mobility)
 
 **Stat Profile** (TBD values):
 - Attack: 8 (moderate)
 - Defense: 13 (very high)
 - Speed: 8 (low)
-- Energy: 9 (moderate, reduced by shield)
+- Energy: 10 (average)
 
-**Strategy**: Hold key positions, absorb damage with armor and shields, use Repair to extend combat effectiveness. Win through attrition rather than burst damage.
+**Strategy**: Hold key positions, absorb damage with heavy armor, use Repair to extend combat effectiveness, rely on sensors to track enemy movements. Win through attrition rather than burst damage.
 
 **Weaknesses**: Low mobility makes positioning critical, vulnerable to kiting strategies, limited offensive pressure.
 
@@ -199,10 +186,10 @@ The following example loadouts demonstrate the range of viable bot configuration
 **Philosophy**: Versatile configuration capable of adapting to various situations. No extreme weaknesses, no extreme strengths.
 
 **Equipment**:
-- **Weapon**: Missile Launcher (ranged damage with area potential)
+- **Weapon**: Rifle (reliable ranged damage)
 - **Armor**: Medium Armor (reasonable defense without severe speed penalty)
-- **Module 1**: Sensor Array (tactical awareness and range advantage)
-- **Module 2**: Shield Generator (temporary survivability boost)
+- **Module 1**: Sensor Array (tactical awareness)
+- **Module 2**: Repair Kit (survivability boost during combat)
 
 **Stat Profile** (TBD values):
 - Attack: 10 (above average)
@@ -210,29 +197,29 @@ The following example loadouts demonstrate the range of viable bot configuration
 - Speed: 9 (average)
 - Energy: 10 (average)
 
-**Strategy**: Maintain distance using sensors and missile range, use shields to survive engagement spikes, rely on well-rounded stats to handle unexpected situations. Adaptable to opponent strategies.
+**Strategy**: Use sensors for tactical awareness, maintain optimal engagement distance with rifle, use repair to extend combat effectiveness, rely on well-rounded stats to handle unexpected situations. Adaptable to opponent strategies.
 
 **Weaknesses**: Lacks specialization, may be outperformed by specialized builds in their areas of strength.
 
-### Utility/Disruption Build
+### Stealth/Scout Build
 
-**Philosophy**: Control the battlefield through information advantage and enemy disruption rather than direct damage.
+**Philosophy**: Control the battlefield through information advantage and mobility rather than direct damage.
 
 **Equipment**:
-- **Weapon**: EMP Device (disable enemy systems)
+- **Weapon**: Rifle (precise long-range attacks)
 - **Armor**: Light Armor (maintain mobility)
 - **Module 1**: Sensor Array (information gathering)
 - **Module 2**: Stealth Module (avoid detection)
 
 **Stat Profile** (TBD values):
-- Attack: 7 (low direct damage)
-- Defense: 7 (low)
+- Attack: 8 (moderate)
+- Defense: 6 (low)
 - Speed: 12 (very high)
-- Energy: 11 (support utility actions)
+- Energy: 10 (average)
 
-**Strategy**: Scout with sensors, avoid detection with stealth, disrupt enemy systems with EMP when opportunities arise. Win through tactical advantage and enemy frustration rather than direct confrontation.
+**Strategy**: Scout with sensors, avoid detection with stealth, strike from unexpected angles with rifle shots, rely on mobility to disengage. Win through tactical advantage and superior positioning rather than sustained combat.
 
-**Weaknesses**: Ineffective in forced direct combat, relies heavily on stealth and positioning mechanics working as intended, may struggle to finish weakened enemies.
+**Weaknesses**: Ineffective in forced direct combat, relies heavily on stealth and positioning mechanics working as intended, vulnerable if detected in poor position.
 
 ## Design Considerations
 
