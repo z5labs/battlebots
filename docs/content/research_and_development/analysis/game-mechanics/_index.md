@@ -99,7 +99,11 @@ These game mechanics integrate with the broader Battle Bots architecture:
 
 ## Related Documentation
 
-- **[ADR-0005: 1v1 Battle Game Mechanics](../adrs/0005-1v1-battle-game-mechanics.md)**: Strategic ADR documenting the decision to adopt these mechanics
+- **[ADR-0005: Battle Space Spatial System](../adrs/0005-battle-space-spatial-system.md)**: Decision on continuous 2D Cartesian coordinate system
+- **[ADR-0006: Bot Characteristics System](../adrs/0006-bot-characteristics-system.md)**: Decision on four-stat system (Health, Speed, Defense, Mass)
+- **[ADR-0007: Equipment and Loadout System](../adrs/0007-equipment-loadout-system.md)**: Decision on equipment-based customization system
+- **[ADR-0008: Bot Actions and Resource Management](../adrs/0008-bot-actions-resource-management.md)**: Decision on dual-constraint action system (energy + cooldowns)
+- **[ADR-0009: 1v1 Battle Orchestration](../adrs/0009-1v1-battle-orchestration.md)**: High-level battle orchestration including fog of war, pacing, and win conditions
 - **[POC User Journey](../user-journeys/0001-poc.md)**: Proof of concept implementation that validates the architecture
 - **ADR-NNNN: Game Runtime Architecture** (Pending): Future ADR covering implementation details like tick rate, game loop pseudo code, and state processing
 
