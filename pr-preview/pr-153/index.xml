@@ -70,7 +70,108 @@ ADR Categories:
 - api-design: API endpoint design decisions (pagination, filtering, bulk operations)
 --&gt;
 &lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
-&lt;p&gt;Battle Bots requires an action system that governs how bots behave in real-time battles. We need to define what actions bots can perform, how actions are constrained (costs, cooldowns, equipment requirements), and how the resource management system prevents action spam while maintaining fluid gameplay. The action system must integrate with the real-time continuous gameplay model and support the equipment-based customization system (ADR-0006).&lt;/p&gt;</description></item><item><title>Loki: OTLP Integration</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/analysis/observability/logs/loki/loki-otlp-integration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/analysis/observability/logs/loki/loki-otlp-integration/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Battle Bots requires an action system that governs how bots behave in real-time battles. We need to define what actions bots can perform, how actions are constrained (costs, cooldowns, equipment requirements), and how the resource management system prevents action spam while maintaining fluid gameplay. The action system must integrate with the real-time continuous gameplay model and support the equipment-based customization system (ADR-0006).&lt;/p&gt;</description></item><item><title>Getting Started</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/getting-started/</guid><description>&lt;h2 id="getting-started-with-1v1-battles"&gt;Getting Started with 1v1 Battles&lt;/h2&gt;
+&lt;p&gt;This guide will help you create your first bot for 1v1 battles. We&amp;rsquo;ll cover the basics of bot structure, equipment configuration, and connecting to the battle server.&lt;/p&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Programming experience in any language&lt;/li&gt;
+&lt;li&gt;Battle Bots SDK installed for your chosen language&lt;/li&gt;
+&lt;li&gt;Development environment set up&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="bot-structure"&gt;Bot Structure&lt;/h2&gt;
+&lt;p&gt;A Battle Bots bot consists of:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Equipment Configuration&lt;/strong&gt; - Choose your weapon and armor before battle&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;State Processing&lt;/strong&gt; - Receive and process battle state updates each tick&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Action Submission&lt;/strong&gt; - Decide which actions to perform based on current state&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Communication&lt;/strong&gt; - Connect to the battle server via gRPC&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="minimal-bot-example"&gt;Minimal Bot Example&lt;/h2&gt;
+&lt;p&gt;Here&amp;rsquo;s a minimal bot structure to get you started:&lt;/p&gt;</description></item><item><title>Arena</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</guid><description>&lt;h2 id="arena-overview"&gt;Arena Overview&lt;/h2&gt;
+&lt;p&gt;1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.&lt;/p&gt;
+&lt;h2 id="coordinate-system"&gt;Coordinate System&lt;/h2&gt;
+&lt;p&gt;The arena uses a &lt;strong&gt;2D Cartesian coordinate system&lt;/strong&gt; - the same (x, y) coordinates you learned in math class.&lt;/p&gt;
+&lt;pre class="mermaid"&gt;graph TD
+ subgraph Arena[&amp;#34;Arena: 100x100 units&amp;#34;]
+ origin[&amp;#34;Origin (0, 0)&amp;lt;br/&amp;gt;Center of arena&amp;#34;]
+ topRight[&amp;#34;&amp;#43;50, &amp;#43;50&amp;lt;br/&amp;gt;Top-Right Corner&amp;#34;]
+ topLeft[&amp;#34;-50, &amp;#43;50&amp;lt;br/&amp;gt;Top-Left Corner&amp;#34;]
+ bottomRight[&amp;#34;&amp;#43;50, -50&amp;lt;br/&amp;gt;Bottom-Right Corner&amp;#34;]
+ bottomLeft[&amp;#34;-50, -50&amp;lt;br/&amp;gt;Bottom-Left Corner&amp;#34;]
+ end
+ style origin fill:#4CAF50
+ style topRight fill:#f9f
+ style topLeft fill:#f9f
+ style bottomRight fill:#f9f
+ style bottomLeft fill:#f9f&lt;/pre&gt;
+&lt;h3 id="key-properties"&gt;Key Properties&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Origin (0, 0)&lt;/strong&gt;: Located at the center of the arena&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;X-axis&lt;/strong&gt;: Horizontal axis
+&lt;ul&gt;
+&lt;li&gt;Positive values extend to the right&lt;/li&gt;
+&lt;li&gt;Negative values extend to the left&lt;/li&gt;
+&lt;li&gt;Range: -50 to +50&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Y-axis&lt;/strong&gt;: Vertical axis
+&lt;ul&gt;
+&lt;li&gt;Positive values extend upward&lt;/li&gt;
+&lt;li&gt;Negative values extend downward&lt;/li&gt;
+&lt;li&gt;Range: -50 to +50&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Units&lt;/strong&gt;: Abstract spatial units (not meters or pixels)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Precision&lt;/strong&gt;: Floating-point coordinates allow sub-unit positioning&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="distance-calculation"&gt;Distance Calculation&lt;/h3&gt;
+&lt;p&gt;Distance between two points uses the Pythagorean theorem:&lt;/p&gt;</description></item><item><title>Bot Characteristics</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</guid><description>&lt;h2 id="bot-characteristics-overview"&gt;Bot Characteristics Overview&lt;/h2&gt;
+&lt;p&gt;Your bot&amp;rsquo;s capabilities are defined by three core characteristics: &lt;strong&gt;Health&lt;/strong&gt;, &lt;strong&gt;Defense&lt;/strong&gt;, and &lt;strong&gt;Mass&lt;/strong&gt;. These stats determine your survivability, damage mitigation, and movement properties.&lt;/p&gt;
+&lt;h2 id="health"&gt;Health&lt;/h2&gt;
+&lt;p&gt;Health (HP) is your bot&amp;rsquo;s survivability pool - the total amount of damage your bot can sustain before being eliminated.&lt;/p&gt;
+&lt;h3 id="key-properties"&gt;Key Properties&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;HP Pool&lt;/strong&gt;: Total damage your bot can take before destruction
+&lt;ul&gt;
+&lt;li&gt;Range: 100-500 HP (placeholder values, subject to balance tuning)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Destruction&lt;/strong&gt;: Bot is eliminated when Health reaches 0&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No Regeneration&lt;/strong&gt;: Health does not regenerate during battle (current design)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="gameplay-impact"&gt;Gameplay Impact&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Higher Health allows your bot to stay in battles longer&lt;/li&gt;
+&lt;li&gt;Low-Health bots must rely on damage avoidance through mobility or defensive actions&lt;/li&gt;
+&lt;li&gt;Health works multiplicatively with Defense to create Effective HP (see below)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="defense"&gt;Defense&lt;/h2&gt;
+&lt;p&gt;Defense represents your bot&amp;rsquo;s ability to mitigate incoming damage. It reduces the effective damage from enemy attacks.&lt;/p&gt;</description></item><item><title>Equipment</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/equipment/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/equipment/</guid><description>&lt;div class="alert alert-warning" role="alert"&gt;
+&lt;h4 class="alert-heading"&gt;Subject to Change&lt;/h4&gt;
+
+ The equipment system described here is currently in the PROPOSED stage and may change based on playtesting and balance analysis. Check back for updates!
+
+&lt;/div&gt;
+
+&lt;h2 id="equipment-system-overview"&gt;Equipment System Overview&lt;/h2&gt;
+&lt;p&gt;Before battle, you configure your bot&amp;rsquo;s &lt;strong&gt;loadout&lt;/strong&gt; by selecting equipment. Equipment modifies your bot&amp;rsquo;s characteristics and determines which actions are available during battle.&lt;/p&gt;
+&lt;h3 id="loadout-slots"&gt;Loadout Slots&lt;/h3&gt;
+&lt;p&gt;Each bot equips:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1 Weapon&lt;/strong&gt; - Determines available combat actions&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;1 Armor&lt;/strong&gt; - Modifies Defense and Speed characteristics&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;All equipment contributes to your bot&amp;rsquo;s total Mass, which affects movement acceleration.&lt;/p&gt;</description></item><item><title>Actions</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/actions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/actions/</guid><description>&lt;div class="alert alert-warning" role="alert"&gt;
+&lt;h4 class="alert-heading"&gt;Subject to Change&lt;/h4&gt;
+
+ The action system described here is currently in the PROPOSED stage and may change based on playtesting and balance analysis. Energy costs, cooldowns, and action availability may be adjusted!
+
+&lt;/div&gt;
+
+&lt;h2 id="actions-overview"&gt;Actions Overview&lt;/h2&gt;
+&lt;p&gt;During battle, your bot performs &lt;strong&gt;actions&lt;/strong&gt; each tick. Actions allow your bot to move, attack, defend, and gather information. All actions are constrained by a dual-resource system: energy costs and cooldowns.&lt;/p&gt;
+&lt;h2 id="resource-management-system"&gt;Resource Management System&lt;/h2&gt;
+&lt;p&gt;Actions are governed by two independent constraint systems that work together to prevent action spam while maintaining gameplay fluidity.&lt;/p&gt;</description></item><item><title>Loki: OTLP Integration</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/analysis/observability/logs/loki/loki-otlp-integration/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/analysis/observability/logs/loki/loki-otlp-integration/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
 &lt;p&gt;Grafana Loki introduced native OpenTelemetry Protocol (OTLP) support in version 3.0, marking a significant advancement in how logs can be ingested into Loki. This native integration allows applications instrumented with OpenTelemetry to send logs directly to Loki using the standardized OTLP format, eliminating the need for format transformations and simplifying the observability pipeline.&lt;/p&gt;
 &lt;p&gt;The native OTLP endpoint provides a fully OpenTelemetry-compliant ingestion path where logs sent in OTLP format are stored directly in Loki without requiring conversion to JSON or logfmt blobs. This approach leverages Loki&amp;rsquo;s structured metadata feature, which stores log attributes and other OpenTelemetry LogRecord fields separately from the log body itself. The result is a more intuitive query experience and better performance, as queries no longer need to parse JSON at runtime to access fields.&lt;/p&gt;</description></item><item><title>Loki: Overview</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/analysis/observability/logs/loki/loki-overview/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/analysis/observability/logs/loki/loki-overview/</guid><description>&lt;h2 id="overview"&gt;Overview&lt;/h2&gt;
 &lt;p&gt;Grafana Loki is a horizontally-scalable, highly-available, multi-tenant log aggregation system designed to be cost-effective and easy to operate. Inspired by Prometheus, Loki takes a fundamentally different approach to log storage compared to traditional systems like Elasticsearch.&lt;/p&gt;
