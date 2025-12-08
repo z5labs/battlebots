@@ -47,7 +47,6 @@ Without a well-defined equipment system, we cannot:
 The equipment system consists of three equipment categories (Weapons, Armor, Modules) with the following initial equipment options:
 - **Weapons**: Rifle, Shotgun
 - **Armor**: Light Armor, Medium Armor, Heavy Armor
-- **Modules**: Boost Engine, Repair Kit, Sensor Array, Stealth Module
 
 Each bot equips a loadout with 1 weapon, 1 armor, and 2 modules. Equipment modifies bot characteristics (ADR-0007) and determines available actions (ADR-0009), creating distinct tactical options for different builds.
 
