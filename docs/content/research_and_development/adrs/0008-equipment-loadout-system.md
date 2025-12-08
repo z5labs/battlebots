@@ -42,72 +42,180 @@ Without a well-defined equipment system, we cannot:
 * **Protocol Integration** - Equipment selection must map to gRPC protocol (ADR-0004)
 * **Developer Accessibility** - Loadout configuration should be straightforward for bot developers
 
-## Considered Options
-
-* **Option 1: No Customization** - All bots identical, differentiation through AI only
-* **Option 2: Skill/Ability Selection** - Choose abilities from pool, no stat modification
-* **Option 3: Equipment Loadout System** - Weapons, armor, modules with stat modifications and action enablement
-* **Option 4: Class-Based System** - Predefined bot classes with fixed equipment
-
 ## Decision Outcome
 
-Chosen option: "**Option 3: Equipment Loadout System**", because it enables meaningful pre-battle strategic decisions, creates stat tradeoffs through equipment modifications, enables diverse builds (DPS, Tank, Balanced, Stealth), provides extensibility for future equipment, and maps cleanly to the protocol while maintaining developer accessibility.
+The equipment system consists of three equipment categories (Weapons, Armor, Modules) with the following initial equipment options:
+- **Weapons**: Rifle, Shotgun
+- **Armor**: Light Armor, Medium Armor, Heavy Armor
+- **Modules**: Boost Engine, Repair Kit, Sensor Array, Stealth Module
 
-### Equipment and Loadout Specification
+Each bot equips a loadout with 1 weapon, 1 armor, and 2 modules. Equipment modifies bot characteristics (ADR-0007) and determines available actions (ADR-0009), creating distinct tactical options for different builds.
 
-#### Equipment Categories
+## Equipment System Specification
 
-Equipment falls into three primary categories, each serving a distinct role in bot customization:
+### Weapons
 
-**Weapons**: Enable combat actions and determine offensive capabilities
+Weapons enable combat actions and determine offensive capabilities. Each weapon provides a unique attack action with different energy costs, damage patterns, and tactical applications. All weapons contribute to bot Mass (ADR-0007), with heavier weapons providing greater firepower at the cost of mobility.
 
-- **Rifle**: Enables single-shot, precise attacks with moderate damage
-  - Stat Effects: No modifications (baseline weapon)
-  - Enabled Action: RifleShot (15 energy, 1 tick cooldown)
-  - Tactical Profile: Reliable ranged damage, versatile baseline option
+#### Rifle
 
-- **Shotgun**: Enables spray of projectiles with damage falloff based on distance
-  - Stat Effects: -1 Speed (weight penalty), -1 Range (close-range weapon) (TBD)
-  - Enabled Action: ShotgunBlast (20 energy, 2 tick cooldown)
-  - Tactical Profile: High close-range burst damage, requires positioning
+Standard precision weapon enabling reliable ranged attacks.
 
-**Armor**: Provides defensive bonuses and damage mitigation
+**Stat Effects**:
+- No modifications (baseline weapon)
+- Mass Contribution: TBD (baseline weapon mass)
 
-- **Light Armor**: Minimal defense bonus, no speed penalty
-  - Stat Effects: +1 Defense, +0 Speed (TBD)
-  - Tactical Profile: Maintains mobility for evasive playstyles
+**Enabled Actions**:
+- **RifleShot**: Single-shot, precise attack with moderate damage (15 energy, 1 tick cooldown)
 
-- **Medium Armor**: Balanced defense bonus with minor speed penalty
-  - Stat Effects: +2 Defense, -1 Speed (TBD)
-  - Tactical Profile: Versatile option for balanced builds
+**Tactical Profile**:
+- Reliable ranged damage output
+- Versatile baseline option suitable for any playstyle
+- No stat penalties, maintains mobility
+- Effective at medium to long range
 
-- **Heavy Armor**: Significant defense bonus with substantial speed penalty
-  - Stat Effects: +3 Defense, -2 Speed (TBD)
-  - Tactical Profile: Maximizes survivability for tank builds
+#### Shotgun
 
-**Modules**: Provide utility functions, special abilities, and tactical advantages
+Close-range weapon enabling devastating burst damage with damage falloff based on distance.
 
-- **Boost Engine**: Enables temporary speed increases
-  - Stat Effects: +1 Max Speed, -1 Energy Capacity (TBD)
-  - Enabled Action: Boost (variable energy cost and duration)
-  - Tactical Profile: Repositioning and engagement control
+**Stat Effects**:
+- -1 Speed (weight penalty) (TBD)
+- -1 Range (close-range weapon) (TBD)
+- Mass Contribution: TBD (higher than Rifle)
 
-- **Repair Kit**: Allows limited self-repair during combat
-  - Stat Effects: No continuous stat modifications
-  - Enabled Action: Repair (restore HP, usage limits TBD)
-  - Tactical Profile: Extended combat effectiveness through self-sustain
+**Enabled Actions**:
+- **ShotgunBlast**: Spray of projectiles with high close-range damage (20 energy, 2 tick cooldown)
 
-- **Sensor Array**: Increases detection range and provides tactical information
-  - Stat Effects: +2 Detection Range (TBD)
-  - Enabled Action: Scan (5 energy, variable cooldown)
-  - Tactical Profile: Information advantage and awareness
+**Tactical Profile**:
+- High close-range burst damage
+- Requires positioning to maximize effectiveness
+- Weight penalty reduces mobility
+- Ineffective at long range due to damage falloff
 
-- **Stealth Module**: Reduces detection range by enemies
-  - Stat Effects: -2 Enemy Detection Range, -1 Defense (exposed systems) (TBD)
-  - Enabled Action: Cloak (variable energy cost and duration)
-  - Tactical Profile: Avoid detection and enable surprise attacks
+### Armor
 
-#### Loadout Constraints
+Armor provides defensive bonuses and damage mitigation. Armor directly modifies Defense and Speed characteristics (ADR-0007), creating tradeoffs between survivability and mobility. All armor contributes to bot Mass, with heavier armor providing greater protection at the cost of reduced Speed.
+
+#### Light Armor
+
+Minimal protection that maintains mobility for evasive playstyles.
+
+**Stat Effects**:
+- +1 Defense (TBD)
+- +0 Speed (no speed penalty) (TBD)
+- Mass Contribution: TBD (minimal)
+
+**Tactical Profile**:
+- Minimal defense bonus maintains baseline survivability
+- No speed penalty preserves mobility
+- Optimal for evasion-based and high-mobility builds
+- Relies on Speed rather than damage absorption
+
+#### Medium Armor
+
+Balanced protection with moderate defensive bonus and minor speed penalty.
+
+**Stat Effects**:
+- +2 Defense (TBD)
+- -1 Speed (TBD)
+- Mass Contribution: TBD (moderate)
+
+**Tactical Profile**:
+- Reasonable defense without severe mobility cost
+- Versatile option for balanced builds
+- Moderate survivability increase with manageable speed reduction
+- Suitable for all-around playstyles
+
+#### Heavy Armor
+
+Maximum protection with significant defensive bonus and substantial speed penalty.
+
+**Stat Effects**:
+- +3 Defense (TBD)
+- -2 Speed (TBD)
+- Mass Contribution: TBD (high)
+
+**Tactical Profile**:
+- Maximum damage reduction for tank builds
+- Significant speed penalty limits mobility
+- Enables prolonged engagements and damage absorption
+- Requires positional awareness due to low mobility
+
+### Modules
+
+Modules provide utility functions, special abilities, and tactical advantages beyond direct combat. Each module enables unique actions or passive effects that expand tactical options. Bots equip 2 modules, creating diverse combinations and strategic depth.
+
+#### Boost Engine
+
+Mobility module enabling temporary speed increases for repositioning and engagement control.
+
+**Stat Effects**:
+- +1 Max Speed (TBD)
+- -1 Energy Capacity (TBD)
+- Mass Contribution: TBD
+
+**Enabled Actions**:
+- **Boost**: Temporary speed increase (variable energy cost and duration, TBD)
+
+**Tactical Profile**:
+- Enables rapid repositioning and pursuit
+- Critical for close-range builds requiring gap closing
+- Energy capacity reduction creates resource tradeoff
+- Enhances engagement and disengagement control
+
+#### Repair Kit
+
+Self-sustain module allowing limited health restoration during combat.
+
+**Stat Effects**:
+- No continuous stat modifications
+- Mass Contribution: TBD
+
+**Enabled Actions**:
+- **Repair**: Restore HP during combat (energy cost and usage limits TBD)
+
+**Tactical Profile**:
+- Extends combat effectiveness through self-healing
+- Enables prolonged engagements and attrition strategies
+- Critical for tank builds and defensive playstyles
+- Limited uses prevent infinite sustain
+
+#### Sensor Array
+
+Information module increasing detection range and providing tactical awareness.
+
+**Stat Effects**:
+- +2 Detection Range (TBD)
+- Mass Contribution: TBD
+
+**Enabled Actions**:
+- **Scan**: Enhanced tactical information and enemy detection (5 energy, variable cooldown, TBD)
+
+**Tactical Profile**:
+- Information advantage through increased awareness
+- Detects enemies earlier for tactical positioning
+- Scan action provides enhanced battlefield intelligence
+- Supports all playstyles through situational awareness
+
+#### Stealth Module
+
+Concealment module reducing detection range by enemies and enabling cloaking.
+
+**Stat Effects**:
+- -2 Enemy Detection Range (enemies detect this bot at shorter range) (TBD)
+- -1 Defense (exposed systems vulnerability) (TBD)
+- Mass Contribution: TBD
+
+**Enabled Actions**:
+- **Cloak**: Temporary stealth state further reducing detection (variable energy cost and duration, TBD)
+
+**Tactical Profile**:
+- Avoid detection and enable surprise attacks
+- Defense penalty creates survivability tradeoff
+- Requires tactical positioning to maximize stealth advantage
+- Ineffective in forced direct combat
+
+### Loadout Constraints
 
 Each bot has limited loadout capacity to prevent overpowered configurations and maintain balance:
 
@@ -123,9 +231,9 @@ These slot limitations force meaningful choices during bot configuration. Player
 - Variable module slots based on bot chassis type
 - Equipment weight/point systems instead of fixed slots
 
-#### Stat Modification Mechanics
+### Stat Modification Mechanics
 
-Equipment modifies bot characteristics (ADR-0007), creating different performance profiles:
+Equipment modifies bot characteristics (ADR-0007), creating different performance profiles through cumulative stat modifications from all equipped items.
 
 **Stat Calculation Formula**:
 ```
@@ -141,13 +249,14 @@ Final Speed: 10 - 2 + 1 = 9
 ```
 
 **Mass Contribution**: All equipment contributes to bot Mass (ADR-0007), creating natural mobility-firepower tradeoffs:
-- Heavy weapons and armor increase Mass, reducing Effective Speed
-- Light loadouts minimize Mass for maximum mobility
-- Equipment choices create cascading effects on movement capabilities
+- Heavy weapons (Shotgun) and armor (Heavy Armor) increase Mass, reducing Effective Speed
+- Light loadouts (Rifle + Light Armor) minimize Mass for maximum mobility
+- Module choices contribute additional Mass based on equipment weight
+- Equipment choices create cascading effects on movement capabilities through Mass-Speed interaction
 
-#### Action Requirements
+### Action Requirements
 
-Equipment directly determines which actions (ADR-0009) are available during combat:
+Equipment directly determines which actions (ADR-0009) are available during combat. Each piece of equipment may enable specific actions, creating distinct tactical capabilities based on loadout choices.
 
 **Weapon-Dependent Actions**:
 - **RifleShot**: Requires Rifle equipped
@@ -159,19 +268,19 @@ Without the appropriate weapon, these actions are unavailable in the bot's actio
 - **Boost**: Requires Boost Engine module
 - **Repair**: Requires Repair Kit module
 - **Scan**: Requires Sensor Array module
-- **Cloak**: Requires Stealth Module module
+- **Cloak**: Requires Stealth Module
 
-Module-dependent actions provide tactical options beyond direct combat.
+Module-dependent actions provide tactical options beyond direct combat. Bots can equip 2 modules, enabling up to 2 additional tactical actions beyond weapon attacks.
 
-**Universal Actions** (always available):
+**Universal Actions** (always available regardless of equipment):
 - **Move**: Movement in the 2D battle space (ADR-0006)
 - **Evade**: Defensive positioning or dodge action
 - **Block**: Damage reduction stance
 - **Shield**: Energy-based damage absorption
 
-#### Example Loadouts
+### Example Loadouts
 
-The following example loadouts demonstrate the range of viable bot configurations and playstyle diversity:
+The following example loadouts demonstrate the range of viable bot configurations and playstyle diversity using the equipment options defined above:
 
 **DPS (Damage Per Second) Build**
 
@@ -268,7 +377,8 @@ The following example loadouts demonstrate the range of viable bot configuration
 * Good, because Defense vs. Speed tradeoffs in armor create natural power-mobility choices
 * Good, because module variety enables utility and tactical flexibility
 * Good, because loadout constraints force meaningful choices (can't equip everything)
-* Good, because extensible design supports future equipment additions
+* Good, because modular structure (each equipment type and option in dedicated sections) makes future equipment additions straightforward
+* Good, because initial equipment set provides foundation for expansion through future ADRs
 * Good, because example builds demonstrate viable diversity and counter-play options
 * Neutral, because stat modification values (all TBD) require extensive playtesting
 * Neutral, because loadout slot counts (1 weapon, 1 armor, 2 modules) need validation through testing
@@ -290,67 +400,6 @@ The decision will be confirmed through:
 6. Developer feedback on equipment configuration clarity and accessibility
 7. Protocol integration testing for equipment selection and validation
 
-## Pros and Cons of the Options
-
-### Option 1: No Customization
-
-All bots identical, differentiation through AI implementation only.
-
-* Good, because simplest possible implementation
-* Good, because eliminates equipment balance concerns
-* Good, because focuses all differentiation on AI quality
-* Good, because easier for new developers to start (no loadout decisions)
-* Neutral, because may be sufficient for initial proof-of-concept
-* Bad, because eliminates pre-battle strategic decisions
-* Bad, because no build diversity or customization depth
-* Bad, because limits long-term engagement and replayability
-* Bad, because reduces strategic gameplay to AI implementation skill only
-
-### Option 2: Skill/Ability Selection
-
-Choose abilities from pool, no stat modification system.
-
-* Good, because creates action diversity without stat complexity
-* Good, because simpler than full equipment system
-* Good, because focuses customization on tactical options (abilities)
-* Neutral, because enables some build diversity through ability choices
-* Bad, because lacks stat customization and optimization depth
-* Bad, because no power vs. mobility tradeoffs
-* Bad, because abilities may be imbalanced without stat constraints
-* Bad, because equipment flavor and thematic coherence is lost
-
-### Option 3: Equipment Loadout System
-
-Weapons, armor, modules with stat modifications and action enablement (CHOSEN).
-
-* Good, because creates strategic depth through stat customization
-* Good, because equipment-action coupling creates diverse tactical options
-* Good, because Defense vs. Speed tradeoffs enable distinct playstyles
-* Good, because enables multiple viable builds (DPS, Tank, Balanced, Stealth)
-* Good, because extensible to future equipment additions
-* Good, because equipment choices create cascading effects via Mass (ADR-0007)
-* Good, because loadout constraints force meaningful tradeoffs
-* Good, because thematically coherent (weapons, armor, modules)
-* Neutral, because requires extensive balance tuning
-* Neutral, because stat modification complexity is moderate (simple additive formula)
-* Bad, because more complex than ability-only or no customization
-* Bad, because equipment validation adds protocol overhead
-* Bad, because balance is critical - single dominant loadout kills diversity
-
-### Option 4: Class-Based System
-
-Predefined bot classes (Tank, DPS, Scout) with fixed equipment.
-
-* Good, because guarantees build diversity through class design
-* Good, because simpler for developers (just pick class)
-* Good, because easier to balance (fewer total configurations)
-* Neutral, because provides some customization through class choice
-* Bad, because eliminates loadout customization and optimization
-* Bad, because rigid class definitions may not match all desired playstyles
-* Bad, because limits strategic depth (no stat allocation decisions)
-* Bad, because less extensible (new equipment requires new classes or class modifications)
-* Bad, because reduces pre-battle strategic planning to class selection
-
 ## More Information
 
 ### Related Documentation
@@ -367,6 +416,16 @@ Predefined bot classes (Tank, DPS, Scout) with fixed equipment.
 
 ### Implementation Notes
 
+**Modular Structure and Extensibility**:
+
+This ADR defines the initial equipment options for each category (2 weapons, 3 armor types, 4 modules). The modular structure—with each equipment type and option in dedicated sections—enables straightforward expansion:
+
+- **Adding New Equipment Options**: Future ADRs can add new equipment by simply adding new subsections under the appropriate category (Weapons, Armor, or Modules). For example, a future ADR could add "Laser Rifle" as a new subsection under Weapons.
+- **Adding New Equipment Categories**: Future ADRs can introduce entirely new equipment categories (e.g., "Chassis Types" or "Power Cores") by adding new top-level sections to the Equipment System Specification.
+- **Modifying Existing Equipment**: Future ADRs can supersede specific equipment subsections to rebalance or redesign individual items without affecting other equipment.
+
+**Stat Value Refinement**:
+
 All numeric values in this ADR are marked TBD (To Be Determined) and serve as placeholder values to establish the framework structure. These values will be refined through:
 
 1. Playtesting with all four example builds to validate competitive viability
@@ -382,16 +441,17 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 - Defense vs. Speed tradeoffs in armor create natural tank vs. mobile playstyle spectrum
 - Module slots enable tactical customization beyond raw combat stats
 - Example builds demonstrate diversity while providing optimization starting points
+- Modular structure (dedicated sections per equipment) simplifies future expansion and balance changes
 
-**Future Enhancements**:
+**Future Equipment Expansion** (to be defined in subsequent ADRs):
+- Additional weapon types: Laser, Plasma, Melee, Rocket Launcher
+- Additional armor types: Reactive Armor, Ablative Plating, Energy Shields
+- Additional modules: Hacking Module, Jamming System, ECM Suite, Decoy Projector, Grappling Hook
 - Equipment rarity/tier systems for progression
 - Equipment upgrade mechanics for long-term advancement
 - Synergy bonuses for specific equipment combinations
 - Dynamic equipment swapping during combat (risky but strategic)
 - Equipment durability and damage mechanics
-- Additional weapon types (laser, plasma, melee)
-- Additional armor types (reactive, ablative, energy shields)
-- Additional modules (hacking, jamming, ECM, decoys)
 
 ### Design Principles
 
