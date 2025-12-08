@@ -43,47 +43,86 @@ Without well-defined battle orchestration, we cannot:
 
 ## Considered Options
 
-* **Option 1: Full Visibility + Fixed Time Limit** - Complete battlefield vision, 5-minute hard cutoff
-* **Option 2: Fog of War + Dynamic Arena** - Limited detection ranges, shrinking play area over time
-* **Option 3: Fog of War + Fixed Time Limit** - Limited detection ranges with sensor/stealth mechanics, fixed time limit
+Battle orchestration is decomposed into independent properties, each with distinct options:
+
+### Property 1: Visibility
+
+* **Option 1.1: Full Visibility** - All bots can see everything on the battlefield at all times
+* **Option 1.2: Constant Fog of War** - Each bot can only see what's within a limited radius around themselves (similar to arcade-style games)
+* **Option 1.3: Revealed Fog of War** - Each bot can see within a radius around themselves, but as they move they reveal the map and can see any items/enemies within the revealed area (similar to Age of Empires and Civilization)
+
+### Property 2: Battle Termination
+
+* **Option 2.1: Health-Only Termination** - Battle ends when `enemy.health <= 0`
+* **Option 2.2: Health or Timeout Termination** - Battle ends when `enemy.health <= 0` OR max time reached (prevents indefinite stalemates)
+* **Option 2.3: Health, Timeout, or Disconnect Termination** - Battle ends when `enemy.health <= 0` OR max time reached OR bot disconnected (forfeit victory)
 
 ## Decision Outcome
 
-Chosen option: "**Option 3: Fog of War + Fixed Time Limit**", because it creates strategic depth through information advantage (sensor/stealth equipment becomes valuable), encourages tactical positioning (must get in range to detect), maintains simplicity (no dynamic arena complexity), and provides definitive conclusion through time limits. This option maximizes the value of Sensor Array and Stealth Module equipment (ADR-0008).
+### Property 1: Visibility
+
+**Chosen: Option 1.1 - Full Visibility**
+
+Rationale:
+- Simpler implementation for initial POC - no detection mechanics, line-of-sight calculations, or visibility protocol complexity
+- Encourages users to implement full pathfinding solutions - with complete battlefield information, bots can calculate optimal paths considering enemy positions and obstacles
+- Enables sophisticated AI strategies - bots have complete information to make informed tactical decisions
+- Easier to debug and visualize - all battlefield state always visible
+- Reduces initial implementation scope - allows focus on core battle mechanics before adding fog of war complexity
+- Future enhancement path - fog of war can be added in later iterations once core mechanics are validated
+
+**Alternative Considered: Option 1.2 - Constant Fog of War** would create strategic depth through information advantage but adds significant implementation complexity (detection ranges, line-of-sight, sensor/stealth mechanics) that is not necessary for initial POC. Can be reconsidered for future game modes once core mechanics are proven.
+
+**Alternative Rejected: Option 1.3 - Revealed Fog of War** adds even more complexity (persistent revealed state tracking) and is not appropriate for initial implementation.
+
+### Property 2: Battle Termination
+
+**Chosen: Option 2.3 - Health, Timeout, or Disconnect Termination**
+
+Rationale:
+- **Health termination** (`enemy.health <= 0`) provides the primary definitive victory condition
+- **Timeout termination** (max time reached with HP comparison) prevents indefinite stalemates from equally matched bots or passive/buggy strategies, encourages aggressive play by rewarding damage dealt
+- **Disconnect termination** (forfeit on disconnect/unresponsive) handles technical failures gracefully with grace period for reconnection, ensures battles conclude even with connection issues
+- All three termination conditions are necessary to handle the complete set of battle scenarios
+
+**Time Limit Value**: TBD (placeholder: 5 minutes / 300 seconds) - requires playtesting to balance engagement encouragement vs. strategic gameplay depth
+
+**Grace Period Value**: TBD - requires testing to balance reconnection allowance vs. competitive integrity
+
+**Timeout Resolution**: Bot with higher health at timeout wins; equal health results in draw. This rewards aggressive play and damage dealing over passive stalemate.
 
 ### Battle Orchestration Specification
 
 #### Battlefield Visibility Rules
 
-**Fog of War System**:
+**Full Visibility System**:
 
-Bots do not have automatic full battlefield visibility. Instead, detection is range-based:
+All bots have complete battlefield visibility at all times. Each bot receives full information about all entities and state on the battlefield.
 
-**Detection Mechanics**:
-- **Base Detection Range**: Each bot has a detection radius (TBD: placeholder 30 units)
-- **Sensor Array Bonus**: +2 Detection Range (TBD) when equipped (ADR-0008)
-- **Stealth Module Effect**: -2 Enemy Detection Range (TBD) when equipped (ADR-0008)
-- **Line of Sight Required**: Detection requires unobstructed line of sight (ADR-0006)
+**Information Provided to All Bots**:
+- **Enemy Bot Position**: Complete x, y coordinates of all enemy bots
+- **Enemy Bot Health**: Current HP value of all enemy bots
+- **Enemy Bot Orientation**: Facing direction of all enemy bots (for predicting movement)
+- **Enemy Bot Equipment**: Loadout information for all enemy bots (visible equipment from ADR-0008)
+- **Battlefield Obstacles**: All obstacle positions and dimensions (from ADR-0006)
+- **Arena Boundaries**: Complete arena size and boundary information (from ADR-0006)
+- **Enemy Actions**: All actions performed by enemy bots are visible when executed
 
-**Information Provided Within Detection Range**:
-- Enemy bot position (x, y coordinates)
-- Enemy bot health (current HP value)
-- Enemy bot orientation/facing (for predicting movement)
-- Enemy actions (visible when performed within range)
-
-**Information Hidden Outside Detection Range**:
-- Enemy bot position unknown (not visible on battlefield)
-- Enemy bot health unknown
-- Enemy actions unknown
+**No Hidden Information**:
+- All battlefield state is visible to all bots at all times
+- No detection ranges or line-of-sight restrictions
+- No visibility-based equipment effects (Sensor Array and Stealth Module provide stat bonuses only, not visibility effects)
 
 **Tactical Implications**:
-- **Sensor Array Equipment**: Increases detection range, providing information advantage (ADR-0008)
-- **Stealth Module Equipment**: Reduces enemy detection range, enables surprise attacks (ADR-0008)
-- **Scan Action**: Provides temporary detection boost within area (ADR-0009)
-- **Positioning Strategy**: Bots must position to detect enemies or avoid detection
-- **Equipment Tradeoffs**: Sensor/Stealth builds become viable strategic choices
+- **Complete Information Gameplay**: Bots can make fully informed decisions based on complete battlefield state
+- **Pathfinding Opportunities**: Bots can calculate optimal paths considering enemy positions, obstacles, and arena boundaries
+- **Predictive AI**: Bots can implement sophisticated prediction algorithms knowing enemy positions and past actions
+- **Strategic Positioning**: Position-based tactics still valuable (flanking, distance management, obstacle usage)
+- **Equipment Focus**: Equipment choices focus on combat stats rather than detection/stealth capabilities
 
-**Alternative Considered**: Full Visibility (all bots always visible) would simplify implementation but eliminate information strategy layer and reduce value of sensor/stealth equipment.
+**Design Rationale**: Full visibility simplifies initial implementation, enables sophisticated pathfinding and AI strategies, and allows focus on core battle mechanics. Fog of war mechanics can be added in future iterations once core gameplay is validated.
+
+**Future Consideration**: Fog of War (constant or revealed) could be added as optional game modes once core mechanics are proven, providing information strategy depth and making sensor/stealth equipment affect visibility.
 
 #### Battle Pacing and Time Management
 
@@ -218,81 +257,153 @@ If a bot begins battle with 0 or negative health (configuration error):
 
 ### Consequences
 
-* Good, because fog of war creates strategic depth through information advantage and detection mechanics
-* Good, because sensor/stealth equipment becomes meaningfully valuable (not just stat modifiers)
-* Good, because time limits ensure battles conclude in reasonable timeframes
+**Visibility Decision (Full Visibility)**:
+
+* Good, because simplest possible implementation (no detection mechanics, line-of-sight, or visibility protocol)
+* Good, because encourages users to implement sophisticated pathfinding solutions with complete battlefield information
+* Good, because enables advanced AI strategies - bots have complete information for tactical decisions
+* Good, because easier to debug and visualize (all state always visible)
+* Good, because reduces initial POC scope - allows focus on core battle mechanics
+* Good, because integrates seamlessly with spatial system (ADR-0006) without additional visibility calculations
+* Good, because provides clear future enhancement path - fog of war can be added later
+* Neutral, because sensor/stealth equipment provides stat bonuses only (no visibility effects in this mode)
+* Neutral, because eliminates information strategy layer - all gameplay is complete information
+* Bad, because may reduce strategic depth compared to fog of war (no information advantage mechanic)
+* Bad, because sensor/stealth builds less distinctive (equipment affects stats but not visibility)
+
+**Battle Termination Decision (Health, Timeout, or Disconnect)**:
+
+* Good, because handles all battle termination scenarios comprehensively
+* Good, because timeout ensures battles conclude in reasonable timeframes (prevents infinite stalemates)
 * Good, because timeout resolution encourages aggressive play (damage creates HP advantage)
-* Good, because win conditions handle all scenarios including edge cases definitively
-* Good, because deterministic resolution rules ensure fairness and predictability
-* Good, because integrates seamlessly with spatial system (ADR-0006), characteristics (ADR-0007), equipment (ADR-0008), and actions (ADR-0009)
-* Good, because draw conditions are clear and handle simultaneous outcomes
 * Good, because disconnect handling with grace period balances technical issues with competitive integrity
-* Neutral, because detection range values (base 30 units, +2 sensor, -2 stealth) require playtesting
+* Good, because provides definitive outcomes for all scenarios including edge cases
+* Good, because deterministic resolution rules ensure fairness and predictability
+* Good, because draw conditions are clear (mutual destruction, equal health at timeout)
 * Neutral, because time limit (5 minutes) requires validation through competitive gameplay
-* Neutral, because fog of war adds complexity vs. full visibility but creates strategic value
-* Bad, because fog of war implementation is more complex than full visibility
-* Bad, because detection range mechanics require careful tuning to balance sensor/stealth value
-* Bad, because time limit may feel artificial if tuned incorrectly (too short or too long)
+* Neutral, because grace period duration requires tuning (balance fairness vs. delays)
+* Neutral, because timeout may feel artificial if tuned incorrectly (too short or too long)
+* Bad, because most complex termination implementation (three conditions to track and handle)
+* Bad, because requires robust disconnect detection and reconnection infrastructure
 * Bad, because timeout resolution may favor defensive play if time limit is too generous
+
+**Overall Integration**:
+
+* Good, because decisions integrate seamlessly with ADR-0006 (spatial system), ADR-0007 (characteristics), ADR-0008 (equipment), and ADR-0009 (actions)
+* Good, because property-based decision structure allows independent tuning and future modifications
+* Good, because each property addresses distinct battle orchestration concerns
 
 ### Confirmation
 
 The decision will be confirmed through:
 
-1. Implementation of fog of war system with detection ranges and line of sight
-2. Equipment integration testing to validate sensor/stealth effects on detection
+1. Implementation of full visibility system with complete battlefield state synchronization
+2. Validation that all bots receive complete and accurate battlefield information
 3. Playtesting to tune time limits and ensure engagement without stalemate
 4. Win condition testing to verify all scenarios (destruction, forfeit, timeout, draw) resolve correctly
 5. Edge case validation for simultaneous actions, disconnects, and timeout priorities
-6. Competitive gameplay to ensure sensor/stealth builds are viable strategic choices
+6. User testing to confirm pathfinding and AI strategy opportunities with complete information
 7. Timeout scenario analysis to confirm aggressive play is rewarded over passive stalemate
+8. Future evaluation of fog of war as optional game mode once core mechanics are validated
 
 ## Pros and Cons of the Options
 
-### Option 1: Full Visibility + Fixed Time Limit
+### Property 1: Visibility
 
-Complete battlefield vision, all bots always visible, 5-minute hard cutoff.
+#### Option 1.1: Full Visibility (CHOSEN)
 
-* Good, because simplest implementation (no detection mechanics)
+All bots can see everything on the battlefield at all times.
+
+* Good, because simplest implementation (no detection mechanics required)
 * Good, because eliminates fog of war complexity
 * Good, because bots always have complete information for decision-making
 * Good, because easier to debug and visualize (everything always visible)
-* Neutral, because may be sufficient for initial POC
-* Bad, because eliminates information strategy layer
-* Bad, because Sensor Array and Stealth Module equipment have no visibility effect (only stat modifiers)
-* Bad, because no reward for scouting or positioning for detection
+* Good, because no line-of-sight calculations needed
+* Neutral, because may be sufficient for initial POC or simple game modes
+* Bad, because eliminates information strategy layer entirely
+* Bad, because Sensor Array and Stealth Module equipment have no visibility effect (reduced to stat modifiers only)
+* Bad, because no reward for scouting, positioning, or detection tactics
 * Bad, because reduces strategic depth (no information advantage mechanic)
+* Bad, because all builds become combat-focused with no sensor/stealth viability
 
-### Option 2: Fog of War + Dynamic Arena
+#### Option 1.2: Constant Fog of War
 
-Limited detection ranges with sensor/stealth mechanics, shrinking play area forces engagement.
+Each bot can only see what's within a limited radius around themselves.
 
-* Good, because fog of war creates information strategy depth
-* Good, because dynamic arena (shrinking boundaries) guarantees eventual engagement
-* Good, because eliminates timeout stalemate possibility (arena forces contact)
-* Good, because sensor/stealth equipment becomes highly valuable
-* Neutral, because dynamic arena adds urgency and tension
-* Bad, because dynamic arena significantly increases implementation complexity
-* Bad, because shrinking boundaries may feel artificial or gimmicky
-* Bad, because requires careful tuning of shrink rate to avoid frustration
-* Bad, because arena size changes affect all spatial calculations over time
-* Bad, because may disadvantage slower bots unfairly (cannot escape shrinking boundary)
-
-### Option 3: Fog of War + Fixed Time Limit
-
-Limited detection ranges with sensor/stealth mechanics, fixed 5-minute time limit (CHOSEN).
-
-* Good, because fog of war creates information strategy depth
-* Good, because sensor/stealth equipment becomes meaningfully valuable
-* Good, because simpler than dynamic arena (static boundaries from ADR-0006)
-* Good, because detection mechanics encourage tactical positioning and scouting
-* Good, because time limit ensures definitive conclusion without arena complexity
-* Good, because timeout resolution (HP comparison) encourages aggressive play
+* Good, because creates information strategy depth through limited visibility
+* Good, because sensor/stealth equipment becomes meaningfully valuable (affects detection ranges)
+* Good, because encourages tactical positioning and maneuvering
+* Good, because enables viable sensor/stealth builds as strategic alternatives
+* Good, because balances complexity vs. value - simpler than revealed fog of war
+* Good, because detection mechanics add depth without persistent state tracking
 * Neutral, because requires tuning detection ranges for balance
-* Neutral, because time limit needs validation through playtesting
-* Bad, because fog of war implementation more complex than full visibility
-* Bad, because passive play is technically possible until timeout (relies on timeout resolution to discourage)
+* Neutral, because requires line-of-sight calculations (already needed for ADR-0006)
+* Bad, because more complex implementation than full visibility
 * Bad, because detection range mechanics add protocol and server complexity
+* Bad, because requires careful balancing of base detection, sensor bonus, and stealth penalty
+
+#### Option 1.3: Revealed Fog of War
+
+Bots reveal map areas as they move, maintaining visibility of revealed areas.
+
+* Good, because creates strong information strategy depth
+* Good, because rewards exploration and map control
+* Good, because enables "scouting" strategies and territorial gameplay
+* Good, because familiar mechanic from RTS games (Age of Empires, Civilization)
+* Neutral, because sensor/stealth equipment still valuable for initial detection
+* Bad, because significant implementation complexity (persistent revealed state per bot)
+* Bad, because requires tracking revealed areas across battle duration
+* Bad, because arena state synchronization becomes more complex
+* Bad, because memory overhead for revealed area maps
+* Bad, because may favor mobility-focused builds disproportionately
+* Bad, because complexity may not justify strategic benefit for 1v1 battles
+
+### Property 2: Battle Termination
+
+#### Option 2.1: Health-Only Termination
+
+Battle ends only when `enemy.health <= 0`.
+
+* Good, because simplest termination logic (single victory condition)
+* Good, because most intuitive outcome (destroy enemy to win)
+* Good, because no timeout mechanics needed
+* Neutral, because appropriate for games where engagement is guaranteed
+* Bad, because battles could run indefinitely with equally matched bots
+* Bad, because passive/defensive strategies could create stalemates
+* Bad, because buggy bot logic could cause infinite battles
+* Bad, because no mechanism to conclude matches that reach equilibrium
+* Bad, because requires external intervention to end problematic matches
+
+#### Option 2.2: Health or Timeout Termination
+
+Battle ends when `enemy.health <= 0` OR max time reached.
+
+* Good, because ensures battles conclude in reasonable timeframes
+* Good, because prevents stalemates from equally matched bots
+* Good, because handles buggy/passive bot strategies gracefully
+* Good, because timeout resolution (HP comparison) encourages aggressive play
+* Good, because rewards damage dealing over pure defense
+* Neutral, because requires tuning time limit for balance
+* Neutral, because timeout may feel artificial if tuned incorrectly
+* Bad, because doesn't handle disconnection/unresponsive bots
+* Bad, because disconnect scenarios require separate handling or manual intervention
+* Bad, because incomplete solution for all battle termination scenarios
+
+#### Option 2.3: Health, Timeout, or Disconnect Termination (CHOSEN)
+
+Battle ends when `enemy.health <= 0` OR max time reached OR bot disconnected.
+
+* Good, because handles all battle termination scenarios comprehensively
+* Good, because timeout prevents indefinite stalemates
+* Good, because disconnect handling ensures battles conclude gracefully
+* Good, because grace period for reconnection balances fairness with technical issues
+* Good, because rewards aggressive play through timeout HP comparison
+* Good, because provides definitive outcomes for all edge cases
+* Neutral, because requires tuning both time limit and grace period
+* Neutral, because disconnect logic adds complexity to battle flow
+* Bad, because most complex termination implementation (three conditions to track)
+* Bad, because grace period tuning difficult (too short = unfair, too long = delays)
+* Bad, because requires robust disconnect detection and handling infrastructure
 
 ## More Information
 
@@ -321,32 +432,38 @@ Limited detection ranges with sensor/stealth mechanics, fixed 5-minute time limi
 
 All numeric values in this ADR are marked TBD (To Be Determined) and serve as placeholder values to establish the framework structure. These values will be refined through:
 
-1. Detection range playtesting to balance sensor/stealth value (base: 30 units, sensor: +2, stealth: -2)
-2. Time limit tuning to ensure engagement without stalemate (placeholder: 5 minutes)
-3. Grace period validation for disconnect handling (balance technical issues vs. competitive integrity)
-4. Win condition edge case testing (simultaneous destruction, timeout priorities, etc.)
-5. Fog of war implementation testing to validate detection mechanics work correctly
-6. Competitive gameplay analysis to ensure sensor/stealth builds are viable
-7. Timeout scenario frequency analysis to tune time limit appropriately
+1. Time limit tuning to ensure engagement without stalemate (placeholder: 5 minutes)
+2. Grace period validation for disconnect handling (balance technical issues vs. competitive integrity)
+3. Win condition edge case testing (simultaneous destruction, timeout priorities, etc.)
+4. Full visibility state synchronization testing to validate complete battlefield information delivery
+5. Pathfinding and AI strategy validation to confirm complete information enables sophisticated bot implementations
+6. Timeout scenario frequency analysis to tune time limit appropriately
+7. Equipment balance testing to ensure stat-based equipment choices remain meaningful
 
 **Key Design Insights**:
-- Fog of war makes Sensor Array and Stealth Module equipment strategically valuable beyond stat effects
+- Full visibility simplifies initial implementation and focuses on core battle mechanics
+- Complete battlefield information enables users to implement sophisticated pathfinding and AI solutions
 - Time limit with HP-based timeout resolution encourages aggressive play over passive stalemate
 - Destruction takes precedence over timeout to prioritize definitive outcomes
 - Grace period for disconnects balances technical issues with competitive fairness
+- Sensor Array and Stealth Module equipment provide stat bonuses without visibility effects in this mode
 
 **Future Considerations**:
 - **Variable Time Limits**: Different battle modes (quick match vs. tournament) may have different time limits
+- **Fog of War Game Modes**: Constant or revealed fog of war could be added as optional game modes to create information strategy layer
 - **Shrinking Arena**: Dynamic boundaries could be added for specific game modes if passive play becomes problematic
 - **Overtime Mechanics**: If timeout occurs with close HP values, brief overtime period could be added
-- **Spectator Mode**: Full visibility for spectators even with fog of war for participants
-- **Replay System**: Battle recordings with fog of war visualization
+- **Spectator Mode**: Already full visibility for all participants; spectators share same view
+- **Replay System**: Battle recordings with complete visibility throughout
+- **Partial Information Modes**: Once core mechanics proven, visibility could become configurable property per game mode
 
 ### Design Principles
 
 The battle orchestration follows these principles:
-- **Information Strategy**: Fog of war creates meaningful sensor/stealth choices
+- **Simplicity First**: Full visibility reduces initial complexity and enables focus on core mechanics
+- **Complete Information Strategy**: Bots have full battlefield knowledge to implement sophisticated AI and pathfinding
 - **Engagement Encouragement**: Timeout resolution rewards aggressive play
 - **Definitive Outcomes**: All scenarios have clear win/loss/draw determination
-- **Fairness**: Deterministic, predictable resolution rules
+- **Fairness**: Deterministic, predictable resolution rules with complete information
 - **Integration**: Seamlessly combines mechanics from ADR-0006 through ADR-0009
+- **Future Extensibility**: Visibility property can be enhanced later (fog of war modes) without disrupting core mechanics
