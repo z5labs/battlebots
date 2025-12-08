@@ -60,8 +60,8 @@ Each bot equips a loadout with 1 weapon, 1 armor, and 2 modules. Equipment modif
 * Good, because Defense vs. Speed tradeoffs in armor create natural power-mobility choices
 * Good, because module variety enables utility and tactical flexibility
 * Good, because loadout constraints force meaningful choices (can't equip everything)
-* Good, because modular structure (each equipment type and option in dedicated sections) makes future equipment additions straightforward
-* Good, because initial equipment set provides foundation for expansion through future ADRs
+* Good, because modular structure (each equipment type and option in dedicated sections) makes equipment additions straightforward
+* Good, because initial equipment set provides foundation for expansion
 * Good, because example builds demonstrate viable diversity and counter-play options
 * Neutral, because stat modification values (all TBD) require extensive playtesting
 * Neutral, because loadout slot counts (1 weapon, 1 armor, 2 modules) need validation through testing
@@ -281,9 +281,9 @@ The following example loadouts demonstrate the range of viable bot configuration
 
 This ADR defines the initial equipment options for each category (2 weapons, 3 armor types, 4 modules). The modular structure—with each equipment type and option in dedicated sections—enables straightforward expansion:
 
-- **Adding New Equipment Options**: Future ADRs can add new equipment by simply adding new subsections under the appropriate category (Weapons, Armor, or Modules). For example, a future ADR could add "Laser Rifle" as a new subsection under Weapons.
-- **Adding New Equipment Categories**: Future ADRs can introduce entirely new equipment categories (e.g., "Chassis Types" or "Power Cores") by adding new top-level sections to the Equipment System Specification.
-- **Modifying Existing Equipment**: Future ADRs can supersede specific equipment subsections to rebalance or redesign individual items without affecting other equipment.
+- **Adding New Equipment Options**: New equipment can be added by simply adding new subsections under the appropriate category (Weapons, Armor, or Modules). For example, "Laser Rifle" could be added as a new subsection under Weapons.
+- **Adding New Equipment Categories**: New equipment categories (e.g., "Chassis Types" or "Power Cores") can be introduced by adding new top-level sections to the Equipment System Specification.
+- **Modifying Existing Equipment**: Specific equipment subsections can be superseded to rebalance or redesign individual items without affecting other equipment.
 
 **Stat Value Refinement**:
 
@@ -302,17 +302,7 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 - Defense vs. Speed tradeoffs in armor create natural tank vs. mobile playstyle spectrum
 - Module slots enable tactical customization beyond raw combat stats
 - Example builds demonstrate diversity while providing optimization starting points
-- Modular structure (dedicated sections per equipment) simplifies future expansion and balance changes
-
-**Future Equipment Expansion** (to be defined in subsequent ADRs):
-- Additional weapon types: Laser, Plasma, Melee, Rocket Launcher
-- Additional armor types: Reactive Armor, Ablative Plating, Energy Shields
-- Additional modules: Hacking Module, Jamming System, ECM Suite, Decoy Projector, Grappling Hook
-- Equipment rarity/tier systems for progression
-- Equipment upgrade mechanics for long-term advancement
-- Synergy bonuses for specific equipment combinations
-- Dynamic equipment swapping during combat (risky but strategic)
-- Equipment durability and damage mechanics
+- Modular structure (dedicated sections per equipment) simplifies expansion and balance changes
 
 ### Design Principles
 
