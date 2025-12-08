@@ -34,13 +34,11 @@ These properties form the mathematical foundation upon which all spatial mechani
 
 Without well-defined topological properties, we cannot:
 - Implement consistent position and movement mechanics
-- Calculate distances for ranged attacks and detection
-- Define collision detection algorithms
 - Establish arena boundaries and out-of-bounds handling
-- Provide predictable physics for bot developers
-- Design pathfinding algorithms
+- Provide a predictable spatial framework for bot developers
+- Design algorithms that work with the spatial structure
 - Support visualization and rendering systems
-- Create a coherent spatial framework for all game mechanics
+- Create a coherent foundation for all spatial game mechanics
 
 ## Decision Drivers
 
@@ -149,99 +147,14 @@ The battle space is defined by rectangular boundaries:
 3. **Boundary Contact**: Bots may be positioned exactly on the boundary line
 4. **Force Effects**: External forces (knockback, explosions, etc.) that would push a bot out-of-bounds will stop at the boundary
 
-#### Bot Positioning and Collision Detection
-
-Each bot occupies a circular area within the battle space:
-
-- **Bot Radius**: **2 units** (TBD - subject to balance tuning)
-- **Center Position**: Each bot's coordinates (x, y) represent the center of its circular footprint
-- **Minimum Separation**: Bots cannot overlap; their circular areas must not intersect
-
-**Collision Detection** uses simple circle-to-circle distance calculations:
-
-1. **Bot-to-Bot Collision**: Two bots collide when the distance between their centers is less than the sum of their radii (2r = 4 units for identical bots)
-2. **Bot-to-Wall Collision**: A bot collides with a wall when its center position plus its radius exceeds the boundary
-   - Left wall: `x - radius < -50`
-   - Right wall: `x + radius > 50`
-   - Bottom wall: `y - radius < -50`
-   - Top wall: `y + radius > 50`
-3. **Collision Resolution**: When a collision is detected, the movement is adjusted to place the bot in contact with the obstacle without overlapping
-
-**Bot-to-Bot Collision Rules**:
-1. **Movement Blocking**: Bots cannot move through each other
-2. **Collision Physics**: When two bots attempt to occupy overlapping space:
-   - The moving bot stops at the point of contact
-   - Both bots remain stationary in their final positions (no pushing or displacement)
-3. **Damage**: Bot-to-bot collisions do not inherently cause damage (unless specific collision damage mechanics are introduced)
-
-#### Friction and Movement Physics
-
-The battle space applies friction to all moving bots, which affects their velocity and movement behavior. Friction provides realistic physics that require bots to continuously apply force to maintain movement, and it enables the possibility of variable terrain types with different surface properties.
-
-**Friction Mechanics**:
-
-1. **Friction Force**: Opposes the direction of bot movement, proportional to velocity
-2. **Friction Coefficient (μ)**: Determines the strength of friction applied to a bot
-   - **Default Coefficient**: **0.1** (TBD - subject to balance tuning)
-   - **Range**: 0.0 (frictionless) to 1.0 (maximum friction)
-3. **Velocity Decay**: Each update tick, a bot's velocity is reduced by the friction force
-4. **Natural Stopping**: Without continuous thrust, a bot will gradually slow to a stop due to friction
-
-**Friction Calculation**:
-
-```
-friction_force = -μ × velocity
-new_velocity = velocity + friction_force
-```
-
-Where:
-- `μ` is the friction coefficient at the bot's current position
-- `velocity` is the bot's current velocity vector
-- The negative sign indicates friction opposes the direction of movement
-
-**Variable Friction Zones**:
-
-1. **Uniform Friction**: By default, the entire battle space has a uniform friction coefficient
-2. **Friction Zones**: Specific rectangular or circular areas may define different friction values
-   - **Low Friction** (μ < 0.1): "Slippery" surfaces where bots slide more easily
-   - **Standard Friction** (μ = 0.1): Normal battle space surface
-   - **High Friction** (μ > 0.1): "Rough" surfaces that slow bot movement more quickly
-3. **Zone Priority**: When friction zones overlap, the highest friction coefficient applies
-4. **Transition Behavior**: Moving between friction zones immediately applies the new coefficient (no gradual transition)
-
-**Tactical Implications**:
-- **Movement Planning**: Bots must account for deceleration when planning movements
-- **Pursuit and Evasion**: Understanding friction helps predict opponent stopping distances
-- **Zone Control**: High-friction zones can limit mobility, while low-friction zones enable faster repositioning
-- **Energy Management**: Continuous thrust is required to maintain velocity, affecting energy economy
-
-#### Line of Sight
-
-Line of sight determines whether one bot can "see" or target another bot, which is essential for ranged attacks and targeting systems.
-
-**Line of Sight Rules**:
-
-1. **Direct Path**: A bot has line of sight to another bot if an unobstructed straight line can be drawn between their center positions
-2. **Obstacle-Free**: Currently, the only obstacles are other bots. A bot blocks line of sight between two other bots if the line passes through its circular area
-3. **Boundary Walls**: Walls do not block line of sight (bots can see through walls but cannot shoot through them - weapon-specific rules apply)
-
-**Line of Sight Calculation**:
-
-To determine if Bot A has line of sight to Bot B:
-
-1. Draw a line segment from A's center to B's center
-2. For each other bot C in the arena:
-   - Calculate the perpendicular distance from C's center to the line segment
-   - If this distance is less than C's radius, line of sight is blocked
-
-This calculation may be optimized by only checking bots that fall within a bounding box around the line segment.
-
 #### Movement Constraints
 
-1. **Speed Limits**: Bots have maximum movement speeds (defined in ADR-0006: Bot Characteristics)
-2. **No Teleportation**: Bots cannot instantly move from one position to another; all movement follows continuous paths
-3. **Elastic Wall Collisions**: When a bot collides with a wall during movement, it stops at the wall position without bouncing
-4. **No Wall Damage**: Wall collisions do not inherently cause damage to bots
+The following basic movement constraints apply to the battle space:
+
+1. **Continuous Movement**: Bots cannot instantly teleport from one position to another; all movement follows continuous paths through the 2D Euclidean space
+2. **Boundary Enforcement**: Any movement that would place a bot outside the rectangular boundaries is prevented (specific collision mechanics will be defined in a separate ADR)
+3. **No Coordinate Wrapping**: The space does not wrap around (i.e., exiting one side does not place a bot on the opposite side)
+4. **Deterministic Physics**: All spatial calculations use deterministic algorithms to ensure consistent behavior across platforms
 
 ### Consequences
 
@@ -310,10 +223,9 @@ The decision will be confirmed through:
    - Rectangular boundary enforcement
 
 2. **Spatial Mechanics Validation**:
-   - Implement collision detection using 2D Euclidean distance
-   - Boundary collision detection and clamping working correctly
-   - Friction physics applied correctly each tick
-   - Line of sight calculations accurate
+   - Boundary enforcement working correctly (clamping at edges)
+   - Continuous movement paths validated
+   - Coordinate calculations accurate and deterministic
 
 3. **Developer Accessibility**:
    - Bot SDK exposes Cartesian (x, y) coordinates
@@ -343,8 +255,7 @@ The decision will be confirmed through:
 
 8. **Playtesting**:
    - Arena size (100x100) provides appropriate tactical space
-   - Bot radius (2 units) creates reasonable collision frequency
-   - Friction coefficient (0.1) balances mobility vs stopping control
+   - Spatial dimensions support engaging battles
 
 9. **Future Consideration**:
    - Document path to 3D extension if needed
@@ -536,7 +447,12 @@ Fixed circular arena boundary centered at origin.
 
 - **[POC User Journey](../user-journeys/0001-poc.md)**: Proof of concept implementation using this spatial foundation
 
-**Note**: This ADR supersedes and integrates the former ADR-0006 (Battle Space Spatial System), which is now deprecated. The spatial implementation details previously in ADR-0006 are now part of this ADR's "Spatial System Implementation Specification" section.
+**Note**: This ADR supersedes and integrates the former ADR-0006 (Battle Space Spatial System), which is now deprecated.
+
+**Future ADRs**: The following topics were removed from this ADR and will be addressed in separate architectural decisions:
+- Collision Detection and Bot Positioning (bot size, collision mechanics, collision resolution)
+- Friction and Movement Physics (friction coefficients, velocity decay, variable friction zones)
+- Line of Sight (visibility calculations, obstacle blocking)
 
 ### Implementation Notes
 
@@ -551,15 +467,12 @@ The BattleBot Universe is mathematically defined as:
 
 **Numeric Value Refinement**:
 
-All numeric values (arena size, bot radius, friction coefficient) are marked TBD and will be refined through:
+The arena size (100x100 units) is marked TBD and will be refined through:
 
-1. Performance profiling of collision detection at various arena sizes
-2. Playtesting to tune arena size for engagement frequency
-3. Balance analysis of bot radius for collision frequency
-4. Friction coefficient tuning for movement feel
-5. Visualization testing for rendering clarity
-6. Timeout scenario frequency analysis to tune arena size appropriately
-7. Equipment balance testing to ensure stat-based equipment choices remain meaningful
+1. Playtesting to tune arena size for engagement frequency
+2. Visualization testing for rendering clarity
+3. Timeout scenario frequency analysis to tune arena size appropriately
+4. Equipment balance testing to ensure stat-based equipment choices remain meaningful
 
 **Key Design Insights**:
 - 2D + R^n continuous + Cartesian + Rectangular boundaries create mutually reinforcing topological framework
