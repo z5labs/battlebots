@@ -1,9 +1,9 @@
 ---
-title: "[0007] Bot Characteristics System"
+title: "[0006] Bot Characteristics System"
 description: >
     Attribute system defining bot capabilities and creating strategic differentiation
 type: docs
-weight: 7
+weight: 6
 category: "strategic"
 status: "accepted"
 date: 2025-12-07
@@ -39,7 +39,7 @@ Without a well-defined characteristic system, we cannot:
 * **Developer Accessibility** - Stats should be understandable without being overwhelming
 * **Calculation Simplicity** - Stat interactions should be calculable and predictable
 * **Playstyle Support** - Should enable distinct archetypes (tank, DPS, mobile, balanced)
-* **Spatial Integration** - Must work with continuous 2D movement system (ADR-0006)
+* **Spatial Integration** - Must work with continuous 2D Euclidean space (ADR-0005)
 
 ## Decision Outcome
 
@@ -49,7 +49,7 @@ The bot characteristics system consists of three core attributes that create str
 2. **Defense** - Damage mitigation capability; reduces effective damage from enemy attacks
 3. **Mass** - Equipment-derived weight; calculated from equipped items and impacts effective thrust-to-movement conversion
 
-This three-attribute system creates strategic depth through stat interactions (Effective HP, thrust-based mobility), enables equipment-driven tradeoffs via Mass, balances complexity with accessibility, and provides diverse optimization paths without overwhelming developers. Movement is governed by a thrust-based system (ADR-0009) where bots apply continuous thrust force to overcome friction (ADR-0006), with Mass affecting how efficiently thrust translates into velocity. The inclusion of equipment-derived Mass creates natural mobility-power tradeoffs that emerge from loadout choices.
+This three-attribute system creates strategic depth through stat interactions (Effective HP, thrust-based mobility), enables equipment-driven tradeoffs via Mass, balances complexity with accessibility, and provides diverse optimization paths without overwhelming developers. Movement is governed by a thrust-based system (ADR-0009) where bots apply continuous thrust force to overcome friction (ADR-0005), with Mass affecting how efficiently thrust translates into velocity. The inclusion of equipment-derived Mass creates natural mobility-power tradeoffs that emerge from loadout choices.
 
 ## Bot Characteristics Specification
 
@@ -104,7 +104,7 @@ Mass represents the total physical weight of a bot, consisting of an intrinsic b
 - Light bots sacrifice durability for superior acceleration and agility
 - Mass cannot be optimized independently - it's a consequence of equipment choices
 - Forces strategic decisions between powerful equipment and tactical mobility
-- Higher Mass requires sustained thrust to overcome friction and maintain velocity (ADR-0006)
+- Higher Mass requires sustained thrust to overcome friction and maintain velocity (ADR-0005)
 - May affect collision mechanics and position displacement (future mechanics)
 
 **Equipment Examples** (TBD):
@@ -124,12 +124,12 @@ Bot characteristics don't operate in isolation - they create complex interaction
 - Example: 100 Health + 50% Defense = 150 Effective HP
 
 **Mass and Mobility**: Mass directly impacts effective movement capability:
-- **Thrust-to-Velocity Relationship**: Acceleration = Thrust Force / Mass (influenced by friction from ADR-0006)
+- **Thrust-to-Velocity Relationship**: Acceleration = Thrust Force / Mass (influenced by friction from ADR-0005)
 - Heavy equipment increases Mass, reducing acceleration from thrust actions and requiring more sustained thrust to overcome friction
 - Light loadouts maximize agility and responsiveness at the cost of offensive/defensive power
 - Equipment choices fundamentally alter tactical capabilities through Mass-based mobility tradeoffs
 
-**Combat Positioning**: Thrust actions (ADR-0009) enable tactical positioning and engagement control:
+**Combat Positioning**: Thrust actions (ADR-0008) enable tactical positioning and engagement control:
 - High thrust capacity allows kiting, pursuit, and disengagement
 - Low-Mass bots have positioning advantage through superior acceleration
 - Mass penalties from heavy equipment reduce positioning flexibility and increase thrust requirements
@@ -141,7 +141,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 - Mass from defensive equipment reduces mobility and increases thrust requirements for evasion
 - Optimal defensive strategy depends on threat profile
 
-**Loadout Optimization**: Equipment choices (ADR-0008) create cascading effects across all characteristics:
+**Loadout Optimization**: Equipment choices (ADR-0007) create cascading effects across all characteristics:
 - Heavy weapons increase offensive capability but increase Mass, reducing acceleration and requiring more thrust
 - Armor improves Defense but adds Mass that limits mobility and increases friction effects
 - Lightweight builds sacrifice protection for superior acceleration and lower thrust requirements
@@ -154,7 +154,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 * Good, because equipment-derived Mass creates natural mobility-firepower tradeoffs through thrust mechanics
 * Good, because multiple playstyles are viable (tank, DPS, mobile, balanced) through different stat profiles
 * Good, because Defense × Health interaction rewards balanced allocation over single-stat stacking
-* Good, because thrust-based movement (ADR-0009) with Mass and friction (ADR-0006) enables tactical gameplay through physics
+* Good, because thrust-based movement (ADR-0008) with Mass and friction (ADR-0005) enables tactical gameplay through physics
 * Good, because Mass cannot be optimized independently, forcing meaningful equipment tradeoffs
 * Good, because stats map cleanly to combat calculations and physics-based movement
 * Good, because movement physics create natural skill expression through thrust management
@@ -170,7 +170,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 The decision will be confirmed through:
 
 1. Implementation of characteristic system in game server with stat calculation formulas
-2. Equipment system implementation (ADR-0008) that modifies stats and contributes Mass
+2. Equipment system implementation (ADR-0007) that modifies stats and contributes Mass
 3. Playtesting with diverse bot builds (tank, DPS, balanced, mobile) to validate viability
 4. Balance analysis ensuring no single stat profile dominates all scenarios
 5. Developer feedback on stat system accessibility and understandability
@@ -180,15 +180,15 @@ The decision will be confirmed through:
 
 ### Related Documentation
 
-- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: Spatial environment with friction mechanics that govern movement physics
+- **[ADR-0005: BattleBot Universe Topological Properties](0005-battlebot-universe-topological-properties.md)**: Mathematical foundation and spatial system with friction mechanics that govern movement physics
 
-- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment that modifies stats and contributes to Mass
+- **[ADR-0007: Equipment and Loadout System](0007-equipment-loadout-system.md)**: Equipment that modifies stats and contributes to Mass
 
-- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Actions that consume resources and leverage bot characteristics
+- **[ADR-0008: Bot Actions and Resource Management](0008-bot-actions-resource-management.md)**: Actions that consume resources and leverage bot characteristics
 
 - **[Bot Characteristics Analysis](../analysis/game-mechanics/characteristics/)**: Detailed technical specifications for the stat system
 
-- **[ADR-0005: 1v1 Battle Orchestration](0005-1v1-battle-orchestration.md)**: High-level battle flow that uses these characteristics
+- **[ADR-0005: BattleBot Universe Topological Properties](0005-battlebot-universe-topological-properties.md)**: Mathematical foundation and spatial system that these characteristics integrate with
 
 ### Implementation Notes
 
@@ -199,10 +199,10 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 3. Equipment balance analysis to ensure Mass penalties are meaningful but not punishing
 4. Health and Defense tuning to create appropriate effective HP ranges
 5. Thrust-to-Mass ratio balancing to ensure mobility advantages are significant but not overwhelming
-6. Friction coefficient tuning (ADR-0006) to balance movement physics
+6. Friction coefficient tuning (ADR-0005) to balance movement physics
 7. Competitive meta analysis to identify dominant builds and adjust accordingly
 
-**Key Design Insight**: Mass consists of intrinsic base mass plus equipment weight, not directly allocated as a stat. This creates emergent tradeoffs where powerful equipment inherently reduces mobility (through increased thrust requirements and friction effects), forcing strategic loadout decisions without requiring explicit stat allocation. Movement is governed by thrust actions (ADR-0009) that must overcome both Mass-based inertia and friction forces (ADR-0006).
+**Key Design Insight**: Mass consists of intrinsic base mass plus equipment weight, not directly allocated as a stat. This creates emergent tradeoffs where powerful equipment inherently reduces mobility (through increased thrust requirements and friction effects), forcing strategic loadout decisions without requiring explicit stat allocation. Movement is governed by thrust actions (ADR-0008) that must overcome both Mass-based inertia and friction forces (ADR-0005).
 
 **Future Considerations**:
 - Additional derived stats (e.g., Effective HP, effective acceleration) may be exposed to developers
@@ -218,4 +218,4 @@ The characteristic system follows these principles:
 - **Tradeoffs over Power**: Equipment choices involve costs and benefits through Mass
 - **Diversity over Dominance**: Multiple stat profiles should be competitively viable
 - **Clarity over Complexity**: Four stats balance depth with accessibility
-- **Equipment Integration**: Stats are modified by loadout choices (ADR-0008)
+- **Equipment Integration**: Stats are modified by loadout choices (ADR-0007)
