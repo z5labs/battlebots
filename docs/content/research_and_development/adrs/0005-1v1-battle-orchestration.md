@@ -46,33 +46,6 @@ Without well-defined battle orchestration, we cannot:
 * **Observability** - Battle state and outcomes must be clear for visualization and analysis
 * **Time Constraints** - Battles must conclude in reasonable timeframes
 
-## Considered Options
-
-Battle orchestration is decomposed into independent properties, each with distinct options:
-
-### Property 1: Visibility
-
-* **Option 1.1: Full Visibility** - All bots can see everything on the battlefield at all times
-* **Option 1.2: Constant Fog of War** - Each bot can only see what's within a limited radius around themselves (similar to arcade-style games)
-* **Option 1.3: Revealed Fog of War** - Each bot can see within a radius around themselves, but as they move they reveal the map and can see any items/enemies within the revealed area (similar to Age of Empires and Civilization)
-
-### Property 2: Battle Termination
-
-* **Option 2.1: Health-Only Termination** - Battle ends when `enemy.health <= 0`
-* **Option 2.2: Health or Timeout Termination** - Battle ends when `enemy.health <= 0` OR max time reached (prevents indefinite stalemates)
-* **Option 2.3: Health, Timeout, or Disconnect Termination** - Battle ends when `enemy.health <= 0` OR max time reached OR bot disconnected (forfeit victory)
-
-### Property 3: Spatial Dimensionality
-
-* **Option 3.1: 2D** - Battles occur in two-dimensional space (x, y coordinates)
-* **Option 3.2: 3D** - Battles occur in three-dimensional space (x, y, z coordinates)
-
-### Property 4: Spatial Manifold
-
-* **Option 4.1: Bounded** - Fixed arena boundaries that remain constant throughout the battle
-* **Option 4.2: Bounded and Shrinking** - Arena boundaries that progressively shrink over time to force engagement
-* **Option 4.3: Unbounded** - No arena boundaries (infinite or very large playable area)
-
 ## Decision Outcome
 
 ### Property 1: Visibility

@@ -55,8 +55,9 @@ Chosen option: "**Option 2: Continuous 2D Cartesian Coordinate System**", becaus
 
 #### Coordinate System
 
-The battle space uses a **Cartesian coordinate system** with the following properties:
+The battle space uses a **2D Cartesian coordinate system** with the following properties:
 
+- **Dimensionality**: Two-dimensional space (x, y coordinates only; no z-axis or vertical elevation)
 - **Origin (0, 0)**: Located at the center of the arena
 - **X-axis**: Horizontal axis, with positive values extending to the right and negative values to the left
 - **Y-axis**: Vertical axis, with positive values extending upward and negative values downward
@@ -257,7 +258,7 @@ Hex tiles for movement and positioning, common in strategy games.
 
 - **[Battle Space Analysis](../analysis/game-mechanics/battle-space/)**: Detailed technical specifications for the spatial system
 
-- **[ADR-0005: 1v1 Battle Orchestration](0005-1v1-battle-orchestration.md)**: High-level battle flow that operates within this spatial system
+- **[ADR-0005: 1v1 Battle Orchestration](0005-1v1-battle-orchestration.md)**: Defines 2D spatial dimensionality and bounded manifold properties for battles; high-level battle flow that operates within this spatial system
 
 ### Implementation Notes
 
@@ -274,7 +275,7 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 - **Advanced Terrain Effects**: Damage-over-time zones, healing zones, vision-reducing fog
 - **Dynamic Boundaries**: Shrinking play areas or moving walls to force engagement
 - **Variable Arena Sizes**: Different battle modes with different dimensions
-- **Vertical Dimension**: Elevation or z-axis for flying bots or multi-level arenas
+- **3D Extension**: Could extend to three-dimensional space (x, y, z) if aerial combat becomes strategically important (see ADR-0005 for current 2D decision)
 
 ### Design Principles
 
