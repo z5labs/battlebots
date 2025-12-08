@@ -43,14 +43,13 @@ Without a well-defined characteristic system, we cannot:
 
 ## Decision Outcome
 
-The bot characteristics system consists of four core attributes that create strategic depth through meaningful interactions while remaining accessible to bot developers:
+The bot characteristics system consists of three core attributes that create strategic depth through meaningful interactions while remaining accessible to bot developers:
 
 1. **Health** - Bot's survivability pool; total damage a bot can sustain before destruction
-2. **Speed** - Movement rate through the 2D battle space; determines positioning and engagement control
-3. **Defense** - Damage mitigation capability; reduces effective damage from enemy attacks
-4. **Mass** - Equipment-derived weight; calculated from equipped items and impacts effective Speed
+2. **Defense** - Damage mitigation capability; reduces effective damage from enemy attacks
+3. **Mass** - Equipment-derived weight; calculated from equipped items and impacts effective thrust-to-movement conversion
 
-This four-attribute system creates strategic depth through stat interactions (Effective HP, Effective Speed), enables equipment-driven tradeoffs via Mass, balances complexity with accessibility, and provides diverse optimization paths without overwhelming developers. The inclusion of equipment-derived Mass creates natural mobility-power tradeoffs that emerge from loadout choices.
+This three-attribute system creates strategic depth through stat interactions (Effective HP, thrust-based mobility), enables equipment-driven tradeoffs via Mass, balances complexity with accessibility, and provides diverse optimization paths without overwhelming developers. Movement is governed by a thrust-based system (ADR-0009) where bots apply continuous thrust force to overcome friction (ADR-0006), with Mass affecting how efficiently thrust translates into velocity. The inclusion of equipment-derived Mass creates natural mobility-power tradeoffs that emerge from loadout choices.
 
 ## Bot Characteristics Specification
 
@@ -68,24 +67,7 @@ Health (HP) represents a bot's survivability in combat. This is the primary reso
 - Higher Health allows bots to sustain longer engagements
 - Critical for aggressive playstyles that prioritize direct confrontation
 - Must be balanced against offensive capabilities to ensure threat viability
-- Low Health bots must rely on Speed and tactical positioning to survive
-
-### Speed
-
-Speed determines how quickly a bot can move through the 2D battle space (ADR-0006). This stat directly affects positioning, engagement control, and evasion capabilities.
-
-**Key Properties**:
-- **Movement Rate**: Distance covered per game tick (TBD: placeholder 1-10 units/tick)
-- **Positioning Advantage**: Faster bots control engagement range
-- **Pursuit/Evasion**: Enables chasing or retreating from combat
-- **No Direct Damage Scaling**: Speed affects tactics, not raw damage output
-
-**Gameplay Impact**:
-- High Speed enables kiting strategies (attacking while maintaining distance)
-- Critical for evasion-based playstyles that avoid damage
-- Allows control of engagement timing (when to fight vs. when to disengage)
-- Low Speed bots must rely on durability or zone control
-- Speed differences create natural predator/prey dynamics between bot types
+- Low Health bots must rely on mobility (via thrust actions) and tactical positioning to survive
 
 ### Defense
 
@@ -101,7 +83,7 @@ Defense represents a bot's ability to mitigate incoming damage. This stat reduce
 - High Defense enables tank strategies and prolonged engagements
 - Multiplicatively increases effective Health pool
 - Critical for front-line and damage-absorbing playstyles
-- Low Defense bots must rely on Speed for damage avoidance
+- Low Defense bots must rely on mobility (via thrust actions) for damage avoidance
 - Defense vs. Health allocation creates build optimization choices
 
 ### Mass
@@ -111,16 +93,17 @@ Mass represents the total physical weight of a bot, determined by the equipment 
 **Key Properties**:
 - **Equipment-Derived**: Mass is calculated from the sum of all equipped items
 - **Dynamic Value**: Changes based on equipped weapons, armor, and modules
-- **Movement Impact**: Higher Mass reduces effective Speed
+- **Movement Impact**: Higher Mass reduces acceleration from thrust actions (more force needed to overcome inertia and friction)
 - **Momentum Effects**: Mass affects collision physics and knockback resistance (TBD)
 - **No Direct Damage Scaling**: Mass affects mobility, not offensive capability
 
 **Gameplay Impact**:
-- Heavy equipment loadouts reduce mobility through increased Mass
-- Creates natural tradeoff between firepower/protection and Speed
-- Light bots sacrifice durability for superior maneuverability
+- Heavy equipment loadouts reduce mobility through increased Mass (requiring more thrust to achieve same velocity)
+- Creates natural tradeoff between firepower/protection and maneuverability
+- Light bots sacrifice durability for superior acceleration and agility
 - Mass cannot be optimized independently - it's a consequence of equipment choices
 - Forces strategic decisions between powerful equipment and tactical mobility
+- Higher Mass requires sustained thrust to overcome friction and maintain velocity (ADR-0006)
 - May affect collision mechanics and position displacement (future mechanics)
 
 **Equipment Examples** (TBD):
@@ -140,45 +123,46 @@ Bot characteristics don't operate in isolation - they create complex interaction
 - Example: 100 Health + 50% Defense = 150 Effective HP
 
 **Mass and Mobility**: Mass directly impacts effective movement capability:
-- **Effective Speed Formula**: Base Speed / Mass modifier
-- Heavy equipment reduces Speed, creating mobility-firepower tradeoffs
-- Light loadouts maximize Speed at the cost of offensive/defensive power
-- Equipment choices fundamentally alter tactical capabilities
+- **Thrust-to-Velocity Relationship**: Acceleration = Thrust Force / Mass (influenced by friction from ADR-0006)
+- Heavy equipment increases Mass, reducing acceleration from thrust actions and requiring more sustained thrust to overcome friction
+- Light loadouts maximize agility and responsiveness at the cost of offensive/defensive power
+- Equipment choices fundamentally alter tactical capabilities through Mass-based mobility tradeoffs
 
-**Combat Positioning**: Speed enables tactical positioning and engagement control:
-- High Speed allows kiting, pursuit, and disengagement
-- Speed advantage determines range control in combat
-- Mass penalties from equipment reduce positioning flexibility
+**Combat Positioning**: Thrust actions (ADR-0009) enable tactical positioning and engagement control:
+- High thrust capacity allows kiting, pursuit, and disengagement
+- Low-Mass bots have positioning advantage through superior acceleration
+- Mass penalties from heavy equipment reduce positioning flexibility and increase thrust requirements
 - Lightweight builds gain tactical mobility at the cost of durability
 
 **Survivability Tradeoffs**: Defensive investment creates complex build choices:
 - High Health + Low Defense = vulnerable to sustained damage
 - Low Health + High Defense = vulnerable to burst damage
-- Mass from defensive equipment reduces evasion capability
+- Mass from defensive equipment reduces mobility and increases thrust requirements for evasion
 - Optimal defensive strategy depends on threat profile
 
 **Loadout Optimization**: Equipment choices (ADR-0008) create cascading effects across all characteristics:
-- Heavy weapons increase offensive capability but reduce Speed through Mass
-- Armor improves Defense but adds Mass that limits mobility
-- Lightweight builds sacrifice protection for superior positioning
+- Heavy weapons increase offensive capability but increase Mass, reducing acceleration and requiring more thrust
+- Armor improves Defense but adds Mass that limits mobility and increases friction effects
+- Lightweight builds sacrifice protection for superior acceleration and lower thrust requirements
 - No equipment configuration dominates all scenarios (intended design goal)
 
 ## Consequences
 
-* Good, because four-stat system creates strategic depth without overwhelming developers
-* Good, because stat interactions (Effective HP, Effective Speed) enable emergent complexity from simple rules
-* Good, because equipment-derived Mass creates natural mobility-firepower tradeoffs
+* Good, because three-stat system creates strategic depth without overwhelming developers
+* Good, because stat interactions (Effective HP, thrust-based mobility) enable emergent complexity from simple rules
+* Good, because equipment-derived Mass creates natural mobility-firepower tradeoffs through thrust mechanics
 * Good, because multiple playstyles are viable (tank, DPS, mobile, balanced) through different stat profiles
 * Good, because Defense × Health interaction rewards balanced allocation over single-stat stacking
-* Good, because Speed enables tactical gameplay through positioning and engagement control
+* Good, because thrust-based movement (ADR-0009) with Mass and friction (ADR-0006) enables tactical gameplay through physics
 * Good, because Mass cannot be optimized independently, forcing meaningful equipment tradeoffs
-* Good, because stats map cleanly to combat calculations and are easy to understand
-* Neutral, because stat values (Health range, Speed range, Defense values) require extensive playtesting
-* Neutral, because Mass modifier formulas need tuning to balance equipment weight penalties
-* Neutral, because four stats hit a middle ground - simpler than complex systems but more nuanced than minimal
-* Bad, because more stats to track and balance than minimal 2-3 stat systems
-* Bad, because stat interactions (especially Effective HP) add complexity to build optimization
-* Bad, because equipment-derived Mass means loadout choices have cascading effects that may confuse new developers
+* Good, because stats map cleanly to combat calculations and physics-based movement
+* Good, because movement physics create natural skill expression through thrust management
+* Neutral, because stat values (Health range, Defense values) require extensive playtesting
+* Neutral, because Mass modifier formulas and thrust-to-acceleration ratios need tuning to balance equipment weight penalties
+* Neutral, because three stats create a minimal but sufficient foundation for strategic depth
+* Bad, because thrust-based movement adds complexity compared to simple speed-based systems
+* Bad, because stat interactions (especially Effective HP and thrust-Mass-friction relationships) add complexity to build optimization
+* Bad, because equipment-derived Mass means loadout choices have cascading effects on movement that may confuse new developers
 
 ## Confirmation
 
@@ -195,7 +179,7 @@ The decision will be confirmed through:
 
 ### Related Documentation
 
-- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: Spatial environment where Speed determines movement
+- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: Spatial environment with friction mechanics that govern movement physics
 
 - **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment that modifies stats and contributes to Mass
 
@@ -213,16 +197,18 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 2. Playtesting with diverse bot builds across different stat profiles
 3. Equipment balance analysis to ensure Mass penalties are meaningful but not punishing
 4. Health and Defense tuning to create appropriate effective HP ranges
-5. Speed balancing to ensure mobility advantages are significant but not overwhelming
-6. Competitive meta analysis to identify dominant builds and adjust accordingly
+5. Thrust-to-Mass ratio balancing to ensure mobility advantages are significant but not overwhelming
+6. Friction coefficient tuning (ADR-0006) to balance movement physics
+7. Competitive meta analysis to identify dominant builds and adjust accordingly
 
-**Key Design Insight**: Mass is equipment-derived, not directly allocated. This creates emergent tradeoffs where powerful equipment inherently reduces mobility, forcing strategic loadout decisions without requiring explicit stat allocation.
+**Key Design Insight**: Mass is equipment-derived, not directly allocated. This creates emergent tradeoffs where powerful equipment inherently reduces mobility (through increased thrust requirements and friction effects), forcing strategic loadout decisions without requiring explicit stat allocation. Movement is governed by thrust actions (ADR-0009) that must overcome both Mass-based inertia and friction forces (ADR-0006).
 
 **Future Considerations**:
-- Additional derived stats (e.g., Effective HP, Effective Speed) may be exposed to developers
+- Additional derived stats (e.g., Effective HP, effective acceleration) may be exposed to developers
 - Attack stat may be added if weapon damage needs per-bot customization
 - Energy stat may become a direct characteristic if resource management complexity increases
 - Evasion or Accuracy stats may be added if hit-chance mechanics are introduced
+- Thrust capacity may become a direct characteristic if thrust-based movement requires per-bot customization beyond equipment
 
 ### Design Principles
 
