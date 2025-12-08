@@ -88,10 +88,11 @@ Defense represents a bot's ability to mitigate incoming damage. This stat reduce
 
 ### Mass
 
-Mass represents the total physical weight of a bot, determined by the equipment and components it carries. Unlike other characteristics, **Mass is not directly allocated** but is the cumulative result of loadout choices.
+Mass represents the total physical weight of a bot, consisting of an intrinsic base mass plus the weight of equipment and components it carries. Unlike other characteristics, **Mass is not directly allocated** but is determined by the bot's base mass and loadout choices.
 
 **Key Properties**:
-- **Equipment-Derived**: Mass is calculated from the sum of all equipped items
+- **Base Mass**: Every bot has an intrinsic starting mass (TBD: placeholder value)
+- **Equipment-Derived**: Total Mass = Base Mass + sum of all equipped items
 - **Dynamic Value**: Changes based on equipped weapons, armor, and modules
 - **Movement Impact**: Higher Mass reduces acceleration from thrust actions (more force needed to overcome inertia and friction)
 - **Momentum Effects**: Mass affects collision physics and knockback resistance (TBD)
@@ -201,7 +202,7 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 6. Friction coefficient tuning (ADR-0006) to balance movement physics
 7. Competitive meta analysis to identify dominant builds and adjust accordingly
 
-**Key Design Insight**: Mass is equipment-derived, not directly allocated. This creates emergent tradeoffs where powerful equipment inherently reduces mobility (through increased thrust requirements and friction effects), forcing strategic loadout decisions without requiring explicit stat allocation. Movement is governed by thrust actions (ADR-0009) that must overcome both Mass-based inertia and friction forces (ADR-0006).
+**Key Design Insight**: Mass consists of intrinsic base mass plus equipment weight, not directly allocated as a stat. This creates emergent tradeoffs where powerful equipment inherently reduces mobility (through increased thrust requirements and friction effects), forcing strategic loadout decisions without requiring explicit stat allocation. Movement is governed by thrust actions (ADR-0009) that must overcome both Mass-based inertia and friction forces (ADR-0006).
 
 **Future Considerations**:
 - Additional derived stats (e.g., Effective HP, effective acceleration) may be exposed to developers
