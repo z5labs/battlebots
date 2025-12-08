@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>1v1 Battles on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/</link><description>Recent content in 1v1 Battles on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/index.xml" rel="self" type="application/rss+xml"/><item><title>Getting Started</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/getting-started/</guid><description>&lt;h2 id="getting-started-with-1v1-battles"&gt;Getting Started with 1v1 Battles&lt;/h2&gt;
-&lt;p&gt;This guide will help you create your first bot for 1v1 battles. We&amp;rsquo;ll cover the basics of bot structure, equipment configuration, and connecting to the battle server.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>1v1 Battles on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/</link><description>Recent content in 1v1 Battles on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/index.xml" rel="self" type="application/rss+xml"/><item><title>Getting Started</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/getting-started/</guid><description>&lt;p&gt;This guide will help you create your first bot for 1v1 battles. We&amp;rsquo;ll cover the basics of bot structure, equipment configuration, and connecting to the battle server.&lt;/p&gt;
 &lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;Programming experience in any language&lt;/li&gt;
@@ -15,8 +14,7 @@
 &lt;li&gt;&lt;strong&gt;Communication&lt;/strong&gt; - Connect to the battle server via gRPC&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2 id="minimal-bot-example"&gt;Minimal Bot Example&lt;/h2&gt;
-&lt;p&gt;Here&amp;rsquo;s a minimal bot structure to get you started:&lt;/p&gt;</description></item><item><title>Arena</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</guid><description>&lt;h2 id="arena-overview"&gt;Arena Overview&lt;/h2&gt;
-&lt;p&gt;1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.&lt;/p&gt;
+&lt;p&gt;Here&amp;rsquo;s a minimal bot structure to get you started:&lt;/p&gt;</description></item><item><title>Arena</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</guid><description>&lt;p&gt;1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.&lt;/p&gt;
 &lt;h2 id="coordinate-system"&gt;Coordinate System&lt;/h2&gt;
 &lt;p&gt;The arena uses a &lt;strong&gt;2D Cartesian coordinate system&lt;/strong&gt; - the same (x, y) coordinates you learned in math class.&lt;/p&gt;
 &lt;pre class="mermaid"&gt;graph TD
@@ -53,8 +51,7 @@
 &lt;li&gt;&lt;strong&gt;Precision&lt;/strong&gt;: Floating-point coordinates allow sub-unit positioning&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id="distance-calculation"&gt;Distance Calculation&lt;/h3&gt;
-&lt;p&gt;Distance between two points uses the Pythagorean theorem:&lt;/p&gt;</description></item><item><title>Bot Characteristics</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</guid><description>&lt;h2 id="bot-characteristics-overview"&gt;Bot Characteristics Overview&lt;/h2&gt;
-&lt;p&gt;Your bot&amp;rsquo;s capabilities are defined by three core characteristics: &lt;strong&gt;Health&lt;/strong&gt;, &lt;strong&gt;Defense&lt;/strong&gt;, and &lt;strong&gt;Mass&lt;/strong&gt;. These stats determine your survivability, damage mitigation, and movement properties.&lt;/p&gt;
+&lt;p&gt;Distance between two points uses the Pythagorean theorem:&lt;/p&gt;</description></item><item><title>Bot Characteristics</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</guid><description>&lt;p&gt;Your bot&amp;rsquo;s capabilities are defined by three core characteristics: &lt;strong&gt;Health&lt;/strong&gt;, &lt;strong&gt;Defense&lt;/strong&gt;, and &lt;strong&gt;Mass&lt;/strong&gt;. These stats determine your survivability, damage mitigation, and movement properties.&lt;/p&gt;
 &lt;h2 id="health"&gt;Health&lt;/h2&gt;
 &lt;p&gt;Health (HP) is your bot&amp;rsquo;s survivability pool - the total amount of damage your bot can sustain before being eliminated.&lt;/p&gt;
 &lt;h3 id="key-properties"&gt;Key Properties&lt;/h3&gt;
@@ -81,7 +78,6 @@
 
 &lt;/div&gt;
 
-&lt;h2 id="equipment-system-overview"&gt;Equipment System Overview&lt;/h2&gt;
 &lt;p&gt;Before battle, you configure your bot&amp;rsquo;s &lt;strong&gt;loadout&lt;/strong&gt; by selecting equipment. Equipment modifies your bot&amp;rsquo;s characteristics and determines which actions are available during battle.&lt;/p&gt;
 &lt;h3 id="loadout-slots"&gt;Loadout Slots&lt;/h3&gt;
 &lt;p&gt;Each bot equips:&lt;/p&gt;
@@ -96,7 +92,6 @@
 
 &lt;/div&gt;
 
-&lt;h2 id="actions-overview"&gt;Actions Overview&lt;/h2&gt;
 &lt;p&gt;During battle, your bot performs &lt;strong&gt;actions&lt;/strong&gt; each tick. Actions allow your bot to move, attack, defend, and gather information. All actions are constrained by a dual-resource system: energy costs and cooldowns.&lt;/p&gt;
 &lt;h2 id="resource-management-system"&gt;Resource Management System&lt;/h2&gt;
 &lt;p&gt;Actions are governed by two independent constraint systems that work together to prevent action spam while maintaining gameplay fluidity.&lt;/p&gt;</description></item></channel></rss>
