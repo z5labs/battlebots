@@ -21,7 +21,7 @@ ADR Categories:
 
 ## Context and Problem Statement
 
-Battle Bots requires a spatial environment where bots can move, position themselves tactically, and interact with each other. We need to define the fundamental coordinate system, boundaries, collision mechanics, and movement physics that govern all bot interactions. This spatial system must support real-time continuous gameplay while integrating cleanly with the gRPC bidirectional streaming protocol (ADR-0004).
+Battle Bots requires a spatial environment where bots can move, position themselves tactically, and interact with each other. We need to define the fundamental coordinate system, boundaries, collision mechanics, and movement physics that govern all bot interactions. This spatial system must support real-time continuous gameplay while integrating cleanly with the gRPC protocol (ADR-0004).
 
 Without a well-defined spatial system, we cannot:
 - Implement bot movement mechanics
@@ -35,7 +35,7 @@ Without a well-defined spatial system, we cannot:
 
 * **Real-time Continuous Gameplay** - Must support smooth, continuous movement (not turn-based or tile-based)
 * **Tactical Depth** - Precise positioning should enable strategic gameplay and tactical maneuvering
-* **Protocol Integration** - Must integrate with gRPC streaming for position updates (ADR-0004)
+* **Protocol Integration** - Must integrate with gRPC protocol for position updates (ADR-0004)
 * **Computational Efficiency** - Collision detection and position calculations must perform well in real-time
 * **Predictability** - Movement physics should be deterministic and understandable to bot developers
 * **Extensibility** - Should support future additions like obstacles, terrain effects, and variable arena sizes
@@ -49,7 +49,7 @@ Without a well-defined spatial system, we cannot:
 
 ## Decision Outcome
 
-Chosen option: "**Option 2: Continuous 2D Cartesian Coordinate System**", because it enables smooth real-time movement that integrates naturally with gRPC streaming, provides precise tactical positioning depth, supports predictable physics calculations, and allows for future enhancements like variable terrain without fundamental redesign.
+Chosen option: "**Option 2: Continuous 2D Cartesian Coordinate System**", because it enables smooth real-time movement that integrates naturally with the gRPC protocol, provides precise tactical positioning depth, supports predictable physics calculations, and allows for future enhancements like variable terrain without fundamental redesign.
 
 ### Spatial System Specification
 
@@ -183,7 +183,7 @@ This calculation may be optimized by only checking bots that fall within a bound
 * Good, because circle-based collision detection is computationally efficient and easy to understand
 * Good, because friction system creates tactical depth through movement physics and enables future terrain variety
 * Good, because extensible design supports future additions (obstacles, dynamic boundaries, variable terrain)
-* Good, because integrates naturally with gRPC streaming protocol for real-time position updates
+* Good, because integrates naturally with gRPC protocol for real-time position updates
 * Neutral, because arena size (100x100) and bot radius (2 units) are placeholders requiring playtesting
 * Neutral, because friction coefficient (0.1) requires tuning to balance movement fluidity vs. stopping distances
 * Neutral, because line of sight rules are simple but may need enhancement for fog of war features
@@ -224,7 +224,7 @@ Smooth continuous space with floating-point coordinates, circle-based collision 
 
 * Good, because smooth, realistic movement that feels natural and fluid
 * Good, because precise tactical positioning enables fine-grained strategy
-* Good, because integrates naturally with real-time gRPC streaming
+* Good, because integrates naturally with real-time gRPC protocol
 * Good, because friction and physics systems are straightforward to implement
 * Good, because extensible to obstacles, terrain effects, and variable arenas
 * Good, because distance and angle calculations use standard Cartesian math

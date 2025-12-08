@@ -21,7 +21,7 @@ ADR Categories:
 
 ## Context and Problem Statement
 
-Battle Bots requires an action system that governs how bots behave in real-time battles. We need to define what actions bots can perform, how actions are constrained (costs, cooldowns, equipment requirements), and how the resource management system prevents action spam while maintaining fluid gameplay. The action system must integrate with the real-time continuous gameplay model, work with the gRPC bidirectional streaming protocol (ADR-0004), and support the equipment-based customization system (ADR-0007).
+Battle Bots requires an action system that governs how bots behave in real-time battles. We need to define what actions bots can perform, how actions are constrained (costs, cooldowns, equipment requirements), and how the resource management system prevents action spam while maintaining fluid gameplay. The action system must integrate with the real-time continuous gameplay model, work with the gRPC protocol (ADR-0004), and support the equipment-based customization system (ADR-0007).
 
 Without a well-defined action system, we cannot:
 - Design the game server tick processing and action resolution
@@ -38,7 +38,7 @@ Without a well-defined action system, we cannot:
 * **Tactical Timing Decisions** - Cooldowns should create timing choices beyond raw resource availability
 * **Equipment Integration** - Actions must respect equipment requirements (ADR-0008)
 * **Balance Flexibility** - Energy costs and cooldowns provide tuning knobs for game balance
-* **Protocol Integration** - Actions must map cleanly to gRPC streaming protocol (ADR-0004)
+* **Protocol Integration** - Actions must map cleanly to gRPC protocol (ADR-0004)
 * **Action Spam Prevention** - System must prevent trivial spamming of powerful actions
 * **Gameplay Fluidity** - Basic actions (Move) should remain fluid and responsive
 
@@ -213,7 +213,7 @@ Actions are organized into four categories based on their primary purpose:
 #### Action Execution and Processing
 
 **Action Submission**:
-- Bots submit actions via gRPC bidirectional streaming (ADR-0004)
+- Bots submit actions via the gRPC protocol (ADR-0004)
 - Actions are queued and processed during the next game tick
 - Multiple actions may be submitted if resources permit (parallel actions TBD)
 
@@ -225,7 +225,7 @@ Actions are organized into four categories based on their primary purpose:
 
 **Action Resolution**:
 - Actions are resolved during the game tick cycle
-- Action outcomes are broadcast to all bots via gRPC stream
+- Action outcomes are broadcast to all bots via the gRPC protocol
 - State changes (damage, position, energy) are updated and synchronized
 
 ### Consequences
@@ -237,7 +237,7 @@ Actions are organized into four categories based on their primary purpose:
 * Good, because energy costs and cooldowns provide independent tuning knobs for balance
 * Good, because action variety (Movement, Combat, Defensive, Utility) enables diverse playstyles
 * Good, because universal actions (Move, Block, Evade) are always available regardless of equipment
-* Good, because real-time action submission integrates with gRPC streaming (ADR-0004)
+* Good, because real-time action submission integrates with the gRPC protocol (ADR-0004)
 * Neutral, because all energy costs and cooldown values are TBD requiring extensive playtesting
 * Neutral, because dual resource system (energy + cooldowns) is more complex than single-constraint systems
 * Neutral, because energy regeneration rate requires careful tuning to avoid starvation or abundance
@@ -319,7 +319,7 @@ Traditional turn-based action point economy.
 * Neutral, because works well for turn-based gameplay
 * Bad, because poor fit for real-time continuous gameplay model
 * Bad, because turn boundaries create artificial rhythm contrary to real-time design
-* Bad, because gRPC streaming protocol designed for continuous action submission, not turns
+* Bad, because gRPC protocol designed for continuous action submission, not turns
 * Bad, because eliminates timing decisions within turns
 * Bad, because rigid action economy may feel restrictive in real-time battles
 

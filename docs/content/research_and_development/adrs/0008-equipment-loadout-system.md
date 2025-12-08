@@ -1,7 +1,7 @@
 ---
 title: "[0008] Equipment and Loadout System"
 description: >
-    Bot customization through weapons, armor, and modules enabling strategic diversity
+    Bot customization through weapons and armor enabling strategic diversity
 type: docs
 weight: 8
 category: "strategic"
@@ -44,31 +44,29 @@ Without a well-defined equipment system, we cannot:
 
 ## Decision Outcome
 
-The equipment system consists of three equipment categories (Weapons, Armor, Modules) with the following initial equipment options:
+The equipment system consists of two equipment categories (Weapons, Armor) with the following initial equipment options:
 - **Weapons**: Rifle, Shotgun
 - **Armor**: Light Armor, Medium Armor, Heavy Armor
 
-Each bot equips a loadout with 1 weapon, 1 armor, and 2 modules. Equipment modifies bot characteristics (ADR-0007) and determines available actions (ADR-0009), creating distinct tactical options for different builds.
+Each bot equips a loadout with 1 weapon and 1 armor. Equipment modifies bot characteristics (ADR-0007) and determines available actions (ADR-0009), creating distinct tactical options for different builds.
 
 ### Consequences
 
-* Good, because equipment loadout system creates meaningful build diversity (DPS, Tank, Balanced, Stealth)
+* Good, because equipment loadout system creates meaningful build diversity (DPS, Tank, Balanced, Mobile/Skirmisher)
 * Good, because pre-battle equipment selection enables strategic planning and counter-play
 * Good, because stat modifications are clear and calculable (simple additive formula)
 * Good, because equipment-action coupling creates distinct tactical options for different builds
 * Good, because Defense vs. Speed tradeoffs in armor create natural power-mobility choices
-* Good, because module variety enables utility and tactical flexibility
-* Good, because loadout constraints force meaningful choices (can't equip everything)
+* Good, because loadout constraints force meaningful choices
 * Good, because modular structure (each equipment type and option in dedicated sections) makes equipment additions straightforward
 * Good, because initial equipment set provides foundation for expansion
 * Good, because example builds demonstrate viable diversity and counter-play options
 * Neutral, because stat modification values (all TBD) require extensive playtesting
-* Neutral, because loadout slot counts (1 weapon, 1 armor, 2 modules) need validation through testing
+* Neutral, because loadout slot counts (1 weapon, 1 armor) need validation through testing
 * Neutral, because equipment balance requires tuning to ensure no dominant loadout
 * Bad, because equipment system adds complexity for bot developers to understand
 * Bad, because stat modifications and action requirements create dependencies to track
 * Bad, because equipment balance is critical - single dominant loadout would eliminate diversity
-* Bad, because module-dependent actions require protocol validation of equipment
 
 ### Confirmation
 
@@ -94,9 +92,6 @@ Standard precision weapon enabling reliable ranged attacks.
 - No modifications (baseline weapon)
 - Mass Contribution: TBD (baseline weapon mass)
 
-**Enabled Actions**:
-- **RifleShot**: Single-shot, precise attack with moderate damage (15 energy, 1 tick cooldown)
-
 **Tactical Profile**:
 - Reliable ranged damage output
 - Versatile baseline option suitable for any playstyle
@@ -111,9 +106,6 @@ Close-range weapon enabling devastating burst damage with damage falloff based o
 - -1 Speed (weight penalty) (TBD)
 - -1 Range (close-range weapon) (TBD)
 - Mass Contribution: TBD (higher than Rifle)
-
-**Enabled Actions**:
-- **ShotgunBlast**: Spray of projectiles with high close-range damage (20 energy, 2 tick cooldown)
 
 **Tactical Profile**:
 - High close-range burst damage
@@ -181,8 +173,6 @@ The following example loadouts demonstrate the range of viable bot configuration
 *Equipment*:
 - **Weapon**: Shotgun (high damage spray at close range)
 - **Armor**: Light Armor (minimal defense, maintain mobility)
-- **Module 1**: Boost Engine (enable repositioning for close-range attacks)
-- **Module 2**: Sensor Array (track enemies for optimal engagement range)
 
 *Stat Profile* (TBD values):
 - Attack: 12 (high)
@@ -190,7 +180,7 @@ The following example loadouts demonstrate the range of viable bot configuration
 - Speed: 10 (good)
 - Energy: 10 (average)
 
-*Strategy*: Close distance quickly using Boost, deliver devastating shotgun blasts at close range, use sensors to track enemy positions for optimal engagement. High risk, high reward playstyle.
+*Strategy*: Close distance quickly, deliver devastating shotgun blasts at close range. High risk, high reward playstyle focused on burst damage.
 
 *Weaknesses*: Vulnerable to sustained fire, limited survivability if caught in poor position, ineffective at long range.
 
@@ -203,8 +193,6 @@ The following example loadouts demonstrate the range of viable bot configuration
 *Equipment*:
 - **Weapon**: Rifle (reliable baseline offense)
 - **Armor**: Heavy Armor (maximum damage reduction)
-- **Module 1**: Repair Kit (self-sustain during extended engagements)
-- **Module 2**: Sensor Array (maintain awareness despite low mobility)
 
 *Stat Profile* (TBD values):
 - Attack: 8 (moderate)
@@ -212,7 +200,7 @@ The following example loadouts demonstrate the range of viable bot configuration
 - Speed: 8 (low)
 - Energy: 10 (average)
 
-*Strategy*: Hold key positions, absorb damage with heavy armor, use Repair to extend combat effectiveness, rely on sensors to track enemy movements. Win through attrition rather than burst damage.
+*Strategy*: Hold key positions, absorb damage with heavy armor, maintain reliable ranged offense with rifle. Win through attrition rather than burst damage.
 
 *Weaknesses*: Low mobility makes positioning critical, vulnerable to kiting strategies, limited offensive pressure.
 
@@ -225,8 +213,6 @@ The following example loadouts demonstrate the range of viable bot configuration
 *Equipment*:
 - **Weapon**: Rifle (reliable ranged damage)
 - **Armor**: Medium Armor (reasonable defense without severe speed penalty)
-- **Module 1**: Sensor Array (tactical awareness)
-- **Module 2**: Repair Kit (survivability boost during combat)
 
 *Stat Profile* (TBD values):
 - Attack: 10 (above average)
@@ -234,21 +220,19 @@ The following example loadouts demonstrate the range of viable bot configuration
 - Speed: 9 (average)
 - Energy: 10 (average)
 
-*Strategy*: Use sensors for tactical awareness, maintain optimal engagement distance with rifle, use repair to extend combat effectiveness, rely on well-rounded stats to handle unexpected situations. Adaptable to opponent strategies.
+*Strategy*: Maintain optimal engagement distance with rifle, rely on well-rounded stats to handle unexpected situations. Adaptable to opponent strategies.
 
 *Weaknesses*: Lacks specialization, may be outperformed by specialized builds in their areas of strength.
 
 ---
 
-**Stealth/Scout Build**
+**Mobile/Skirmisher Build**
 
-*Philosophy*: Control battlefield through information advantage and mobility rather than direct damage.
+*Philosophy*: Control battlefield through mobility and positioning rather than direct combat superiority.
 
 *Equipment*:
 - **Weapon**: Rifle (precise long-range attacks)
 - **Armor**: Light Armor (maintain mobility)
-- **Module 1**: Sensor Array (information gathering)
-- **Module 2**: Stealth Module (avoid detection)
 
 *Stat Profile* (TBD values):
 - Attack: 8 (moderate)
@@ -256,9 +240,9 @@ The following example loadouts demonstrate the range of viable bot configuration
 - Speed: 12 (very high)
 - Energy: 10 (average)
 
-*Strategy*: Scout with sensors, avoid detection with stealth, strike from unexpected angles with rifle shots, rely on mobility to disengage. Win through tactical advantage and superior positioning rather than sustained combat.
+*Strategy*: Strike from optimal angles with rifle shots, rely on superior mobility to control engagement distance and disengage when needed. Win through tactical advantage and superior positioning rather than sustained combat.
 
-*Weaknesses*: Ineffective in forced direct combat, relies heavily on stealth and positioning mechanics working as intended, vulnerable if detected in poor position.
+*Weaknesses*: Ineffective in forced direct combat, vulnerable if caught in poor position, relies on maintaining optimal range.
 
 ## More Information
 
@@ -278,9 +262,9 @@ The following example loadouts demonstrate the range of viable bot configuration
 
 **Modular Structure and Extensibility**:
 
-This ADR defines the initial equipment options for each category (2 weapons, 3 armor types, 4 modules). The modular structure—with each equipment type and option in dedicated sections—enables straightforward expansion:
+This ADR defines the initial equipment options for each category (2 weapons, 3 armor types). The modular structure—with each equipment type and option in dedicated sections—enables straightforward expansion:
 
-- **Adding New Equipment Options**: New equipment can be added by simply adding new subsections under the appropriate category (Weapons, Armor, or Modules). For example, "Laser Rifle" could be added as a new subsection under Weapons.
+- **Adding New Equipment Options**: New equipment can be added by simply adding new subsections under the appropriate category (Weapons or Armor). For example, "Laser Rifle" could be added as a new subsection under Weapons.
 - **Adding New Equipment Categories**: New equipment categories (e.g., "Chassis Types" or "Power Cores") can be introduced by adding new top-level sections to the Equipment System Specification.
 - **Modifying Existing Equipment**: Specific equipment subsections can be superseded to rebalance or redesign individual items without affecting other equipment.
 
@@ -292,14 +276,12 @@ All numeric values in this ADR are marked TBD (To Be Determined) and serve as pl
 2. Balance modeling to ensure no single loadout dominates all matchups
 3. Counter-play analysis confirming viable counter-builds exist for each archetype
 4. Stat tuning to create meaningful tradeoffs (Defense vs. Speed, Power vs. Mobility)
-5. Module effectiveness testing to ensure utility value justifies module slots
-6. Weapon balance to ensure Rifle and Shotgun are situationally viable
-7. Armor balance to ensure Light/Medium/Heavy each have optimal use cases
+5. Weapon balance to ensure Rifle and Shotgun are situationally viable
+6. Armor balance to ensure Light/Medium/Heavy each have optimal use cases
 
 **Key Design Insights**:
 - Equipment-action coupling ensures loadout choices directly affect tactical options
 - Defense vs. Speed tradeoffs in armor create natural tank vs. mobile playstyle spectrum
-- Module slots enable tactical customization beyond raw combat stats
 - Example builds demonstrate diversity while providing optimization starting points
 - Modular structure (dedicated sections per equipment) simplifies expansion and balance changes
 
