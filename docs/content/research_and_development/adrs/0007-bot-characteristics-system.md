@@ -41,19 +41,20 @@ Without a well-defined characteristic system, we cannot:
 * **Playstyle Support** - Should enable distinct archetypes (tank, DPS, mobile, balanced)
 * **Spatial Integration** - Must work with continuous 2D movement system (ADR-0006)
 
-## Considered Options
-
-* **Option 1: Minimal Stats (2-3 attributes)** - Health + Speed only, possibly Attack
-* **Option 2: Four-Stat System** - Health, Speed, Defense, Mass (equipment-derived)
-* **Option 3: Complex Stats (6+ attributes)** - Health, Speed, Defense, Attack, Energy, Accuracy, Evasion, etc.
-
 ## Decision Outcome
 
-Chosen option: "**Option 2: Four-Stat System (Health, Speed, Defense, Mass)**", because it creates strategic depth through meaningful stat interactions (Effective HP, Effective Speed), enables equipment-driven tradeoffs via Mass, balances complexity with accessibility, and provides diverse optimization paths without overwhelming developers. The inclusion of equipment-derived Mass creates natural mobility-power tradeoffs that emerge from loadout choices.
+The bot characteristics system consists of four core attributes that create strategic depth through meaningful interactions while remaining accessible to bot developers:
 
-### Bot Characteristics Specification
+1. **Health** - Bot's survivability pool; total damage a bot can sustain before destruction
+2. **Speed** - Movement rate through the 2D battle space; determines positioning and engagement control
+3. **Defense** - Damage mitigation capability; reduces effective damage from enemy attacks
+4. **Mass** - Equipment-derived weight; calculated from equipped items and impacts effective Speed
 
-#### Health
+This four-attribute system creates strategic depth through stat interactions (Effective HP, Effective Speed), enables equipment-driven tradeoffs via Mass, balances complexity with accessibility, and provides diverse optimization paths without overwhelming developers. The inclusion of equipment-derived Mass creates natural mobility-power tradeoffs that emerge from loadout choices.
+
+## Bot Characteristics Specification
+
+### Health
 
 Health (HP) represents a bot's survivability in combat. This is the primary resource that determines whether a bot remains operational in battle.
 
@@ -69,7 +70,7 @@ Health (HP) represents a bot's survivability in combat. This is the primary reso
 - Must be balanced against offensive capabilities to ensure threat viability
 - Low Health bots must rely on Speed and tactical positioning to survive
 
-#### Speed
+### Speed
 
 Speed determines how quickly a bot can move through the 2D battle space (ADR-0006). This stat directly affects positioning, engagement control, and evasion capabilities.
 
@@ -86,7 +87,7 @@ Speed determines how quickly a bot can move through the 2D battle space (ADR-000
 - Low Speed bots must rely on durability or zone control
 - Speed differences create natural predator/prey dynamics between bot types
 
-#### Defense
+### Defense
 
 Defense represents a bot's ability to mitigate incoming damage. This stat reduces the effective damage from enemy attacks.
 
@@ -103,7 +104,7 @@ Defense represents a bot's ability to mitigate incoming damage. This stat reduce
 - Low Defense bots must rely on Speed for damage avoidance
 - Defense vs. Health allocation creates build optimization choices
 
-#### Mass
+### Mass
 
 Mass represents the total physical weight of a bot, determined by the equipment and components it carries. Unlike other characteristics, **Mass is not directly allocated** but is the cumulative result of loadout choices.
 
@@ -128,7 +129,7 @@ Mass represents the total physical weight of a bot, determined by the equipment 
 - Modules: Power cores, sensors, and systems each contribute Mass
 - Loadout variety creates diverse Mass profiles across bot builds
 
-#### Stat Interactions
+### Stat Interactions
 
 Bot characteristics don't operate in isolation - they create complex interactions that define combat dynamics:
 
@@ -162,7 +163,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 - Lightweight builds sacrifice protection for superior positioning
 - No equipment configuration dominates all scenarios (intended design goal)
 
-### Consequences
+## Consequences
 
 * Good, because four-stat system creates strategic depth without overwhelming developers
 * Good, because stat interactions (Effective HP, Effective Speed) enable emergent complexity from simple rules
@@ -179,7 +180,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 * Bad, because stat interactions (especially Effective HP) add complexity to build optimization
 * Bad, because equipment-derived Mass means loadout choices have cascading effects that may confuse new developers
 
-### Confirmation
+## Confirmation
 
 The decision will be confirmed through:
 
@@ -189,56 +190,6 @@ The decision will be confirmed through:
 4. Balance analysis ensuring no single stat profile dominates all scenarios
 5. Developer feedback on stat system accessibility and understandability
 6. Combat simulation confirming stat interactions create meaningful tactical choices
-
-## Pros and Cons of the Options
-
-### Option 1: Minimal Stats (2-3 attributes)
-
-Health + Speed only, possibly Attack. Simplest possible system.
-
-* Good, because extremely accessible and easy to understand
-* Good, because minimal complexity for bot developers to manage
-* Good, because fast iteration on balance with fewer variables
-* Good, because straightforward calculations (no complex stat interactions)
-* Neutral, because may be sufficient for initial gameplay proof-of-concept
-* Bad, because limited strategic depth and build diversity
-* Bad, because shallow optimization (just maximize both stats)
-* Bad, because difficult to create distinct playstyles (tank vs. DPS vs. mobile)
-* Bad, because equipment customization has minimal impact (just adds to 2-3 stats)
-* Bad, because no emergent complexity from stat interactions
-
-### Option 2: Four-Stat System (Health, Speed, Defense, Mass)
-
-Health, Speed, Defense as direct stats, Mass as equipment-derived (CHOSEN).
-
-* Good, because strategic depth through stat interactions (Effective HP, Effective Speed)
-* Good, because equipment-derived Mass creates natural mobility-firepower tradeoffs
-* Good, because enables distinct playstyles (tank, DPS, mobile, balanced)
-* Good, because accessible complexity - four stats are learnable without being overwhelming
-* Good, because Defense × Health interaction rewards balanced builds
-* Good, because Speed enables tactical positioning gameplay
-* Good, because Mass as consequence of equipment forces meaningful loadout choices
-* Neutral, because requires balance tuning but not excessively complex
-* Neutral, because four stats hit sweet spot between simple and overwhelming
-* Bad, because more complex than minimal stats to implement and explain
-* Bad, because stat interactions add cognitive load for optimization
-* Bad, because equipment Mass penalties require careful tuning to avoid punishing heavy loadouts
-
-### Option 3: Complex Stats (6+ attributes)
-
-Health, Speed, Defense, Attack, Energy, Accuracy, Evasion, Stamina, etc.
-
-* Good, because maximum strategic depth and optimization potential
-* Good, because extensive differentiation between bot builds
-* Good, because appeals to players who enjoy complex optimization
-* Good, because many tuning knobs for balance adjustments
-* Neutral, because may enable very deep competitive meta
-* Bad, because high learning curve may deter casual bot developers
-* Bad, because complexity makes game balance extremely difficult
-* Bad, because numerous stats create decision paralysis during bot design
-* Bad, because difficult to understand why one build beats another
-* Bad, because implementation complexity significantly higher
-* Bad, because many stats may be redundant or minimally impactful
 
 ## More Information
 
