@@ -21,7 +21,7 @@ ADR Categories:
 
 ## Context and Problem Statement
 
-Battle Bots requires high-level orchestration rules for 1v1 battles that tie together the spatial system, characteristics, equipment, and actions into a complete battle experience. We need to define spatial configuration (2D vs. 3D, bounded vs. unbounded arena), visibility rules (fog of war vs. full battlefield vision), battle pacing mechanisms (time limits, engagement encouragement), and win conditions (how battles conclude). These orchestration rules must create engaging gameplay while integrating the detailed mechanics defined in ADR-0006 through ADR-0009.
+Battle Bots requires high-level orchestration rules for 1v1 battles that tie together the spatial system, characteristics, equipment, and actions into a complete battle experience. We need to define spatial configuration (2D vs. 3D, bounded vs. unbounded arena), visibility rules (fog of war vs. full battlefield vision), battle pacing mechanisms (time limits, engagement encouragement), and win conditions (how battles conclude). These orchestration rules must create engaging gameplay while providing a foundation for detailed battle mechanics.
 
 Without well-defined battle orchestration, we cannot:
 - Define the spatial dimensions and arena boundaries for battles (spatial configuration)
@@ -42,7 +42,7 @@ Without well-defined battle orchestration, we cannot:
 * **Battle Pacing** - Mechanisms should prevent passive stalemates and force interaction
 * **Definitive Outcomes** - Win conditions must handle all scenarios including edge cases
 * **Fairness** - All rules should be deterministic, predictable, and balanced
-* **Integration** - Must work seamlessly with mechanics from ADR-0006 through ADR-0009
+* **Integration** - Must work seamlessly with spatial mechanics, bot characteristics, equipment systems, and action mechanics
 * **Observability** - Battle state and outcomes must be clear for visualization and analysis
 * **Time Constraints** - Battles must conclude in reasonable timeframes
 
@@ -89,7 +89,7 @@ Rationale:
 - Lower barrier to entry for bot developers - 2D pathfinding and movement algorithms are more accessible and well-documented
 - Easier visualization - 2D battles can be displayed directly on screen without camera controls or 3D rendering complexity
 - Sufficient strategic depth - 2D space provides adequate complexity for positioning, flanking, and tactical movement
-- Consistent with ADR-0006 spatial system design - the cartesian coordinate system is designed for 2D battle space
+- Cartesian coordinate system naturally supports 2D battle space
 - Reduces computational requirements - 2D physics and collision detection are significantly less computationally expensive than 3D
 
 **Alternative Rejected: Option 3.2 - 3D** would add significant complexity to pathfinding (3D A*), collision detection (3D physics), and visualization (3D rendering, camera controls) without proportional gameplay benefit for 1v1 battles. Can be reconsidered for future game modes if aerial combat or vertical positioning becomes strategically important.
@@ -105,229 +105,11 @@ Rationale:
 - Consistent with timeout mechanism - Bounded arena complements the timeout system (ADR Property 2) for ensuring battle conclusion
 - Fair and balanced - Both bots have equal access to the full arena throughout the battle
 - Enables positioning strategy - Fixed boundaries create meaningful positional choices (corner control, center dominance, edge play)
-- Integrates with ADR-0006 - The bounded arena defined in the spatial system ADR
+- Bounded arena provides clear spatial constraints for the battle system
 
 **Alternative Considered: Option 4.2 - Bounded and Shrinking** would add additional engagement pressure through environmental forcing function, but adds implementation complexity (dynamic boundaries, bot notification of shrinking, damage from being outside boundaries) that is unnecessary given the timeout mechanism already prevents stalemates. Could be reconsidered as an optional game mode for more aggressive pacing.
 
 **Alternative Rejected: Option 4.3 - Unbounded** would allow indefinite evasion, potentially creating stalemate scenarios even with timeout (bots could avoid each other for entire battle). Unbounded space also complicates pathfinding (no clear boundaries for navigation) and visualization (camera must follow bots across potentially large distances).
-
-### Battle Orchestration Specification
-
-#### Spatial System Rules
-
-**2D Spatial Dimensionality**:
-
-All battles occur in two-dimensional space with cartesian coordinates.
-
-**Coordinate System**:
-- **X-axis**: Horizontal position (left-right movement)
-- **Y-axis**: Vertical position (up-down movement)
-- **Position Format**: (x, y) coordinate pairs
-- **No Z-axis**: No vertical elevation or aerial movement
-
-**Movement Implications**:
-- Bots move in 2D plane only (no jumping, flying, or vertical positioning)
-- Pathfinding algorithms operate in 2D space (A*, navigation meshes, etc.)
-- Collision detection uses 2D bounding boxes or circles
-- Line-of-sight calculations use 2D raycasting (if fog of war implemented in future)
-
-**Strategic Considerations**:
-- **Positioning**: Tactical positioning focuses on x,y coordinates relative to enemy and obstacles
-- **Flanking**: Bots can flank by moving around obstacles in 2D space
-- **Distance Management**: Range calculations use 2D distance formulas (Euclidean or Manhattan)
-- **No Vertical Advantage**: No height-based tactical advantages (high ground, aerial bombardment)
-
-**Integration with ADR-0006**: The 2D cartesian coordinate system aligns with the spatial system defined in ADR-0006 (Battle Space Spatial System).
-
-**Bounded Arena Manifold**:
-
-All battles occur within a fixed rectangular arena with constant boundaries.
-
-**Arena Boundaries**:
-- **Fixed Size**: Arena dimensions remain constant throughout the battle
-- **Rectangular Shape**: Arena defined by minimum and maximum x,y coordinates
-- **Boundary Enforcement**: Bots cannot move outside arena boundaries (collision/clamping)
-- **No Shrinking**: Boundaries do not change or shrink during battle
-
-**Boundary Behavior**:
-- **Collision**: Bots that attempt to move beyond boundaries are stopped at the edge
-- **Pathfinding**: Bot pathfinding must respect arena boundaries as impassable walls
-- **Visibility**: Arena boundaries are visible to all bots (provided as part of battlefield state)
-
-**Arena Information Provided**:
-- **Arena Width**: Maximum x-coordinate minus minimum x-coordinate
-- **Arena Height**: Maximum y-coordinate minus minimum y-coordinate
-- **Arena Bounds**: Minimum x, minimum y, maximum x, maximum y coordinates
-
-**Strategic Implications**:
-- **Corner Control**: Corners provide defensive positioning but limit escape options
-- **Center Dominance**: Center positioning maximizes movement options
-- **Edge Play**: Bots can use boundaries as strategic barriers (preventing flanking from one side)
-- **Bounded Engagement**: Bots cannot indefinitely flee; boundaries ensure eventual engagement
-
-**Design Rationale**: Bounded arena guarantees engagement by preventing indefinite evasion, provides predictable space for pathfinding algorithms, and creates meaningful positional strategy through corner control and center dominance.
-
-#### Battlefield Visibility Rules
-
-**Full Visibility System**:
-
-All bots have complete battlefield visibility at all times. Each bot receives full information about all entities and state on the battlefield.
-
-**Information Provided to All Bots**:
-- **Enemy Bot Position**: Complete 2D (x, y) coordinates of all enemy bots
-- **Enemy Bot Health**: Current HP value of all enemy bots
-- **Enemy Bot Orientation**: Facing direction of all enemy bots (for predicting movement)
-- **Enemy Bot Equipment**: Loadout information for all enemy bots (visible equipment from ADR-0008)
-- **Battlefield Obstacles**: All obstacle positions and dimensions in 2D space (from ADR-0006)
-- **Arena Boundaries**: Complete bounded arena dimensions (min x, min y, max x, max y coordinates)
-- **Enemy Actions**: All actions performed by enemy bots are visible when executed
-
-**No Hidden Information**:
-- All battlefield state is visible to all bots at all times
-- No detection ranges or line-of-sight restrictions
-- No visibility-based equipment effects (Sensor Array and Stealth Module provide stat bonuses only, not visibility effects)
-
-**Tactical Implications**:
-- **Complete Information Gameplay**: Bots can make fully informed decisions based on complete battlefield state
-- **Pathfinding Opportunities**: Bots can calculate optimal paths considering enemy positions, obstacles, and arena boundaries
-- **Predictive AI**: Bots can implement sophisticated prediction algorithms knowing enemy positions and past actions
-- **Strategic Positioning**: Position-based tactics still valuable (flanking, distance management, obstacle usage)
-- **Equipment Focus**: Equipment choices focus on combat stats rather than detection/stealth capabilities
-
-**Design Rationale**: Full visibility simplifies initial implementation, enables sophisticated pathfinding and AI strategies, and allows focus on core battle mechanics. Fog of war mechanics can be added in future iterations once core gameplay is validated.
-
-**Future Consideration**: Fog of War (constant or revealed) could be added as optional game modes once core mechanics are proven, providing information strategy depth and making sensor/stealth equipment affect visibility.
-
-#### Battle Pacing and Time Management
-
-**Time Limit System**:
-
-All 1v1 battles have a maximum duration to prevent indefinitely long battles and ensure matches conclude:
-
-**Time Limit**: TBD (placeholder: 5 minutes / 300 seconds)
-
-**Time Limit Enforcement**:
-1. Battle engine tracks elapsed time from battle start
-2. When time limit is reached, battle engine stops accepting new actions
-3. All pending actions in the current tick are resolved
-4. Final health values are compared to determine outcome
-5. Battle concludes with timeout victory/defeat/draw
-
-**Timeout Resolution**:
-- **Higher Health Wins**: Bot with more HP at timeout achieves timeout victory
-- **Equal Health Draws**: Bots with equal HP at timeout result in draw
-- **Encourages Aggression**: Passive play risks timeout loss if opponent deals any damage
-
-**Design Considerations**:
-- Time limit should be long enough to allow for strategic gameplay and tactical maneuvering
-- Time limit should be short enough to maintain engagement and prevent stalemate
-- Time limit may need to be configurable for different battle modes or tournaments
-- Future consideration: Shrinking arena over time to force engagement (not in current design)
-
-**Engagement Encouragement Mechanisms**:
-- **Timeout Favors Aggressor**: Dealing damage creates HP advantage for timeout scenario
-- **No Passive Victory**: Cannot win by hiding; must either destroy enemy or have HP advantage
-- **Fog of War**: Limited visibility encourages active scouting and engagement
-- **Energy Regeneration**: Bots have resources to maintain active gameplay (ADR-0009)
-
-#### Win Conditions
-
-Battle resolution defines how a 1v1 battle concludes and determines the winner. Every battle must have a definitive outcome: victory, defeat, or draw.
-
-**Victory Conditions** - A bot achieves victory when any of the following occurs:
-
-*Destruction*: Enemy bot's health reaches 0 or below
-
-- **Trigger**: `enemy.health <= 0`
-- **Outcome**: Immediate victory for the surviving bot
-- **Primary Condition**: Most definitive victory type
-
-*Forfeit*: Enemy bot disconnects or fails to respond
-
-- **Trigger**: Enemy bot connection lost or timeout exceeded
-- **Grace Period**: TBD (brief window allows reconnection before forfeit declared)
-- **Outcome**: Immediate victory for the connected bot
-
-*Timeout*: Battle time limit reached with higher health
-
-- **Trigger**: `battle.elapsed_time >= TIME_LIMIT && bot.health > enemy.health`
-- **Outcome**: Victory by health advantage
-- **Encourages Aggression**: Rewards damage dealt over passive play
-
-**Defeat Conditions** - A bot is defeated when any of the following occurs:
-
-*Destruction*: Bot's own health reaches 0 or below
-
-- **Trigger**: `bot.health <= 0`
-- **Outcome**: Immediate defeat
-
-*Forfeit*: Bot disconnects or fails to respond
-
-- **Trigger**: Bot connection lost or timeout exceeded
-- **Outcome**: Immediate defeat
-
-*Timeout*: Battle time limit reached with lower health
-
-- **Trigger**: `battle.elapsed_time >= TIME_LIMIT && bot.health < enemy.health`
-- **Outcome**: Defeat (opponent wins by health advantage)
-
-**Draw Conditions** - A battle results in a draw when neither bot achieves a clear victory:
-
-*Mutual Destruction*: Both bots reach 0 health simultaneously
-
-- **Trigger**: `bot.health <= 0 && enemy.health <= 0` (same tick)
-- **Scenarios**: Both deal fatal damage in same tick, simultaneous environmental effects
-- **Outcome**: Draw
-
-*Equal Health at Timeout*: Time limit reached with identical health
-
-- **Trigger**: `battle.elapsed_time >= TIME_LIMIT && bot.health == enemy.health`
-- **Outcome**: Draw
-
-#### Edge Cases and Resolution Rules
-
-**Simultaneous Actions**:
-
-When both bots perform actions in the same game tick that affect battle outcome:
-
-1. All actions for the current tick are collected
-2. Actions are resolved in a deterministic order (e.g., by bot ID, action type priority)
-3. Game state is updated after all actions are processed
-4. Win conditions are checked after state update
-
-Example: If both bots fire projectiles that would destroy each other in the same tick, both hits are processed, and if both bots reach 0 health, the result is a draw (mutual destruction).
-
-**Disconnect Handling**:
-
-When a bot disconnects or becomes unresponsive:
-
-- **Grace Period**: TBD timeout window allows bot to reconnect/respond
-- **Reconnection**: If bot reconnects within grace period, battle continues from current state
-- **No Response**: If grace period expires, battle immediately ends with forfeit victory for opponent
-- **Both Disconnect**: If both bots disconnect, outcome determined by who reconnects first within grace period; if neither reconnects, battle ends as draw
-
-**Timeout and Destruction Priority**:
-
-If time limit is reached in the same tick that a bot is destroyed:
-
-- **Priority**: Destruction takes precedence over timeout
-- **Rationale**: Destruction is more definitive and should be the primary victory condition
-- **Example**: Time limit expires at tick 1000, bot destroyed in same tick → victory by destruction (not timeout)
-
-**Negative Health Values**:
-
-Bots can temporarily have negative health if damage exceeds remaining health:
-
-- **Example**: Bot has 5 health, takes 20 damage → health becomes -15
-- **Win Condition Check**: Any health value <= 0 triggers destruction
-- **Display**: For visualization, negative health displayed as 0
-
-**Zero Health at Battle Start**:
-
-If a bot begins battle with 0 or negative health (configuration error):
-
-- **Behavior**: Battle immediately ends with defeat for the bot with invalid health
-- **Prevention**: Battle engine should validate initial state before battle begins
 
 ### Consequences
 
@@ -338,7 +120,7 @@ If a bot begins battle with 0 or negative health (configuration error):
 * Good, because enables advanced AI strategies - bots have complete information for tactical decisions
 * Good, because easier to debug and visualize (all state always visible)
 * Good, because reduces initial POC scope - allows focus on core battle mechanics
-* Good, because integrates seamlessly with spatial system (ADR-0006) without additional visibility calculations
+* Good, because integrates seamlessly with spatial system without additional visibility calculations
 * Good, because provides clear future enhancement path - fog of war can be added later
 * Neutral, because sensor/stealth equipment provides stat bonuses only (no visibility effects in this mode)
 * Neutral, because eliminates information strategy layer - all gameplay is complete information
@@ -368,7 +150,6 @@ If a bot begins battle with 0 or negative health (configuration error):
 * Good, because easier visualization (direct 2D display without 3D rendering complexity)
 * Good, because reduces computational requirements (2D physics less expensive than 3D)
 * Good, because sufficient strategic depth for positioning and tactical movement
-* Good, because integrates seamlessly with ADR-0006 cartesian coordinate system
 * Neutral, because may limit future aerial or vertical combat mechanics
 * Bad, because eliminates vertical positioning as a strategic dimension
 * Bad, because may feel limiting compared to 3D games if users expect aerial combat
@@ -381,14 +162,14 @@ If a bot begins battle with 0 or negative health (configuration error):
 * Good, because complements timeout mechanism for battle conclusion
 * Good, because fair and balanced (equal arena access for both bots)
 * Good, because enables meaningful positional strategy (corner control, center dominance)
-* Good, because integrates with ADR-0006 bounded arena definition
+* Good, because bounded arena definition provides clear spatial constraints
 * Neutral, because could be enhanced with shrinking boundaries in future game modes
 * Bad, because fixed boundaries may enable defensive corner camping strategies
 * Bad, because lacks additional engagement pressure that shrinking boundaries would provide
 
 **Overall Integration**:
 
-* Good, because all four properties integrate seamlessly with ADR-0006 (spatial system), ADR-0007 (characteristics), ADR-0008 (equipment), and ADR-0009 (actions)
+* Good, because all four properties integrate seamlessly with the spatial system, bot characteristics, equipment systems, and action mechanics
 * Good, because property-based decision structure allows independent tuning and future modifications
 * Good, because each property addresses distinct battle orchestration concerns
 * Good, because 2D bounded arena aligns with full visibility decision (simpler implementation, easier visualization)
@@ -404,13 +185,12 @@ The decision will be confirmed through:
 5. Edge case validation for simultaneous actions, disconnects, and timeout priorities
 6. User testing to confirm pathfinding and AI strategy opportunities with complete information
 7. Timeout scenario analysis to confirm aggressive play is rewarded over passive stalemate
-8. 2D spatial system implementation validation with ADR-0006 cartesian coordinates
-9. Bounded arena boundary enforcement testing to ensure bots cannot escape or clip through boundaries
-10. 2D pathfinding and collision detection testing to confirm adequate performance
-11. Visualization testing to confirm 2D display provides clear battle state representation
-12. Future evaluation of fog of war as optional game mode once core mechanics are validated
-13. Future consideration of 3D spatial system if aerial combat becomes strategically important
-14. Future consideration of shrinking boundaries as optional game mode for aggressive pacing
+8. Bounded arena boundary enforcement testing to ensure bots cannot escape or clip through boundaries
+9. 2D pathfinding and collision detection testing to confirm adequate performance
+10. Visualization testing to confirm 2D display provides clear battle state representation
+11. Future evaluation of fog of war as optional game mode once core mechanics are validated
+12. Future consideration of 3D spatial system if aerial combat becomes strategically important
+13. Future consideration of shrinking boundaries as optional game mode for aggressive pacing
 
 ## Pros and Cons of the Options
 
@@ -443,7 +223,7 @@ Each bot can only see what's within a limited radius around themselves.
 * Good, because balances complexity vs. value - simpler than revealed fog of war
 * Good, because detection mechanics add depth without persistent state tracking
 * Neutral, because requires tuning detection ranges for balance
-* Neutral, because requires line-of-sight calculations (already needed for ADR-0006)
+* Neutral, because requires line-of-sight calculations
 * Bad, because more complex implementation than full visibility
 * Bad, because detection range mechanics add protocol and server complexity
 * Bad, because requires careful balancing of base detection, sensor bonus, and stealth penalty
@@ -470,6 +250,8 @@ Bots reveal map areas as they move, maintaining visibility of revealed areas.
 
 Battle ends only when `enemy.health <= 0`.
 
+**Win Determination**: Bot whose opponent reaches `health <= 0` wins. No other win conditions exist.
+
 * Good, because simplest termination logic (single victory condition)
 * Good, because most intuitive outcome (destroy enemy to win)
 * Good, because no timeout mechanics needed
@@ -483,6 +265,10 @@ Battle ends only when `enemy.health <= 0`.
 #### Option 2.2: Health or Timeout Termination
 
 Battle ends when `enemy.health <= 0` OR max time reached.
+
+**Win Determination**:
+- Bot whose opponent reaches `health <= 0` wins
+- If timeout: bot with higher health wins; equal health results in draw
 
 * Good, because ensures battles conclude in reasonable timeframes
 * Good, because prevents stalemates from equally matched bots
@@ -498,6 +284,11 @@ Battle ends when `enemy.health <= 0` OR max time reached.
 #### Option 2.3: Health, Timeout, or Disconnect Termination (CHOSEN)
 
 Battle ends when `enemy.health <= 0` OR max time reached OR bot disconnected.
+
+**Win Determination**:
+- Bot whose opponent reaches `health <= 0` wins
+- If timeout: bot with higher health wins; equal health results in draw
+- If disconnect: connected bot wins after grace period expires; bot that reconnects within grace period continues battle
 
 * Good, because handles all battle termination scenarios comprehensively
 * Good, because timeout prevents indefinite stalemates
@@ -523,7 +314,6 @@ Battles occur in two-dimensional space (x, y coordinates).
 * Good, because lower barrier to entry for bot developers (2D algorithms more accessible)
 * Good, because well-documented algorithms (A*, 2D vector math, 2D physics)
 * Good, because sufficient strategic depth for positioning and movement tactics
-* Good, because integrates seamlessly with ADR-0006 cartesian coordinate system
 * Neutral, because appropriate for ground-based combat scenarios
 * Neutral, because may be extended to 3D in future if needed
 * Bad, because eliminates vertical positioning as strategic dimension
@@ -559,7 +349,7 @@ Fixed arena boundaries that remain constant throughout the battle.
 * Good, because fair and balanced (equal arena access)
 * Good, because enables positional strategy (corner control, center dominance)
 * Good, because complements timeout mechanism for battle conclusion
-* Good, because integrates with ADR-0006 bounded arena definition
+* Good, because bounded arena definition provides clear spatial constraints
 * Good, because clear visualization (fixed arena visible throughout)
 * Neutral, because could be enhanced with shrinking in future modes
 * Neutral, because requires boundary collision detection
@@ -608,14 +398,6 @@ No arena boundaries (infinite or very large playable area).
 
 ### Related Documentation
 
-- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: 2D arena where battles occur, line of sight calculations for detection
-
-- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Health stat that determines timeout and destruction outcomes
-
-- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Sensor Array (+2 detection) and Stealth Module (-2 enemy detection) equipment
-
-- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Scan action for temporary detection boost, actions that occur within battles
-
 - **[ADR-0004: Bot to Battle Server Interface](0004-bot-battle-server-interface.md)**: gRPC protocol for battle state synchronization and visibility information
 
 - **[Game Mechanics Analysis](../analysis/game-mechanics/)**: Detailed framework documentation including:
@@ -626,6 +408,8 @@ No arena boundaries (infinite or very large playable area).
   - [Win Conditions](../analysis/game-mechanics/win-conditions/): Battle resolution details
 
 - **[POC User Journey](../user-journeys/0001-poc.md)**: Proof of concept implementation using these battle orchestration rules
+
+**Future ADRs**: This orchestration ADR will inform future detailed ADRs for spatial systems, bot characteristics, equipment systems, and action mechanics.
 
 ### Implementation Notes
 
@@ -669,5 +453,5 @@ The battle orchestration follows these principles:
 - **Engagement Encouragement**: Timeout resolution rewards aggressive play over passive stalemate
 - **Definitive Outcomes**: All scenarios have clear win/loss/draw determination
 - **Fairness**: Deterministic, predictable resolution rules with complete information and equal arena access
-- **Integration**: Seamlessly combines mechanics from ADR-0006 through ADR-0009
+- **Integration**: Seamlessly combines spatial mechanics, bot characteristics, equipment systems, and action mechanics
 - **Future Extensibility**: All properties (visibility, spatial dimensions, boundaries) can be enhanced later without disrupting core mechanics
