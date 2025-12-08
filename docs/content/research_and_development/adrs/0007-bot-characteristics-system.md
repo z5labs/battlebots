@@ -5,7 +5,7 @@ description: >
 type: docs
 weight: 7
 category: "strategic"
-status: "proposed"
+status: "accepted"
 date: 2025-12-07
 deciders: []
 consulted: []
