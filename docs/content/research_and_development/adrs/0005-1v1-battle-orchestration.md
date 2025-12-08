@@ -1,9 +1,9 @@
 ---
-title: "[0009] 1v1 Battle Orchestration"
+title: "[0005] 1v1 Battle Orchestration"
 description: >
    High-level orchestration of 1v1 battles including visibility rules, battle pacing, and win conditions
 type: docs
-weight: 9
+weight: 5
 category: "strategic"
 status: "proposed"
 date: 2025-12-05
@@ -21,7 +21,7 @@ ADR Categories:
 
 ## Context and Problem Statement
 
-Battle Bots requires high-level orchestration rules for 1v1 battles that tie together the spatial system, characteristics, equipment, and actions into a complete battle experience. We need to define visibility rules (fog of war vs. full battlefield vision), battle pacing mechanisms (time limits, engagement encouragement), and win conditions (how battles conclude). These orchestration rules must create engaging gameplay while integrating the detailed mechanics defined in ADR-0005 through ADR-0008.
+Battle Bots requires high-level orchestration rules for 1v1 battles that tie together the spatial system, characteristics, equipment, and actions into a complete battle experience. We need to define visibility rules (fog of war vs. full battlefield vision), battle pacing mechanisms (time limits, engagement encouragement), and win conditions (how battles conclude). These orchestration rules must create engaging gameplay while integrating the detailed mechanics defined in ADR-0006 through ADR-0009.
 
 Without well-defined battle orchestration, we cannot:
 - Determine what information bots can see during battle (visibility)
@@ -37,7 +37,7 @@ Without well-defined battle orchestration, we cannot:
 * **Engagement Encouragement** - Battle pacing should prevent passive stalemates and force interaction
 * **Definitive Outcomes** - Win conditions must handle all scenarios including edge cases
 * **Fairness** - Resolution rules should be deterministic and predictable
-* **Integration** - Must work seamlessly with mechanics from ADR-0005 through ADR-0008
+* **Integration** - Must work seamlessly with mechanics from ADR-0006 through ADR-0009
 * **Observability** - Battle outcomes must be clear for visualization and analysis
 * **Time Constraints** - Battles must conclude in reasonable timeframes
 
@@ -49,7 +49,7 @@ Without well-defined battle orchestration, we cannot:
 
 ## Decision Outcome
 
-Chosen option: "**Option 3: Fog of War + Fixed Time Limit**", because it creates strategic depth through information advantage (sensor/stealth equipment becomes valuable), encourages tactical positioning (must get in range to detect), maintains simplicity (no dynamic arena complexity), and provides definitive conclusion through time limits. This option maximizes the value of Sensor Array and Stealth Module equipment (ADR-0007).
+Chosen option: "**Option 3: Fog of War + Fixed Time Limit**", because it creates strategic depth through information advantage (sensor/stealth equipment becomes valuable), encourages tactical positioning (must get in range to detect), maintains simplicity (no dynamic arena complexity), and provides definitive conclusion through time limits. This option maximizes the value of Sensor Array and Stealth Module equipment (ADR-0008).
 
 ### Battle Orchestration Specification
 
@@ -61,9 +61,9 @@ Bots do not have automatic full battlefield visibility. Instead, detection is ra
 
 **Detection Mechanics**:
 - **Base Detection Range**: Each bot has a detection radius (TBD: placeholder 30 units)
-- **Sensor Array Bonus**: +2 Detection Range (TBD) when equipped (ADR-0007)
-- **Stealth Module Effect**: -2 Enemy Detection Range (TBD) when equipped (ADR-0007)
-- **Line of Sight Required**: Detection requires unobstructed line of sight (ADR-0005)
+- **Sensor Array Bonus**: +2 Detection Range (TBD) when equipped (ADR-0008)
+- **Stealth Module Effect**: -2 Enemy Detection Range (TBD) when equipped (ADR-0008)
+- **Line of Sight Required**: Detection requires unobstructed line of sight (ADR-0006)
 
 **Information Provided Within Detection Range**:
 - Enemy bot position (x, y coordinates)
@@ -77,9 +77,9 @@ Bots do not have automatic full battlefield visibility. Instead, detection is ra
 - Enemy actions unknown
 
 **Tactical Implications**:
-- **Sensor Array Equipment**: Increases detection range, providing information advantage (ADR-0007)
-- **Stealth Module Equipment**: Reduces enemy detection range, enables surprise attacks (ADR-0007)
-- **Scan Action**: Provides temporary detection boost within area (ADR-0008)
+- **Sensor Array Equipment**: Increases detection range, providing information advantage (ADR-0008)
+- **Stealth Module Equipment**: Reduces enemy detection range, enables surprise attacks (ADR-0008)
+- **Scan Action**: Provides temporary detection boost within area (ADR-0009)
 - **Positioning Strategy**: Bots must position to detect enemies or avoid detection
 - **Equipment Tradeoffs**: Sensor/Stealth builds become viable strategic choices
 
@@ -115,7 +115,7 @@ All 1v1 battles have a maximum duration to prevent indefinitely long battles and
 - **Timeout Favors Aggressor**: Dealing damage creates HP advantage for timeout scenario
 - **No Passive Victory**: Cannot win by hiding; must either destroy enemy or have HP advantage
 - **Fog of War**: Limited visibility encourages active scouting and engagement
-- **Energy Regeneration**: Bots have resources to maintain active gameplay (ADR-0008)
+- **Energy Regeneration**: Bots have resources to maintain active gameplay (ADR-0009)
 
 #### Win Conditions
 
@@ -224,7 +224,7 @@ If a bot begins battle with 0 or negative health (configuration error):
 * Good, because timeout resolution encourages aggressive play (damage creates HP advantage)
 * Good, because win conditions handle all scenarios including edge cases definitively
 * Good, because deterministic resolution rules ensure fairness and predictability
-* Good, because integrates seamlessly with spatial system (ADR-0005), characteristics (ADR-0006), equipment (ADR-0007), and actions (ADR-0008)
+* Good, because integrates seamlessly with spatial system (ADR-0006), characteristics (ADR-0007), equipment (ADR-0008), and actions (ADR-0009)
 * Good, because draw conditions are clear and handle simultaneous outcomes
 * Good, because disconnect handling with grace period balances technical issues with competitive integrity
 * Neutral, because detection range values (base 30 units, +2 sensor, -2 stealth) require playtesting
@@ -284,7 +284,7 @@ Limited detection ranges with sensor/stealth mechanics, fixed 5-minute time limi
 
 * Good, because fog of war creates information strategy depth
 * Good, because sensor/stealth equipment becomes meaningfully valuable
-* Good, because simpler than dynamic arena (static boundaries from ADR-0005)
+* Good, because simpler than dynamic arena (static boundaries from ADR-0006)
 * Good, because detection mechanics encourage tactical positioning and scouting
 * Good, because time limit ensures definitive conclusion without arena complexity
 * Good, because timeout resolution (HP comparison) encourages aggressive play
@@ -298,13 +298,13 @@ Limited detection ranges with sensor/stealth mechanics, fixed 5-minute time limi
 
 ### Related Documentation
 
-- **[ADR-0005: Battle Space Spatial System](0005-battle-space-spatial-system.md)**: 2D arena where battles occur, line of sight calculations for detection
+- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: 2D arena where battles occur, line of sight calculations for detection
 
-- **[ADR-0006: Bot Characteristics System](0006-bot-characteristics-system.md)**: Health stat that determines timeout and destruction outcomes
+- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Health stat that determines timeout and destruction outcomes
 
-- **[ADR-0007: Equipment and Loadout System](0007-equipment-loadout-system.md)**: Sensor Array (+2 detection) and Stealth Module (-2 enemy detection) equipment
+- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Sensor Array (+2 detection) and Stealth Module (-2 enemy detection) equipment
 
-- **[ADR-0008: Bot Actions and Resource Management](0008-bot-actions-resource-management.md)**: Scan action for temporary detection boost, actions that occur within battles
+- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Scan action for temporary detection boost, actions that occur within battles
 
 - **[ADR-0004: Bot to Battle Server Interface](0004-bot-battle-server-interface.md)**: gRPC protocol for battle state synchronization and visibility information
 
@@ -349,4 +349,4 @@ The battle orchestration follows these principles:
 - **Engagement Encouragement**: Timeout resolution rewards aggressive play
 - **Definitive Outcomes**: All scenarios have clear win/loss/draw determination
 - **Fairness**: Deterministic, predictable resolution rules
-- **Integration**: Seamlessly combines mechanics from ADR-0005 through ADR-0008
+- **Integration**: Seamlessly combines mechanics from ADR-0006 through ADR-0009

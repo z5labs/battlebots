@@ -1,9 +1,9 @@
 ---
-title: "[0008] Bot Actions and Resource Management"
+title: "[0009] Bot Actions and Resource Management"
 description: >
     Action system governing bot behavior and creating tactical decision-making in real-time battles
 type: docs
-weight: 8
+weight: 9
 category: "strategic"
 status: "proposed"
 date: 2025-12-07
@@ -36,7 +36,7 @@ Without a well-defined action system, we cannot:
 * **Real-time Gameplay Support** - Must work with continuous tick-based game loop (not turn-based)
 * **Resource Management Depth** - Should create strategic decisions about when to use actions
 * **Tactical Timing Decisions** - Cooldowns should create timing choices beyond raw resource availability
-* **Equipment Integration** - Actions must respect equipment requirements (ADR-0007)
+* **Equipment Integration** - Actions must respect equipment requirements (ADR-0008)
 * **Balance Flexibility** - Energy costs and cooldowns provide tuning knobs for game balance
 * **Protocol Integration** - Actions must map cleanly to gRPC streaming protocol (ADR-0004)
 * **Action Spam Prevention** - System must prevent trivial spamming of powerful actions
@@ -57,7 +57,7 @@ Chosen option: "**Option 3: Dual-Constraint System (energy costs AND cooldowns)*
 
 #### Resource Management System
 
-**Energy Pool** (from ADR-0006: Bot Characteristics):
+**Energy Pool** (from ADR-0007: Bot Characteristics):
 - All actions consume energy from a limited pool
 - Energy regenerates over time at a fixed rate (TBD)
 - Insufficient energy prevents action execution
@@ -79,7 +79,7 @@ Chosen option: "**Option 3: Dual-Constraint System (energy costs AND cooldowns)*
 
 Actions are organized into four categories based on their primary purpose:
 
-**Movement Actions**: Navigate the 2D battle space (ADR-0005)
+**Movement Actions**: Navigate the 2D battle space (ADR-0006)
 
 **Combat Actions**: Deal damage to opponent bots
 
@@ -97,7 +97,7 @@ Actions are organized into four categories based on their primary purpose:
 - **Cooldown**: 0 ticks (TBD)
 - **Equipment Required**: None (universal action)
 - **Parameters**: Direction vector or target coordinates
-- **Constraints**: Cannot move through obstacles or other bots (ADR-0005 collision rules)
+- **Constraints**: Cannot move through obstacles or other bots (ADR-0006 collision rules)
 - **Tactical Use**: Positioning, pursuit, evasion, range control
 
 ---
@@ -108,17 +108,17 @@ Actions are organized into four categories based on their primary purpose:
 
 - **Energy Cost**: 15 (TBD)
 - **Cooldown**: 1 tick (TBD)
-- **Equipment Required**: Rifle (ADR-0007)
+- **Equipment Required**: Rifle (ADR-0008)
 - **Damage**: Moderate (TBD)
 - **Range**: Long (TBD)
-- **Constraints**: Requires line of sight (ADR-0005), rifle must be equipped
+- **Constraints**: Requires line of sight (ADR-0006), rifle must be equipped
 - **Tactical Use**: Consistent ranged damage, reliable baseline offense
 
 *ShotgunBlast*: Spray of projectiles effective at close range
 
 - **Energy Cost**: 20 (TBD)
 - **Cooldown**: 2 ticks (TBD)
-- **Equipment Required**: Shotgun (ADR-0007)
+- **Equipment Required**: Shotgun (ADR-0008)
 - **Damage**: High at close range with falloff based on distance (TBD)
 - **Range**: Short to medium (TBD)
 - **Constraints**: Shotgun must be equipped, damage decreases with distance
@@ -145,7 +145,7 @@ Actions are organized into four categories based on their primary purpose:
 - **Equipment Required**: None (universal action)
 - **Effect**: Chance to completely avoid attack (TBD)
 - **Duration**: Active for current tick only
-- **Constraints**: Success rate may depend on bot Speed stat (ADR-0006)
+- **Constraints**: Success rate may depend on bot Speed stat (ADR-0007)
 - **Tactical Use**: Avoid high-damage attacks, risky but high-reward defense
 
 *Shield*: Activates energy shield that absorbs damage over multiple ticks
@@ -166,7 +166,7 @@ Actions are organized into four categories based on their primary purpose:
 
 - **Energy Cost**: 5 (TBD)
 - **Cooldown**: Variable (TBD)
-- **Equipment Required**: Sensor Array module recommended (ADR-0007)
+- **Equipment Required**: Sensor Array module recommended (ADR-0008)
 - **Effect**: Returns information about nearby entities (positions, health, etc.)
 - **Range**: Limited detection radius, enhanced by Sensor Array (TBD)
 - **Constraints**: May only reveal information within range
@@ -184,7 +184,7 @@ Actions are organized into four categories based on their primary purpose:
 
 ---
 
-**Equipment-Dependent Actions** (from ADR-0007)
+**Equipment-Dependent Actions** (from ADR-0008)
 
 *Boost*: Temporary speed increase for repositioning
 
@@ -233,7 +233,7 @@ Actions are organized into four categories based on their primary purpose:
 * Good, because dual-constraint system (energy + cooldowns) creates both resource management and tactical timing layers
 * Good, because basic actions (Move) have low cost and no cooldown for fluid gameplay
 * Good, because powerful actions (Shield, ShotgunBlast) have high costs and cooldowns preventing spam
-* Good, because equipment-dependent actions integrate naturally with loadout system (ADR-0007)
+* Good, because equipment-dependent actions integrate naturally with loadout system (ADR-0008)
 * Good, because energy costs and cooldowns provide independent tuning knobs for balance
 * Good, because action variety (Movement, Combat, Defensive, Utility) enables diverse playstyles
 * Good, because universal actions (Move, Block, Evade) are always available regardless of equipment
@@ -327,17 +327,17 @@ Traditional turn-based action point economy.
 
 ### Related Documentation
 
-- **[ADR-0006: Bot Characteristics System](0006-bot-characteristics-system.md)**: Energy pool characteristic that actions consume
+- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Energy pool characteristic that actions consume
 
-- **[ADR-0007: Equipment and Loadout System](0007-equipment-loadout-system.md)**: Equipment that enables/disables actions and modifies energy
+- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment that enables/disables actions and modifies energy
 
-- **[ADR-0005: Battle Space Spatial System](0005-battle-space-spatial-system.md)**: Spatial environment where movement and combat actions occur
+- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: Spatial environment where movement and combat actions occur
 
 - **[Bot Actions Analysis](../analysis/game-mechanics/actions/)**: Detailed technical specifications for action catalog
 
 - **[ADR-0004: Bot to Battle Server Interface](0004-bot-battle-server-interface.md)**: gRPC protocol for action submission and validation
 
-- **[ADR-0009: 1v1 Battle Orchestration](0009-1v1-battle-orchestration.md)**: High-level battle flow using these actions
+- **[ADR-0005: 1v1 Battle Orchestration](0005-1v1-battle-orchestration.md)**: High-level battle flow using these actions
 
 ### Implementation Notes
 

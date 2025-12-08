@@ -1,9 +1,9 @@
 ---
-title: "[0006] Bot Characteristics System"
+title: "[0007] Bot Characteristics System"
 description: >
     Attribute system defining bot capabilities and creating strategic differentiation
 type: docs
-weight: 6
+weight: 7
 category: "strategic"
 status: "proposed"
 date: 2025-12-07
@@ -39,7 +39,7 @@ Without a well-defined characteristic system, we cannot:
 * **Developer Accessibility** - Stats should be understandable without being overwhelming
 * **Calculation Simplicity** - Stat interactions should be calculable and predictable
 * **Playstyle Support** - Should enable distinct archetypes (tank, DPS, mobile, balanced)
-* **Spatial Integration** - Must work with continuous 2D movement system (ADR-0005)
+* **Spatial Integration** - Must work with continuous 2D movement system (ADR-0006)
 
 ## Considered Options
 
@@ -71,7 +71,7 @@ Health (HP) represents a bot's survivability in combat. This is the primary reso
 
 #### Speed
 
-Speed determines how quickly a bot can move through the 2D battle space (ADR-0005). This stat directly affects positioning, engagement control, and evasion capabilities.
+Speed determines how quickly a bot can move through the 2D battle space (ADR-0006). This stat directly affects positioning, engagement control, and evasion capabilities.
 
 **Key Properties**:
 - **Movement Rate**: Distance covered per game tick (TBD: placeholder 1-10 units/tick)
@@ -156,7 +156,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 - Mass from defensive equipment reduces evasion capability
 - Optimal defensive strategy depends on threat profile
 
-**Loadout Optimization**: Equipment choices (ADR-0007) create cascading effects across all characteristics:
+**Loadout Optimization**: Equipment choices (ADR-0008) create cascading effects across all characteristics:
 - Heavy weapons increase offensive capability but reduce Speed through Mass
 - Armor improves Defense but adds Mass that limits mobility
 - Lightweight builds sacrifice protection for superior positioning
@@ -184,7 +184,7 @@ Bot characteristics don't operate in isolation - they create complex interaction
 The decision will be confirmed through:
 
 1. Implementation of characteristic system in game server with stat calculation formulas
-2. Equipment system implementation (ADR-0007) that modifies stats and contributes Mass
+2. Equipment system implementation (ADR-0008) that modifies stats and contributes Mass
 3. Playtesting with diverse bot builds (tank, DPS, balanced, mobile) to validate viability
 4. Balance analysis ensuring no single stat profile dominates all scenarios
 5. Developer feedback on stat system accessibility and understandability
@@ -244,15 +244,15 @@ Health, Speed, Defense, Attack, Energy, Accuracy, Evasion, Stamina, etc.
 
 ### Related Documentation
 
-- **[ADR-0005: Battle Space Spatial System](0005-battle-space-spatial-system.md)**: Spatial environment where Speed determines movement
+- **[ADR-0006: Battle Space Spatial System](0006-battle-space-spatial-system.md)**: Spatial environment where Speed determines movement
 
-- **[ADR-0007: Equipment and Loadout System](0007-equipment-loadout-system.md)**: Equipment that modifies stats and contributes to Mass
+- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment that modifies stats and contributes to Mass
 
-- **[ADR-0008: Bot Actions and Resource Management](0008-bot-actions-resource-management.md)**: Actions that consume resources and leverage bot characteristics
+- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Actions that consume resources and leverage bot characteristics
 
 - **[Bot Characteristics Analysis](../analysis/game-mechanics/characteristics/)**: Detailed technical specifications for the stat system
 
-- **[ADR-0009: 1v1 Battle Orchestration](0009-1v1-battle-orchestration.md)**: High-level battle flow that uses these characteristics
+- **[ADR-0005: 1v1 Battle Orchestration](0005-1v1-battle-orchestration.md)**: High-level battle flow that uses these characteristics
 
 ### Implementation Notes
 
@@ -280,4 +280,4 @@ The characteristic system follows these principles:
 - **Tradeoffs over Power**: Equipment choices involve costs and benefits through Mass
 - **Diversity over Dominance**: Multiple stat profiles should be competitively viable
 - **Clarity over Complexity**: Four stats balance depth with accessibility
-- **Equipment Integration**: Stats are modified by loadout choices (ADR-0007)
+- **Equipment Integration**: Stats are modified by loadout choices (ADR-0008)

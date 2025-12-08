@@ -1,9 +1,9 @@
 ---
-title: "[0005] Battle Space Spatial System"
+title: "[0006] Battle Space Spatial System"
 description: >
     Spatial system governing bot positioning, movement, and interactions in the battle arena
 type: docs
-weight: 5
+weight: 6
 category: "strategic"
 status: "proposed"
 date: 2025-12-07
@@ -169,7 +169,7 @@ This calculation may be optimized by only checking bots that fall within a bound
 
 #### Movement Constraints
 
-1. **Speed Limits**: Bots have maximum movement speeds (defined in ADR-0006: Bot Characteristics)
+1. **Speed Limits**: Bots have maximum movement speeds (defined in ADR-0007: Bot Characteristics)
 2. **No Teleportation**: Bots cannot instantly move from one position to another; all movement follows continuous paths
 3. **Elastic Wall Collisions**: When a bot collides with a wall during movement, it stops at the wall position without bouncing
 4. **No Wall Damage**: Wall collisions do not inherently cause damage to bots
@@ -253,11 +253,11 @@ Hex tiles for movement and positioning, common in strategy games.
 
 - **[ADR-0004: Bot to Battle Server Interface](0004-bot-battle-server-interface.md)**: gRPC protocol that transmits position updates and movement commands
 
-- **[ADR-0006: Bot Characteristics System](0006-bot-characteristics-system.md)**: Defines Speed stat that determines movement rate in this spatial system
+- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Defines Speed stat that determines movement rate in this spatial system
 
 - **[Battle Space Analysis](../analysis/game-mechanics/battle-space/)**: Detailed technical specifications for the spatial system
 
-- **[ADR-0009: 1v1 Battle Orchestration](0009-1v1-battle-orchestration.md)**: High-level battle flow that operates within this spatial system
+- **[ADR-0005: 1v1 Battle Orchestration](0005-1v1-battle-orchestration.md)**: High-level battle flow that operates within this spatial system
 
 ### Implementation Notes
 
