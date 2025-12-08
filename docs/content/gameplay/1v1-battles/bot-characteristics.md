@@ -6,8 +6,6 @@ type: docs
 weight: 30
 ---
 
-## Bot Characteristics Overview
-
 Your bot's capabilities are defined by three core characteristics: **Health**, **Defense**, and **Mass**. These stats determine your survivability, damage mitigation, and movement properties.
 
 ## Health

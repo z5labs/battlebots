@@ -6,8 +6,6 @@ type: docs
 weight: 10
 ---
 
-## 1v1 Battle Mechanics
-
 In 1v1 battles, two bots face off in direct combat within a bounded 2D arena. Victory goes to the bot that reduces its opponent's health to zero or has more health when the timeout expires.
 
 ## What You'll Find Here

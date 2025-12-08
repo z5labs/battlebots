@@ -6,8 +6,6 @@ type: docs
 weight: 10
 ---
 
-## Getting Started with 1v1 Battles
-
 This guide will help you create your first bot for 1v1 battles. We'll cover the basics of bot structure, equipment configuration, and connecting to the battle server.
 
 ## Prerequisites

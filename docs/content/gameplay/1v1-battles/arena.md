@@ -6,8 +6,6 @@ type: docs
 weight: 20
 ---
 
-## Arena Overview
-
 1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.
 
 ## Coordinate System

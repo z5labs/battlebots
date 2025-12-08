@@ -6,8 +6,6 @@ type: docs
 weight: 20
 ---
 
-## Gameplay Documentation
-
 Welcome to the Battle Bots gameplay documentation! This section provides comprehensive mechanics guides for different battle types available in Battle Bots.
 
 Each battle type has its own self-contained documentation covering the specific rules, mechanics, and systems that apply to that mode. This organization allows each battle type to have unique mechanics while maintaining clear, focused documentation.

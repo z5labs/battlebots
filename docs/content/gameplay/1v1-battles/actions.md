@@ -10,8 +10,6 @@ weight: 50
 The action system described here is currently in the PROPOSED stage and may change based on playtesting and balance analysis. Energy costs, cooldowns, and action availability may be adjusted!
 {{< /alert >}}
 
-## Actions Overview
-
 During battle, your bot performs **actions** each tick. Actions allow your bot to move, attack, defend, and gather information. All actions are constrained by a dual-resource system: energy costs and cooldowns.
 
 ## Resource Management System

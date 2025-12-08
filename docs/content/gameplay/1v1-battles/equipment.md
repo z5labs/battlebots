@@ -10,8 +10,6 @@ weight: 40
 The equipment system described here is currently in the PROPOSED stage and may change based on playtesting and balance analysis. Check back for updates!
 {{< /alert >}}
 
-## Equipment System Overview
-
 Before battle, you configure your bot's **loadout** by selecting equipment. Equipment modifies your bot's characteristics and determines which actions are available during battle.
 
 ### Loadout Slots
