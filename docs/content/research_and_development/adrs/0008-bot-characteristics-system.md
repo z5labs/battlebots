@@ -186,7 +186,7 @@ The decision will be confirmed through:
 
 - **[ADR-0007: Bot Movement Mechanics](0007-bot-movement-mechanics.md)**: Defines how bots apply movement forces within physics framework; movement force affects acceleration based on Mass (A = F/M)
 
-- **[ADR-0009: Equipment and Loadout System](0009-equipment-loadout-system.md)**: Equipment that modifies stats and contributes to Mass
+- **[ADR-0009: Equipment Type System](0009-equipment-type-system.md)**: Defines equipment type categories (Weapons, Armor) that modify stats and contribute to Mass
 
 - **[ADR-0010: Bot Actions and Resource Management](0010-bot-actions-resource-management.md)**: Actions that consume resources and leverage bot characteristics
 
