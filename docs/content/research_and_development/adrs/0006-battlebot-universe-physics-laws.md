@@ -71,7 +71,7 @@ The chosen physics framework consists of:
 3. **Air Friction** - Constant Uniform Air Resistance
 4. **Collisions** - Elastic Collisions
 
-This physics framework integrates with the spatial system (ADR-0005), equipment system (ADR-0008), and future thrust-based movement to create deterministic, tactically deep gameplay with predictable behavior for bot developers.
+This physics framework integrates with the spatial system (ADR-0005), movement mechanics (ADR-0007), and equipment system (ADR-0008) to create deterministic, tactically deep gameplay with predictable behavior for bot developers.
 
 ## Property 0: Mass
 
@@ -95,7 +95,7 @@ This physics framework integrates with the spatial system (ADR-0005), equipment 
 
 - **Friction**: Higher mass experiences greater friction force (F_friction = μ × M × |v|)
 - **Collisions**: Mass determines momentum transfer in collisions (heavier entities push lighter ones)
-- **Movement**: Higher mass reduces acceleration from thrust (A = F / M)
+- **Movement**: Higher mass reduces acceleration from applied forces (A = F / M, defined in ADR-0007)
 - **Projectiles**: Mass affects air resistance and collision damage
 
 ### Consequences
@@ -149,7 +149,7 @@ Where:
 - Friction applies continuously to all moving bots every game tick
 - Stationary bots (v = 0) have no friction force (no static friction model in initial design)
 - Heavier bots (higher Mass from equipment) experience proportionally greater friction force
-- Friction force interacts with thrust force to determine acceleration
+- Friction force opposes movement forces (as defined in ADR-0007) to determine net acceleration
 - Transitions between friction zones should be smooth to prevent unrealistic instant changes
 
 ### Alternative Rejected: Option 1.1 - None (Frictionless)
@@ -268,12 +268,14 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 
 ## Physics System Implementation Specification
 
-### Integrated Bot Movement Physics
+### Movement Physics
 
-1. Bots apply thrust force to accelerate
+Bot movement is defined in ADR-0007 (Movement Mechanics). The physics laws in this ADR apply to movement:
+
+1. Applied movement forces (defined in ADR-0007) oppose surface friction
 2. Surface friction (μ × M × |v|) opposes movement, creating velocity decay
-3. Heavier bots (higher Mass from ADR-0008) require more thrust to overcome friction
-4. Bots reach terminal velocity when thrust force equals friction force
+3. Heavier bots (higher Mass from equipment) require more force to overcome friction
+4. Bots reach terminal velocity when applied force equals friction force
 5. Collisions transfer momentum based on Mass (elastic collision model)
 
 ### Integrated Projectile Physics
@@ -302,8 +304,8 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 - Floating-point calculations must be consistent across platforms
 - Physics tick rate: TBD (must align with game server tick rate from ADR-0004)
 - Physics update order (per tick):
-  1. Calculate all forces (thrust, friction, air resistance, gravity)
-  2. Update velocities based on forces
+  1. Calculate all forces (movement forces from ADR-0007, friction, air resistance, collision forces)
+  2. Update velocities based on net forces
   3. Update positions based on velocities
   4. Resolve collisions and adjust velocities/positions
 
@@ -314,7 +316,7 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 ### Overall Integration
 
 * Good, because four physics properties create coherent and predictable gameplay framework
-* Good, because physics integrates seamlessly with spatial system (ADR-0005), equipment loadout (ADR-0008), and future thrust actions
+* Good, because physics integrates seamlessly with spatial system (ADR-0005), movement mechanics (ADR-0007), and equipment loadout (ADR-0008)
 * Good, because constant friction and air resistance enable deterministic movement and projectile calculations
 * Good, because elastic collisions create tactical depth through Mass-based momentum transfer
 * Good, because air friction alone determines projectile range without need for virtual third dimension
@@ -326,7 +328,7 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 
 * Good, because creates natural velocity decay and prevents perpetual motion artifacts
 * Good, because integrates with Mass to reward/penalize bot weight choices from equipment
-* Good, because enables thrust-based movement requiring continuous force application
+* Good, because enables force-based movement requiring continuous force application (defined in ADR-0007)
 * Good, because terrain-based friction zones add tactical positioning depth to gameplay
 * Good, because naturally supports future "biome" and weather-based mechanics
 * Good, because players have intuitive understanding of how different surfaces affect movement
@@ -377,8 +379,8 @@ The decision will be confirmed through:
 
 3. **Integration Testing**:
    - Physics integrates correctly with spatial system (ADR-0005) coordinate system and boundaries
+   - Movement mechanics (ADR-0007) correctly apply movement forces within physics framework
    - Equipment system (ADR-0008) Mass contributions correctly modify physics behavior
-   - Future thrust actions (ADR-0010) correctly overcome friction forces
 
 4. **Gameplay Validation**:
    - Bot movement feels responsive and controllable with surface friction
@@ -432,15 +434,15 @@ The decision will be confirmed through:
 - Bad, because makes movement control extremely difficult (no natural deceleration)
 - Bad, because no integration with Mass characteristic
 - Bad, because unrealistic and unintuitive gameplay feel
-- Bad, because eliminates thrust-based movement mechanics (no force to overcome)
+- Bad, because eliminates force-based movement mechanics (no force to overcome)
 
 **Option 1.2: Constant Uniform Friction**
 
 - Good, because simplest friction model (single coefficient everywhere)
 - Good, because predictable movement throughout arena
 - Good, because integrates with Mass for mobility-weight tradeoffs
-- Good, because creates natural velocity decay when thrust not applied
-- Good, because enables thrust-based movement requiring continuous force application
+- Good, because creates natural velocity decay when movement force not applied
+- Good, because enables force-based movement requiring continuous force application
 - Good, because computationally efficient (single constant coefficient)
 - Good, because deterministic behavior across all battles
 - Good, because intuitive movement feel (objects slow down without force)
@@ -537,6 +539,8 @@ The decision will be confirmed through:
 
 - **[ADR-0005: BattleBot Universe Topological Properties](0005-battlebot-universe-topological-properties.md)**: Mathematical and spatial foundation (2D Euclidean space, rectangular boundaries, Cartesian coordinates) that physics laws operate within
 
+- **[ADR-0007: Bot Movement Mechanics](0007-bot-movement-mechanics.md)**: Defines how bots apply movement forces within this physics framework (thrust-based force application)
+
 - **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment system that modifies Mass through equipment weight, affecting friction and collision physics
 
 - **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Actions that operate within physics framework (movement actions interact with friction, combat actions create projectiles)
@@ -547,9 +551,9 @@ The decision will be confirmed through:
 
 The physics laws create an integrated framework where:
 
-- **Surface friction + Mass + thrust actions = movement mechanics**
-  - Bots apply thrust force to overcome friction
-  - Heavier bots (more equipment Mass) require more thrust to achieve same velocity
+- **Surface friction + Mass + movement forces = movement mechanics**
+  - Bots apply movement forces (defined in ADR-0007) to overcome friction
+  - Heavier bots (more equipment Mass) require more force to achieve same velocity
   - Creates natural mobility-firepower tradeoffs through equipment loadout choices
 
 - **Air friction + initial projectile velocity = weapon range mechanics**

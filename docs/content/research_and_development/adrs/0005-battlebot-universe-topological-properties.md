@@ -208,7 +208,7 @@ The following basic movement constraints apply to the battle space:
 * Good, because choices are mutually reinforcing (Cartesian + Rectangular, 2D + R^n)
 * Good, because extensible framework supports future enhancements
 * Good, because spatial system implementation follows naturally from topological properties
-* Good, because creates foundation for ADR-0006 (physics), ADR-0007 (characteristics), ADR-0008 (equipment), ADR-0009 (actions)
+* Good, because creates foundation for ADR-0006 (physics), ADR-0007 (movement), ADR-0008 (characteristics), ADR-0009 (equipment), ADR-0010 (actions)
 * Good, because property-based decision structure allows independent tuning and future modifications
 * Good, because balances mathematical rigor with practical accessibility
 
@@ -441,11 +441,13 @@ Fixed circular arena boundary centered at origin.
 
 - **[ADR-0006: BattleBot Universe Physics Laws](0006-battlebot-universe-physics-laws.md)**: Physics properties (friction, collisions, gravity) that govern movement mechanics in this spatial system
 
-- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Speed and Mass characteristics that govern movement in this spatial system
+- **[ADR-0007: Bot Movement Mechanics](0007-bot-movement-mechanics.md)**: Defines how bots apply thrust forces to control their movement within this spatial system
 
-- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment that modifies movement capabilities within this spatial framework
+- **[ADR-0008: Bot Characteristics System](0008-bot-characteristics-system.md)**: Mass and other characteristics that govern movement and combat in this spatial system
 
-- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Movement and combat actions that operate within this spatial system
+- **[ADR-0009: Equipment and Loadout System](0009-equipment-loadout-system.md)**: Equipment that modifies characteristics and movement capabilities within this spatial framework
+
+- **[ADR-0010: Bot Actions and Resource Management](0010-bot-actions-resource-management.md)**: Movement and combat actions that operate within this spatial system
 
 - **[POC User Journey](../user-journeys/0001-poc.md)**: Proof of concept implementation using this spatial foundation
 
