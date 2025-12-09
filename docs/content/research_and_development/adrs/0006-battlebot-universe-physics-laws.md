@@ -5,7 +5,7 @@ description: >
 type: docs
 weight: 6
 category: "strategic"
-status: "proposed"
+status: "accepted"
 date: 2025-12-08
 deciders: []
 consulted: []
@@ -67,7 +67,7 @@ We define four fundamental physics properties that create a coherent physics fra
 The chosen physics framework consists of:
 
 1. **Mass** - Universal entity property (every bot and projectile has mass)
-2. **Surface Friction** - Constant Uniform Friction
+2. **Surface Friction** - Variable Friction
 3. **Air Friction** - Constant Uniform Air Resistance
 4. **Collisions** - Elastic Collisions
 
@@ -111,51 +111,54 @@ This physics framework integrates with the spatial system (ADR-0005), equipment 
 
 ## Property 1: Surface Friction
 
-**Chosen: Option 1.2 - Constant Uniform Friction**
+**Chosen: Option 1.3 - Variable Friction**
 
 ### Options Considered
 
 - **Option 1.1**: None (frictionless surface)
-- **Option 1.2**: Constant Uniform Friction (CHOSEN)
-- **Option 1.3**: Position-Dependent Friction (variable friction zones)
+- **Option 1.2**: Constant Uniform Friction
+- **Option 1.3**: Variable Friction (CHOSEN)
 
 ### Rationale for Chosen Option
 
-- **Predictable Movement**: Constant friction coefficient enables consistent movement calculations for bot pathfinding throughout the entire arena
-- **Mass Integration**: Friction force directly interacts with Mass to create natural mobility-weight tradeoffs (heavier bots require more thrust to overcome friction)
-- **Thrust System Support**: Enables thrust-based movement system where bots must continuously apply force to overcome friction
-- **Computational Simplicity**: Single constant friction coefficient requires minimal calculation overhead per game tick
-- **Strategic Positioning**: Uniform friction eliminates unpredictable "slippery zone" variables that would complicate tactical positioning
-- **Deterministic Physics**: Same friction coefficient everywhere ensures consistent behavior across all battles and platforms
-- **Velocity Decay**: Creates natural velocity decay when thrust is not applied, preventing perpetual motion artifacts
-- **Intuitive Behavior**: Matches player expectations for how movement should feel (objects slow down without force)
+- **Terrain-Based Tactical Depth**: Variable friction zones create interesting terrain effects (ice zones, mud zones) enabling tactical positioning decisions
+- **Strategic Positioning**: Players can exploit low-friction areas for speed advantages or avoid high-friction areas, adding positional complexity
+- **Future Biome Support**: Enables future "biome" mechanics with different terrain types that naturally have different friction characteristics
+- **Gameplay Variety**: Different arena regions have distinct movement characteristics, encouraging dynamic tactics and positioning
+- **Equipment Balance Opportunities**: Equipment that modifies friction interaction or gives better traction creates additional build diversity
+- **Real-World Intuition**: Players intuitively understand that different surfaces have different friction properties
+- **Enhanced Strategic Decision-Making**: Movement planning becomes more complex as players must navigate variable friction zones
+- **Long-Term Extensibility**: Provides foundation for future weather effects (mud, ice storms) and hazard-based mechanics
 
 ### Implementation Formula
 
 ```
-F_friction = μ × M × |v|
+F_friction = μ(position) × M × |v|
 ```
 
 Where:
-- `μ` = surface friction coefficient (TBD, requires playtesting)
+- `μ(position)` = position-dependent surface friction coefficient (varies by arena location/terrain type)
 - `M` = bot Mass (calculated from base mass + equipment mass)
 - `|v|` = magnitude of bot velocity vector
 
 ### Implementation Notes
 
+- Friction coefficient varies based on bot's current position in arena (terrain-dependent)
+- Arena map defines friction zones with different coefficient values (e.g., μ_ice = 0.2, μ_mud = 1.5)
 - Friction force opposes velocity direction (acts opposite to velocity vector)
 - Friction applies continuously to all moving bots every game tick
 - Stationary bots (v = 0) have no friction force (no static friction model in initial design)
 - Heavier bots (higher Mass from equipment) experience proportionally greater friction force
 - Friction force interacts with thrust force to determine acceleration
+- Transitions between friction zones should be smooth to prevent unrealistic instant changes
 
 ### Alternative Rejected: Option 1.1 - None (Frictionless)
 
 Would create perpetual motion where bots never stop unless they hit boundaries, making movement control extremely difficult and unintuitive. Eliminates integration with Mass characteristic.
 
-### Alternative Rejected: Option 1.3 - Position-Dependent Friction
+### Alternative Rejected: Option 1.2 - Constant Uniform Friction
 
-Would add complexity and unpredictability. Bot developers would struggle with pathfinding in variable-friction zones. Future "biome" or "terrain effect" mechanics can layer on top of constant baseline friction without redesigning the core physics model.
+While simpler to implement, constant friction eliminates opportunities for terrain-based tactical depth. Variable friction provides more engaging gameplay with positional decision-making while still maintaining consistent physics calculations. The framework supports both approaches through the friction coefficient, so variable friction doesn't preclude simpler terrain designs in future arenas.
 
 ---
 
@@ -267,7 +270,7 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 
 ### Integrated Bot Movement Physics
 
-1. Bots apply thrust force (future ADR-0010) to accelerate
+1. Bots apply thrust force to accelerate
 2. Surface friction (μ × M × |v|) opposes movement, creating velocity decay
 3. Heavier bots (higher Mass from ADR-0008) require more thrust to overcome friction
 4. Bots reach terminal velocity when thrust force equals friction force
@@ -319,15 +322,18 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 * Good, because property-based structure allows independent tuning and future modifications
 * Good, because universal mass property simplifies physics implementation
 
-### Surface Friction (Constant Uniform)
+### Surface Friction (Variable)
 
 * Good, because creates natural velocity decay and prevents perpetual motion artifacts
 * Good, because integrates with Mass to reward/penalize bot weight choices from equipment
 * Good, because enables thrust-based movement requiring continuous force application
-* Good, because predictable and consistent across entire arena
-* Good, because computationally efficient (single coefficient calculation)
-* Neutral, because friction coefficient μ requires careful tuning to balance movement feel
-* Bad, because adds physics calculation complexity compared to frictionless movement
+* Good, because terrain-based friction zones add tactical positioning depth to gameplay
+* Good, because naturally supports future "biome" and weather-based mechanics
+* Good, because players have intuitive understanding of how different surfaces affect movement
+* Neutral, because variable friction zones require arena design and tuning for each map
+* Neutral, because friction lookups per position adds modest computational overhead
+* Bad, because bot developers must account for variable friction in pathfinding algorithms
+* Bad, because slightly more complex to communicate and document physics behavior
 
 ### Air Friction (Constant Uniform)
 
@@ -428,8 +434,9 @@ The decision will be confirmed through:
 - Bad, because unrealistic and unintuitive gameplay feel
 - Bad, because eliminates thrust-based movement mechanics (no force to overcome)
 
-**Option 1.2: Constant Uniform Friction** (CHOSEN)
+**Option 1.2: Constant Uniform Friction**
 
+- Good, because simplest friction model (single coefficient everywhere)
 - Good, because predictable movement throughout arena
 - Good, because integrates with Mass for mobility-weight tradeoffs
 - Good, because creates natural velocity decay when thrust not applied
@@ -438,19 +445,25 @@ The decision will be confirmed through:
 - Good, because deterministic behavior across all battles
 - Good, because intuitive movement feel (objects slow down without force)
 - Neutral, because requires tuning friction coefficient μ for gameplay feel
+- Bad, because eliminates opportunities for terrain-based tactical depth
 - Bad, because adds physics calculation complexity compared to frictionless
 
-**Option 1.3: Position-Dependent Friction (Variable Friction Zones)**
+**Option 1.3: Variable Friction** (CHOSEN)
 
-- Good, because could create interesting terrain effects (ice zones, mud zones)
+- Good, because creates interesting terrain effects (ice zones, mud zones)
 - Good, because adds tactical positioning depth (seek low-friction areas for speed)
 - Good, because enables future "biome" mechanics
+- Good, because naturally supports weather-based effects (storms, mud, ice)
+- Good, because players intuitively understand different surfaces have different friction
+- Good, because provides emergent tactical opportunities through map design
+- Good, because enriches gameplay with positional decision-making
 - Neutral, because provides additional game design opportunities
-- Bad, because unpredictable movement complicates bot pathfinding algorithms
-- Bad, because adds computational overhead (friction lookup per position per tick)
-- Bad, because difficult to visualize and communicate to bot developers
-- Bad, because requires additional content creation (friction map design)
-- Bad, because eliminates predictable physics framework
+- Neutral, because variable friction zones require careful arena design
+- Neutral, because friction lookups add modest computational overhead per tick
+- Bad, because more complex to implement than constant friction
+- Bad, because bot developers must account for variable friction in pathfinding
+- Bad, because requires additional arena design and content creation (friction maps)
+- Bad, because slightly more difficult to visualize and communicate to developers
 
 ### Property 2: Air Friction
 
@@ -527,8 +540,6 @@ The decision will be confirmed through:
 - **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment system that modifies Mass through equipment weight, affecting friction and collision physics
 
 - **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Actions that operate within physics framework (movement actions interact with friction, combat actions create projectiles)
-
-- **[Future ADR-0010: Thrust-Based Movement System](../analysis/game-mechanics/)**: Detailed thrust mechanics that apply force to overcome surface friction for bot movement
 
 ### Implementation Notes
 
