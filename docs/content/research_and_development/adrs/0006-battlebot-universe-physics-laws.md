@@ -23,13 +23,12 @@ ADR Categories:
 
 The BattleBot Universe requires well-defined physics laws to govern gameplay mechanics. ADR-0005 established the mathematical and spatial foundation (2D Euclidean continuous space, rectangular boundaries, Cartesian coordinates), but did not define the physical forces and interactions that govern how objects move, collide, and behave within that space.
 
-This decision defines five fundamental physics properties that characterize the physical laws of the battle space:
+This decision defines four fundamental physics properties that characterize the physical laws of the battle space:
 
 1. **Mass** - Universal entity property defining physical weight
 2. **Surface Friction** - Resistance force opposing bot movement in the 2D plane
 3. **Air Friction** - Resistance force affecting projectile movement through the air
-4. **Gravity** - Force affecting projectile time-to-live and behavior
-5. **Collisions** - Mechanics governing bot-to-bot and bot-to-wall interactions
+4. **Collisions** - Mechanics governing bot-to-bot and bot-to-wall interactions
 
 These properties form the physics framework upon which all movement mechanics, projectile behavior, collision resolution, and force-based interactions are built. The choice of physics properties has cascading implications for:
 
@@ -63,15 +62,14 @@ Without well-defined physics laws, we cannot:
 
 ## Decision Outcome
 
-We define five fundamental physics properties that create a coherent physics framework for the BattleBot Universe. Each property follows the property-based decision structure from ADR-0005, with multiple options evaluated and chosen options with detailed rationale.
+We define four fundamental physics properties that create a coherent physics framework for the BattleBot Universe. Each property follows the property-based decision structure from ADR-0005, with multiple options evaluated and chosen options with detailed rationale.
 
 The chosen physics framework consists of:
 
 1. **Mass** - Universal entity property (every bot and projectile has mass)
 2. **Surface Friction** - Constant Uniform Friction
 3. **Air Friction** - Constant Uniform Air Resistance
-4. **Gravity** - Constant Gravity with Simplified TTL Model
-5. **Collisions** - Elastic Collisions
+4. **Collisions** - Elastic Collisions
 
 This physics framework integrates with the spatial system (ADR-0005), equipment system (ADR-0008), and future thrust-based movement to create deterministic, tactically deep gameplay with predictable behavior for bot developers.
 
@@ -204,62 +202,15 @@ Would create infinite-range projectiles or require arbitrary hard range cutoffs,
 
 ---
 
-## Property 3: Gravity
+## Property 3: Collisions
 
-**Chosen: Option 3.2 - Constant Gravity (Simplified TTL Model)**
-
-### Options Considered
-
-- **Option 3.1**: None (no gravity)
-- **Option 3.2**: Constant Gravity (Simplified TTL Model) (CHOSEN)
-
-### Rationale for Chosen Option
-
-- **Projectile Time-to-Live**: Gravity provides physics-based justification for projectile lifetime limits
-- **Simplified 2D Model**: Gravity doesn't create 3D arcing trajectories (game is 2D from ADR-0005), only affects TTL calculation
-- **Weapon Balance Tuning**: Gravity constant provides tuning parameter for projectile duration
-- **Conceptual Consistency**: Gravity exists as a force even though it doesn't create vertical arc in 2D abstraction
-- **Future Extensibility**: If game extends to 3D (future consideration from ADR-0005), gravity framework already exists
-- **Physics-Based Lifetime**: More consistent than arbitrary TTL values without physics justification
-
-### Implementation Model
-
-```
-TTL_projectile = f(initial_velocity, projectile_mass, gravity_constant)
-```
-
-Where:
-- `initial_velocity` = projectile launch velocity (weapon-specific)
-- `projectile_mass` = mass of projectile (weapon-specific)
-- `gravity_constant` (g) = constant gravity value (TBD, requires weapon balance testing)
-
-### Implementation Notes
-
-- **2D Abstraction**: Gravity exists but doesn't create vertical trajectory arcs (no z-axis in 2D space from ADR-0005)
-- **Time-to-Live Mechanism**: Gravity determines how long projectiles remain active before disappearing
-- **Simplified Physics**: Gravity is abstracted to affect lifetime calculation, not parabolic trajectory paths
-- **Weapon-Specific TTL**: Different projectile types may have different effective lifetimes based on initial velocity and mass
-- **Combined with Air Friction**: Gravity TTL and air friction velocity decay both contribute to projectile range
-
-### Design Note
-
-In the 2D BattleBot Universe, gravity is a simplified force that affects projectile time-to-live rather than creating vertical arcing trajectories. This maintains the 2D spatial model from ADR-0005 while providing physics-based projectile duration mechanics for weapon balance.
-
-### Alternative Rejected: Option 3.1 - None
-
-Would require arbitrary TTL values without physics justification, making weapon behavior feel less consistent and eliminating a tuning parameter for weapon balance.
-
----
-
-## Property 4: Collisions
-
-**Chosen: Option 4.2 - Elastic Collisions**
+**Chosen: Option 3.2 - Elastic Collisions**
 
 ### Options Considered
 
-- **Option 4.1**: Inelastic Collisions (energy absorbed, bots stop or slow significantly)
-- **Option 4.2**: Elastic Collisions (CHOSEN)
-- **Option 4.3**: Hybrid (context-dependent collision types)
+- **Option 3.1**: Inelastic Collisions (energy absorbed, bots stop or slow significantly)
+- **Option 3.2**: Elastic Collisions (CHOSEN)
+- **Option 3.3**: Hybrid (context-dependent collision types)
 
 ### Rationale for Chosen Option
 
@@ -302,11 +253,11 @@ v_reflected = -v_incident
 - **Mass Advantage**: Heavy bots (high equipment Mass) push light bots more effectively
 - **Boundary Collisions**: Bot-to-wall collisions reflect velocity perfectly (no energy loss)
 
-### Alternative Rejected: Option 4.1 - Inelastic
+### Alternative Rejected: Option 3.1 - Inelastic
 
 Would cause bots to lose significant velocity on collision, making movement feel sluggish and frustrating. Eliminates Mass-based tactical advantages in collisions.
 
-### Alternative Rejected: Option 4.3 - Hybrid
+### Alternative Rejected: Option 3.3 - Hybrid
 
 Adds complexity without clear benefit for initial implementation. Can be introduced later for specific mechanics.
 
@@ -326,9 +277,8 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 
 1. Projectiles launch with initial velocity (weapon-specific)
 2. Air friction (k × v²) causes velocity decay over distance
-3. Gravity (simplified TTL model) limits projectile lifetime
-4. Projectiles disappear when TTL expires or when hitting bots/walls
-5. Effective range determined by combination of air friction and gravity TTL
+3. Projectiles disappear when velocity reaches zero or when hitting bots/walls
+4. Effective range determined by air friction velocity decay
 
 ### Integrated Collision Physics
 
@@ -341,7 +291,6 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 
 - Surface friction coefficient (μ): TBD
 - Air resistance coefficient (k): TBD
-- Gravity constant (g): TBD
 - Coefficient of restitution (e): 1.0 (perfectly elastic, may be tuned)
 
 ### Deterministic Implementation Requirements
@@ -361,11 +310,11 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 
 ### Overall Integration
 
-* Good, because five physics properties create coherent and predictable gameplay framework
+* Good, because four physics properties create coherent and predictable gameplay framework
 * Good, because physics integrates seamlessly with spatial system (ADR-0005), equipment loadout (ADR-0008), and future thrust actions
 * Good, because constant friction and air resistance enable deterministic movement and projectile calculations
 * Good, because elastic collisions create tactical depth through Mass-based momentum transfer
-* Good, because simplified gravity model maintains 2D gameplay while providing physics-based projectile TTL
+* Good, because air friction alone determines projectile range without need for virtual third dimension
 * Good, because physics framework is extensible for future enhancements (variable friction zones, terrain effects, weather modifiers)
 * Good, because property-based structure allows independent tuning and future modifications
 * Good, because universal mass property simplifies physics implementation
@@ -389,16 +338,6 @@ Adds complexity without clear benefit for initial implementation. Can be introdu
 * Good, because computationally efficient (single coefficient calculation per projectile)
 * Neutral, because air resistance coefficient k requires weapon balance testing
 * Bad, because adds projectile physics calculation complexity
-
-### Gravity (Simplified TTL Model)
-
-* Good, because provides physics-based justification for projectile lifetime limits
-* Good, because maintains 2D gameplay model from ADR-0005 (no vertical trajectory arcs)
-* Good, because creates weapon balance tuning parameter (gravity constant)
-* Good, because conceptually consistent physics framework
-* Good, because extensible to 3D if game evolves in future
-* Neutral, because simplified TTL model is abstraction of real gravity physics
-* Bad, because may be conceptually confusing to some developers (gravity without z-axis arcs)
 
 ### Collisions (Elastic)
 
@@ -535,36 +474,13 @@ The decision will be confirmed through:
 - Good, because computationally efficient (single constant coefficient)
 - Good, because deterministic behavior across all battles
 - Good, because provides weapon balance tuning parameter (k coefficient)
+- Good, because eliminates need for virtual third dimension to limit projectile range
 - Neutral, because requires tuning air resistance coefficient k for weapon balance
 - Bad, because adds projectile physics calculation complexity
 
-### Property 3: Gravity
+### Property 3: Collisions
 
-**Option 3.1: None (No Gravity)**
-
-- Good, because simplest model (no gravity calculations)
-- Good, because eliminates conceptual confusion about 2D gravity
-- Good, because no additional tuning parameter needed
-- Bad, because requires arbitrary TTL values without physics justification
-- Bad, because less realistic and consistent physics framework
-- Bad, because no weapon balance tuning parameter for projectile lifetime
-- Bad, because missed opportunity for future 3D extension
-
-**Option 3.2: Constant Gravity (Simplified TTL Model)** (CHOSEN)
-
-- Good, because physics-based projectile lifetime limits
-- Good, because maintains 2D gameplay from ADR-0005 (no vertical arcs)
-- Good, because provides weapon balance tuning parameter (gravity constant)
-- Good, because conceptually consistent physics framework
-- Good, because extensible to 3D if game evolves in future
-- Good, because works in combination with air friction for realistic projectile behavior
-- Neutral, because simplified TTL model is abstraction of real gravity physics
-- Neutral, because gravity constant g requires weapon balance testing
-- Bad, because may be conceptually confusing (gravity without z-axis trajectory arcs)
-
-### Property 4: Collisions
-
-**Option 4.1: Inelastic Collisions**
+**Option 3.1: Inelastic Collisions**
 
 - Good, because simpler collision model (bots lose energy and slow down)
 - Good, because prevents bouncy collision feel
@@ -575,7 +491,7 @@ The decision will be confirmed through:
 - Bad, because no momentum transfer or knockback mechanics
 - Bad, because eliminates tactical collision-based positioning strategies
 
-**Option 4.2: Elastic Collisions** (CHOSEN)
+**Option 3.2: Elastic Collisions** (CHOSEN)
 
 - Good, because physics-based momentum transfer
 - Good, because Mass determines collision outcomes (heavy pushes light)
@@ -590,7 +506,7 @@ The decision will be confirmed through:
 - Bad, because adds computational overhead for momentum transfer calculations
 - Bad, because requires careful balancing to prevent collision-based exploits
 
-**Option 4.3: Hybrid (Context-Dependent Collision Types)**
+**Option 3.3: Hybrid (Context-Dependent Collision Types)**
 
 - Good, because flexibility for different collision scenarios (bot vs wall, bot vs bot)
 - Good, because could enable specialty mechanics (equipment that changes collision type)
@@ -639,21 +555,20 @@ The physics laws create an integrated framework where:
 
 **Numeric Value Refinement:**
 
-All physics constants (μ, k, g, e) are marked TBD (To Be Determined) and will be refined through:
+All physics constants (μ, k, e) are marked TBD (To Be Determined) and will be refined through:
 
 1. Movement feel testing: Tune surface friction coefficient μ for responsive but controlled movement
-2. Weapon balance testing: Tune air resistance coefficient k for appropriate weapon effective ranges
-3. Projectile lifetime testing: Tune gravity constant g for balanced projectile TTL values
-4. Collision mechanics testing: Tune coefficient of restitution e for satisfying collision feel
-5. Mass integration testing: Validate friction-Mass and collision-Mass interactions create meaningful tradeoffs
-6. Competitive gameplay: Identify physics exploits or imbalances through player testing
-7. Cross-platform testing: Ensure floating-point physics calculations deterministic across platforms
+2. Weapon balance testing: Tune air resistance coefficient k for appropriate weapon effective ranges and projectile lifetime
+3. Collision mechanics testing: Tune coefficient of restitution e for satisfying collision feel
+4. Mass integration testing: Validate friction-Mass and collision-Mass interactions create meaningful tradeoffs
+5. Competitive gameplay: Identify physics exploits or imbalances through player testing
+6. Cross-platform testing: Ensure floating-point physics calculations deterministic across platforms
 
 **Key Design Insights:**
 
 - Constant friction and air resistance provide simplicity, predictability, and computational efficiency
+- Air resistance alone determines projectile range without introducing a virtual third dimension
 - Elastic collisions create Mass-based tactical depth and emergent positioning strategies
-- Simplified gravity maintains 2D gameplay while providing physics-based projectile TTL mechanics
 - Universal mass property enables consistent physics across all entity types
 - Physics framework integrates seamlessly with spatial system (ADR-0005) and equipment loadout (ADR-0008)
 - Extensible design allows future enhancements (variable friction zones, weather effects, terrain modifiers) without redesigning core physics
@@ -662,11 +577,10 @@ All physics constants (μ, k, g, e) are marked TBD (To Be Determined) and will b
 
 - Variable Friction Zones: Different terrain types with different friction coefficients (biomes, hazards, power-up zones)
 - Weather Effects: Wind affecting air resistance direction/magnitude, rain affecting surface friction
-- Gravity Wells: Localized gravity modifiers for special zones (attractors, repulsors)
 - Collision Damage: High-velocity collision-based damage for ramming strategies
 - Equipment-Modified Collision Type: Equipment that changes collision behavior (shock absorbers for inelastic, spikes for damage)
-- 3D Gravity Extension: If game extends to 3D (ADR-0005 future consideration), full gravity with vertical trajectory arcs
 - Momentum-Based Knockback Weapons: Weapons that apply impulse forces for knockback effects
+- Projectile Drag Coefficient Tuning: Per-projectile type air resistance for different weapon characteristics
 
 ### Design Principles
 
