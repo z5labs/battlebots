@@ -78,4 +78,11 @@ ADR Categories:
 - api-design: API endpoint design decisions (pagination, filtering, bulk operations)
 --&gt;
 &lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
-&lt;p&gt;BattleBots requires diverse battle arenas with distinct tactical characteristics to provide meaningful gameplay variety. Currently, the game physics system (ADR-0006) includes variable friction with position-dependent coefficients, explicitly anticipating terrain-based mechanics. To operationalize this capability, we need a consistent framework for defining what makes one arena distinct from another.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;BattleBots requires diverse battle arenas with distinct tactical characteristics to provide meaningful gameplay variety. Currently, the game physics system (ADR-0006) includes variable friction with position-dependent coefficients, explicitly anticipating terrain-based mechanics. To operationalize this capability, we need a consistent framework for defining what makes one arena distinct from another.&lt;/p&gt;</description></item><item><title>[0011] 1v1 Battles</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/adrs/0011-1v1-battles/</link><pubDate>Tue, 09 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/adrs/0011-1v1-battles/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;BattleBot 1v1 battles require a formal definition of what constitutes an arena and how battle instances are configured. Currently, the BattleBot Universe (ADR-0005) defines the universal topological space (R² Euclidean coordinates with Cartesian system) and fixed boundary dimensions ([-50, 50] × [-50, 50]). However, this establishes a single static arena rather than a configurable system that enables tactical variety through property selection.&lt;/p&gt;</description></item></channel></rss>

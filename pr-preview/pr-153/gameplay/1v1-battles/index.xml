@@ -15,43 +15,8 @@
 &lt;/ol&gt;
 &lt;h2 id="minimal-bot-example"&gt;Minimal Bot Example&lt;/h2&gt;
 &lt;p&gt;Here&amp;rsquo;s a minimal bot structure to get you started:&lt;/p&gt;</description></item><item><title>Arena</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/arena/</guid><description>&lt;p&gt;1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.&lt;/p&gt;
-&lt;h2 id="coordinate-system"&gt;Coordinate System&lt;/h2&gt;
-&lt;p&gt;The arena uses a &lt;strong&gt;2D Cartesian coordinate system&lt;/strong&gt; - the same (x, y) coordinates you learned in math class.&lt;/p&gt;
-&lt;pre class="mermaid"&gt;graph TD
- subgraph Arena[&amp;#34;Arena: 100x100 units&amp;#34;]
- origin[&amp;#34;Origin (0, 0)&amp;lt;br/&amp;gt;Center of arena&amp;#34;]
- topRight[&amp;#34;&amp;#43;50, &amp;#43;50&amp;lt;br/&amp;gt;Top-Right Corner&amp;#34;]
- topLeft[&amp;#34;-50, &amp;#43;50&amp;lt;br/&amp;gt;Top-Left Corner&amp;#34;]
- bottomRight[&amp;#34;&amp;#43;50, -50&amp;lt;br/&amp;gt;Bottom-Right Corner&amp;#34;]
- bottomLeft[&amp;#34;-50, -50&amp;lt;br/&amp;gt;Bottom-Left Corner&amp;#34;]
- end
- style origin fill:#4CAF50
- style topRight fill:#f9f
- style topLeft fill:#f9f
- style bottomRight fill:#f9f
- style bottomLeft fill:#f9f&lt;/pre&gt;
-&lt;h3 id="key-properties"&gt;Key Properties&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Origin (0, 0)&lt;/strong&gt;: Located at the center of the arena&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;X-axis&lt;/strong&gt;: Horizontal axis
-&lt;ul&gt;
-&lt;li&gt;Positive values extend to the right&lt;/li&gt;
-&lt;li&gt;Negative values extend to the left&lt;/li&gt;
-&lt;li&gt;Range: -50 to +50&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Y-axis&lt;/strong&gt;: Vertical axis
-&lt;ul&gt;
-&lt;li&gt;Positive values extend upward&lt;/li&gt;
-&lt;li&gt;Negative values extend downward&lt;/li&gt;
-&lt;li&gt;Range: -50 to +50&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Units&lt;/strong&gt;: Abstract spatial units (not meters or pixels)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Precision&lt;/strong&gt;: Floating-point coordinates allow sub-unit positioning&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="distance-calculation"&gt;Distance Calculation&lt;/h3&gt;
-&lt;p&gt;Distance between two points uses the Pythagorean theorem:&lt;/p&gt;</description></item><item><title>Bot Characteristics</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</guid><description>&lt;p&gt;Your bot&amp;rsquo;s capabilities are defined by three core characteristics: &lt;strong&gt;Health&lt;/strong&gt;, &lt;strong&gt;Defense&lt;/strong&gt;, and &lt;strong&gt;Mass&lt;/strong&gt;. These stats determine your survivability, damage mitigation, and movement properties.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;About Arenas&lt;/strong&gt;: A Battle Arena is a configured instance of the BattleBot Universe with specific properties: terrain type (biome), boundary dimensions, visibility rules, starting positions, and win conditions. Different battles may use different arena configurations. For complete technical specification, see &lt;strong&gt;&lt;a href="https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/adrs/0011-1v1-battles.md"&gt;ADR-0011: 1v1 Battles&lt;/a&gt;&lt;/strong&gt;.&lt;/p&gt;</description></item><item><title>Bot Characteristics</title><link>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/pr-preview/pr-153/gameplay/1v1-battles/bot-characteristics/</guid><description>&lt;p&gt;Your bot&amp;rsquo;s capabilities are defined by three core characteristics: &lt;strong&gt;Health&lt;/strong&gt;, &lt;strong&gt;Defense&lt;/strong&gt;, and &lt;strong&gt;Mass&lt;/strong&gt;. These stats determine your survivability, damage mitigation, and movement properties.&lt;/p&gt;
 &lt;h2 id="health"&gt;Health&lt;/h2&gt;
 &lt;p&gt;Health (HP) is your bot&amp;rsquo;s survivability pool - the total amount of damage your bot can sustain before being eliminated.&lt;/p&gt;
 &lt;h3 id="key-properties"&gt;Key Properties&lt;/h3&gt;
