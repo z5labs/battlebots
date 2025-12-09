@@ -6,7 +6,7 @@ type: docs
 weight: 10
 ---
 
-In 1v1 battles, two bots face off in direct combat within a bounded 2D arena. Victory goes to the bot that reduces its opponent's health to zero or has more health when the timeout expires.
+In 1v1 battles, two bots face off in direct combat within a **Battle Arena**. The arena is a configured instance of the BattleBot Universe with specific properties: terrain type (biome), boundary dimensions, visibility rules, starting positions, and win conditions. Victory goes to the bot that satisfies any of the win conditions first: reducing opponent's health to zero, having more health when the timeout expires, or preventing opponent disconnection recovery.
 
 ## What You'll Find Here
 
@@ -26,8 +26,13 @@ This section contains complete mechanics documentation for 1v1 battles:
 
 ### Win Conditions
 
-- **Elimination**: Reduce opponent's Health to 0
-- **Timeout**: Have more Health than opponent when time expires
+A battle concludes when any of the following conditions is met (checked in order):
+
+1. **Elimination** (Primary): Your bot defeats opponent by reducing their Health to 0 - immediate victory
+2. **Timeout** (Fallback): Battle reaches 5-minute time limit - higher Health wins
+3. **Disconnect** (Safety): Opponent disconnects and fails to reconnect within 30-second grace period - your bot wins
+
+See **[ADR-0011: 1v1 Battles](../../../research_and_development/adrs/0011-1v1-battles.md)** for complete technical specification of arena properties and win conditions.
 
 ### Bot Customization
 

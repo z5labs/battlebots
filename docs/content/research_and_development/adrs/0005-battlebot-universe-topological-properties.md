@@ -98,22 +98,13 @@ Rationale:
 
 **Alternative Considered: Option 3.2 - Polar** (r, θ) coordinates would be more natural for rotational mechanics but require trigonometric conversions for most operations, have less library support, and align poorly with rectangular boundaries. Polar coordinates are better suited for radial-specific mechanics (turrets, circular arenas) which are not part of the current design.
 
-### Property 4: Boundary
+### Property 4: Boundary Configuration
 
-**Chosen: Option 4.2 - Rectangular Boundary**
+**Note**: Boundary configuration has been transferred to **ADR-0011 (1v1 Battles)** where it is treated as a selectable arena property rather than a fixed universal topological property.
 
-Rationale:
-- **Engagement Guarantee**: Fixed boundaries prevent indefinite evasion, forcing interaction
-- **Predictable Strategy**: Bots can rely on constant arena size for pathfinding and tactical planning
-- **Cartesian Alignment**: Rectangular boundaries align perfectly with Cartesian coordinates
-- **Simple Collision Detection**: Boundary checks are trivial comparisons (x < min, x > max)
-- **Fair and Balanced**: Equal access to arena space for both bots throughout battle
-- **Visualization Clarity**: Rectangular arena displays naturally on screen without distortion
-- **Complements Timeout**: Fixed boundaries work with timeout mechanism to ensure conclusion
+**Rationale for Transfer**: While a default rectangular boundary ([-50, 50] × [-50, 50]) was appropriate for establishing the spatial system's mathematical foundation, enabling different game modes to use different arena sizes requires decoupling boundary dimensions from universal topology. ADR-0011 provides comprehensive boundary definition and selection mechanism for 1v1 battle instances.
 
-**Alternative Considered: Option 4.3 - Circular Boundary** would provide uniform distance from center but requires distance calculations for boundary checks (more expensive than rectangular comparisons) and aligns poorly with Cartesian coordinates. Circular boundaries also have no corners, which eliminates certain positional strategies.
-
-**Alternative Rejected: Option 4.1 - Unbounded** would allow indefinite evasion, potentially creating stalemate scenarios even with timeout. Unbounded space also complicates pathfinding (no clear boundaries for navigation) and visualization (camera must follow bots across potentially large distances).
+**Reference**: See **[ADR-0011: 1v1 Battles](0011-1v1-battles.md)** for complete boundary specification, alternative boundary options, and battle instance configuration.
 
 ### Spatial System Implementation Specification
 
@@ -134,18 +125,14 @@ This centered origin simplifies calculations for distance, angle, and relative p
 
 #### Boundaries
 
-The battle space is defined by rectangular boundaries:
+Boundary configuration for specific battle types is defined in type-specific ADRs. See **[ADR-0011: 1v1 Battles](0011-1v1-battles.md)** for:
 
-- **Arena Size**: **100 x 100 units** (TBD - subject to tuning based on playtesting)
-- **X-axis Range**: -50 to +50 units
-- **Y-axis Range**: -50 to +50 units
+- **Boundary Dimensions**: Arena size and shape configuration (initially 100 x 100 units rectangular)
+- **Boundary Selection**: How arena boundaries are chosen for specific battles
+- **Out-of-Bounds Handling**: Movement clamping, wrapping rules, boundary contact, force effects
+- **Alternative Boundaries**: Future boundary shapes and sizes (circular, hexagonal, dynamic)
 
-**Out-of-Bounds Handling**:
-
-1. **Movement Blocking**: Any movement command that would place a bot outside the boundaries is clamped to the nearest valid position at the boundary edge
-2. **No Wrapping**: Coordinates do not wrap around (i.e., exiting the right side does not place a bot on the left side)
-3. **Boundary Contact**: Bots may be positioned exactly on the boundary line
-4. **Force Effects**: External forces (knockback, explosions, etc.) that would push a bot out-of-bounds will stop at the boundary
+**Principle**: The BattleBot Universe defines the universal 2D Euclidean topological space and Cartesian coordinate system. Individual game modes (1v1 battles, team battles, etc.) configure specific bounded regions within this space through arena selection.
 
 #### Movement Constraints
 
@@ -190,18 +177,6 @@ The following basic movement constraints apply to the battle space:
 * Neutral, because polar coordinates may be more natural for some rotational mechanics
 * Bad, because bot developers must calculate angles for directional actions
 
-#### Boundary Decision (Rectangular)
-
-* Good, because guarantees engagement (no indefinite evasion)
-* Good, because simple collision detection (4 comparisons)
-* Good, because aligns perfectly with Cartesian coordinates
-* Good, because predictable arena for pathfinding
-* Good, because fair and balanced (symmetric access)
-* Good, because complements timeout mechanism for battle conclusion
-* Neutral, because could support variable sizes in future
-* Bad, because corners enable defensive camping strategies
-* Bad, because lacks additional pressure (no shrinking)
-
 #### Overall Integration
 
 * Good, because all four properties create coherent mathematical foundation
@@ -220,12 +195,12 @@ The decision will be confirmed through:
    - 2D coordinate representation in all spatial data structures
    - Continuous floating-point position values (no grid snapping)
    - Cartesian coordinate system throughout codebase
-   - Rectangular boundary enforcement
+   - Metric calculations accurate (distance formulas)
 
 2. **Spatial Mechanics Validation**:
-   - Boundary enforcement working correctly (clamping at edges)
    - Continuous movement paths validated
    - Coordinate calculations accurate and deterministic
+   - Coordinate transformations correct
 
 3. **Developer Accessibility**:
    - Bot SDK exposes Cartesian (x, y) coordinates
@@ -234,33 +209,34 @@ The decision will be confirmed through:
    - Sample bots demonstrate pathfinding in continuous 2D space
 
 4. **Performance Testing**:
-   - 2D collision detection meets real-time tick rate requirements
+   - 2D coordinate calculations meet real-time tick rate requirements
    - Floating-point calculations deterministic across platforms
-   - Spatial queries (nearest bot, line of sight) performant
+   - Spatial queries (distance, angle) performant
 
 5. **Protocol Integration**:
    - gRPC messages correctly encode 2D positions
    - Position updates stream smoothly in continuous space
-   - Boundary violations detected and communicated
+   - Coordinate system correctly transmitted and received
 
 6. **Visualization Testing**:
    - 2D Cartesian coordinates map correctly to screen pixels
-   - Rectangular arena renders clearly
    - Bot positions and movements display accurately
+   - Coordinate system visualization clear
 
 7. **Extensibility Validation**:
-   - System can support future obstacles and terrain
-   - Variable rectangular arena sizes possible
+   - System can support future battle types and game modes
+   - Coordinate system independent of specific arena configurations
    - Spatial queries abstracted for future enhancements
 
-8. **Playtesting**:
-   - Arena size (100x100) provides appropriate tactical space
-   - Spatial dimensions support engaging battles
+8. **Boundary Validation**: See ADR-0011 for boundary-specific confirmation criteria
+   - Arena boundaries implemented per ADR-0011
+   - Boundary enforcement working correctly for selected arenas
+   - Out-of-bounds handling per game mode specification
 
 9. **Future Consideration**:
-   - Document path to 3D extension if needed
-   - Evaluate polar coordinates for specific mechanics (turrets, sensors)
-   - Consider circular boundaries for alternative game modes
+   - Document path to 3D extension if needed (would add z coordinate)
+   - Evaluate polar coordinates for specific game mechanics (turrets, sensors)
+   - Consider extending to support non-Euclidean spaces if needed
 
 ## Pros and Cons of the Options
 
@@ -379,64 +355,17 @@ Positions represented using discrete Cartesian coordinates on a lattice (integer
 * Bad, because creates grid-to-grid jump artifacts
 * Bad, because not chosen due to vector space decision (R^n continuous chosen)
 
-### Property 4: Boundary
+### Property 4: Boundary Configuration
 
-#### Option 4.1: Unbounded
+**Note**: Boundary options and pros/cons have been moved to **[ADR-0011: 1v1 Battles](0011-1v1-battles.md)** where boundary selection is defined as a configurable arena property.
 
-No arena boundaries (infinite or very large playable area).
-
-* Good, because enables unlimited strategic space
-* Good, because no artificial boundaries constraining movement
-* Good, because may feel more "realistic" for some scenarios
-* Neutral, because appropriate for exploration-focused gameplay
-* Neutral, because eliminates boundary collision checks
-* Bad, because allows indefinite evasion (bots can run away forever)
-* Bad, because enables stalemate even with timeout (avoid combat entire battle)
-* Bad, because complicates pathfinding (no clear navigation boundaries)
-* Bad, because difficult visualization (camera must track across large distances)
-* Bad, because may create boring gameplay (chasing fleeing opponents)
-* Bad, because timeout becomes only victory condition (no engagement guarantee)
-* Bad, because eliminates positional strategy (no boundaries to control)
-* Bad, because fundamentally incompatible with engagement-focused 1v1 gameplay
-
-#### Option 4.2: Rectangular Boundary (CHOSEN)
-
-Fixed rectangular arena boundaries that remain constant throughout the battle.
-
-* Good, because guarantees engagement (bots cannot escape indefinitely)
-* Good, because predictable arena enables reliable pathfinding
-* Good, because simplest implementation (fixed boundary checks)
-* Good, because fair and balanced (equal arena access)
-* Good, because enables positional strategy (corner control, center dominance)
-* Good, because complements timeout mechanism for battle conclusion
-* Good, because aligns perfectly with Cartesian coordinates
-* Good, because clear visualization (fixed arena visible throughout)
-* Neutral, because could be enhanced with shrinking in future modes
-* Neutral, because requires boundary collision detection
-* Bad, because may enable corner camping defensive strategies
-* Bad, because lacks additional engagement pressure
-* Bad, because fixed size may feel static compared to dynamic boundaries
-
-#### Option 4.3: Circular Boundary
-
-Fixed circular arena boundary centered at origin.
-
-* Good, because provides uniform distance from center for all boundary points
-* Good, because guarantees engagement (bots cannot escape)
-* Good, because symmetric and aesthetically pleasing
-* Good, because no corners to enable camping strategies
-* Neutral, because appropriate for radial or rotational gameplay
-* Neutral, because requires distance calculation for boundary checks
-* Bad, because boundary checks more expensive than rectangular (distance vs comparison)
-* Bad, because aligns poorly with Cartesian coordinates (requires distance calculations)
-* Bad, because more complex collision detection than rectangular boundaries
-* Bad, because visualization may require circular clipping
-* Bad, because pathfinding must account for curved boundaries
+For comprehensive evaluation of boundary options (rectangular, circular, hexagonal, dynamic) and their trade-offs, see ADR-0011 Property 2: Boundary.
 
 ## More Information
 
 ### Related Documentation
 
+**Spatial and Physics Foundation**:
 - **[ADR-0004: Bot to Battle Server Interface](0004-bot-battle-server-interface.md)**: gRPC protocol for streaming position updates in continuous 2D space
 
 - **[ADR-0006: BattleBot Universe Physics Laws](0006-battlebot-universe-physics-laws.md)**: Physics properties (friction, collisions, gravity) that govern movement mechanics in this spatial system
@@ -449,6 +378,10 @@ Fixed circular arena boundary centered at origin.
 
 - **[ADR-0010: Bot Actions and Resource Management](0010-bot-actions-resource-management.md)**: Movement and combat actions that operate within this spatial system
 
+**Battle Configuration and Arena System**:
+- **[ADR-0011: 1v1 Battles](0011-1v1-battles.md)**: Defines Arena concept and configurable battle properties (boundary, biome, visibility, positioning, win conditions) for 1v1 battles. Boundary ownership transferred from ADR-0005 to ADR-0011.
+
+**Implementation and Testing**:
 - **[POC User Journey](../user-journeys/0001-poc.md)**: Proof of concept implementation using this spatial foundation
 
 **Note**: This ADR supersedes and integrates the former ADR-0006 (Battle Space Spatial System), which is now deprecated.
@@ -464,34 +397,34 @@ Fixed circular arena boundary centered at origin.
 
 The BattleBot Universe is mathematically defined as:
 - **Topological Space**: 2-dimensional Euclidean space R²
-- **Manifold**: Closed rectangular region [−50, 50] × [−50, 50] ⊂ R²
 - **Metric**: Standard Euclidean metric d(p,q) = √((x₂−x₁)² + (y₂−y₁)²)
 - **Coordinate Chart**: Cartesian coordinates φ: R² → R² where φ(p) = (x, y)
-- **Boundary**: ∂M = {(x,y) : x=±50 or y=±50}
+- **Note on Boundaries**: Specific bounded regions are defined in game mode ADRs (e.g., ADR-0011 for 1v1 battles). This ADR defines the universal topological space; game modes define specific arenas within that space.
 
 **Numeric Value Refinement**:
 
-The arena size (100x100 units) is marked TBD and will be refined through:
+Default arena size (100×100 units) is marked TBD and will be refined through playtesting. See ADR-0011 for specific arena configuration and tuning details.
 
-1. Playtesting to tune arena size for engagement frequency
+1. Playtesting to tune arena size for engagement frequency (per game mode)
 2. Visualization testing for rendering clarity
-3. Timeout scenario frequency analysis to tune arena size appropriately
+3. Timeout scenario frequency analysis (tuned with game mode timeout values)
 4. Equipment balance testing to ensure stat-based equipment choices remain meaningful
 
 **Key Design Insights**:
-- 2D + R^n continuous + Cartesian + Rectangular boundaries create mutually reinforcing topological framework
-- Mathematical rigor provides clear foundation for implementation
+- 2D + R^n continuous + Cartesian create mutually reinforcing topological framework
+- Mathematical rigor provides clear foundation for implementation independent of game modes
 - Simplicity enables focus on core battle mechanics and accessibility
 - Complete spatial framework enables users to implement sophisticated pathfinding and AI solutions
-- Extensibility allows future enhancements (3D, fog of war, variable arenas) without disrupting foundation
+- Extensibility allows future enhancements (3D, new game modes, new physics properties) without disrupting foundation
+- Separation of universal topology (ADR-0005) from game mode configuration (e.g., ADR-0011) enables flexibility
 
 **Future Considerations**:
-- **Variable Arena Sizes**: Different battle modes (quick match vs. tournament) may have different dimensions
+- **Multiple Game Modes**: Different battle types can use different arena configurations (team battles, tournaments, special events)
 - **3D Spatial System**: If aerial combat or vertical positioning becomes strategically important, extend to R³ with (x, y, z) coordinates
-- **Circular Boundaries**: Could be added as optional game mode for radial gameplay
-- **Dynamic Boundaries**: Shrinking arena boundaries could be added as optional game mode for aggressive pacing
+- **Variable Physics**: Different game modes may apply different physics properties (gravity, friction models, collision mechanics)
 - **Obstacles and Terrain**: Spatial system designed to support static/dynamic obstacles and variable terrain effects
 - **Polar Coordinate Option**: For specific mechanics (turret rotation, sensor sweeps) polar coordinates could supplement Cartesian system
+- **Non-Euclidean Space**: Theoretical extensibility to hyperbolic or spherical geometry for future game modes
 
 ### Design Principles
 

@@ -8,6 +8,8 @@ weight: 20
 
 1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.
 
+> **About Arenas**: A Battle Arena is a configured instance of the BattleBot Universe with specific properties: terrain type (biome), boundary dimensions, visibility rules, starting positions, and win conditions. Different battles may use different arena configurations. For complete technical specification, see **[ADR-0011: 1v1 Battles](/research_and_development/adrs/0011-1v1-battles.md)**.
+
 ## Coordinate System
 
 The arena uses a **2D Cartesian coordinate system** - the same (x, y) coordinates you learned in math class.
@@ -158,8 +160,12 @@ Each game tick, the physics engine performs:
 
 #### Variable Friction Zones
 
-- **Uniform friction**: Currently, the entire arena has uniform friction (coefficient TBD)
-- **Future feature**: Specific terrain areas may have different friction values (ice zones for low friction, mud zones for high friction)
+- **Biome-specific friction**: The selected arena biome determines friction throughout the arena. Different biomes have different terrain types with varying friction coefficients.
+  - **Ice zones**: Low friction (coefficient ~0.2) - faster movement, less control
+  - **Grass zones**: Medium friction (coefficient ~0.5) - balanced movement
+  - **Mud zones**: High friction (coefficient ~1.2) - slower movement, more control
+- **Example biomes**: Desert (sand, rock, gravel), Arctic (ice, snow), Forest (grass, swamps, dirt)
+- **Future biomes**: Additional biomes will be defined in future versions to provide more terrain variety
 
 ## Line of Sight
 
