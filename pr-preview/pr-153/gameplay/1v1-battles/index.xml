@@ -93,5 +93,4 @@
 &lt;/div&gt;
 
 &lt;p&gt;During battle, your bot performs &lt;strong&gt;actions&lt;/strong&gt; each tick. Actions allow your bot to move, attack, defend, and gather information. All actions are constrained by a dual-resource system: energy costs and cooldowns.&lt;/p&gt;
-&lt;h2 id="resource-management-system"&gt;Resource Management System&lt;/h2&gt;
-&lt;p&gt;Actions are governed by two independent constraint systems that work together to prevent action spam while maintaining gameplay fluidity.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;&lt;strong&gt;Physics Integration&lt;/strong&gt;: The Move action implements thrust-based movement governed by physics laws. See &lt;a href="https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/adrs/0006-battlebot-universe-physics-laws/"&gt;ADR-0006: BattleBot Universe Physics Laws&lt;/a&gt; and &lt;a href="https://z5labs.github.io/battlebots/pr-preview/pr-153/research_and_development/adrs/0007-bot-movement-mechanics/"&gt;ADR-0007: Bot Movement Mechanics&lt;/a&gt; for detailed specifications.&lt;/p&gt;</description></item></channel></rss>
