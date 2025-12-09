@@ -12,6 +12,8 @@ The action system described here is currently in the PROPOSED stage and may chan
 
 During battle, your bot performs **actions** each tick. Actions allow your bot to move, attack, defend, and gather information. All actions are constrained by a dual-resource system: energy costs and cooldowns.
 
+**Physics Integration**: The Move action implements thrust-based movement governed by physics laws. See [ADR-0006: BattleBot Universe Physics Laws](/research_and_development/adrs/0006-battlebot-universe-physics-laws/) and [ADR-0007: Bot Movement Mechanics](/research_and_development/adrs/0007-bot-movement-mechanics/) for detailed specifications.
+
 ## Resource Management System
 
 Actions are governed by two independent constraint systems that work together to prevent action spam while maintaining gameplay fluidity.
@@ -68,7 +70,7 @@ Actions are organized into four categories:
 
 ### Move
 
-Moves your bot in a specified direction within the battle space.
+Applies thrust force to your bot in a specified direction within the battle space.
 
 **Costs and Constraints**:
 - Energy Cost: 5 (TBD)
@@ -76,14 +78,43 @@ Moves your bot in a specified direction within the battle space.
 - Equipment Required: None (universal action)
 
 **Parameters**:
-- Direction vector or target coordinates
+- Direction: Specified as angle, vector, or cardinal direction
+- Optional: Thrust magnitude (default: maximum thrust, clamped to bot's capacity)
+
+**How It Works**:
+
+Move implements thrust-based movement governed by physics laws:
+
+1. Bot applies thrust force in the specified direction
+2. Physics engine calculates net force: `F_net = F_thrust - F_friction`
+3. Acceleration is calculated: `A = F_net / Mass`
+4. Velocity updates: `v_new = v_current + A × dt`
+5. Position updates: `pos_new = pos_current + v_new × dt`
+
+**Key Mechanics**:
+
+- **Continuous Thrust**: Without applying Move each tick, friction decelerates your bot
+- **Mass Impact**: Heavy bots (from equipment) accelerate slower than light bots from the same thrust
+- **Terminal Velocity**: Your bot reaches maximum speed when thrust equals friction
+  - Light bots reach higher speeds
+  - Heavy bots reach lower speeds
+  - Formula: `v_max = F_thrust / (Friction Coefficient × Mass)`
+- **Momentum-Based**: Your bot maintains velocity and must apply opposite thrust to decelerate
 
 **Constraints**:
 - Cannot move through obstacles or other bots (collision detection applies)
-- Movement affected by arena friction (velocity decays without continuous thrust)
-- Position clamped to arena boundaries
+- Friction continuously opposes movement, causing natural deceleration when thrust stops
+- Position clamped to arena boundaries; collisions with walls reflect velocity elastically
+- Maximum thrust capacity applies (TBD value)
 
-**Description**: Move is the most fundamental action, enabling positioning, pursuit, evasion, and range control. Zero cooldown and low energy cost make movement fluid and responsive.
+**Strategy Tips**:
+
+- **Continuous Movement**: Maintain constant Move actions to sustain velocity
+- **Momentum Management**: Plan your movement in advance; stopping requires active deceleration
+- **Equipment Choices**: Light equipment enables rapid acceleration; heavy equipment sacrifices speed
+- **Terrain Exploitation**: Variable friction zones (ice, mud) affect your maximum speed (ice faster, mud slower)
+
+**Description**: Move is the most fundamental action, enabling positioning, pursuit, evasion, and range control. Zero cooldown and low energy cost make movement fluid and responsive, but require continuous thrust application to sustain motion.
 
 ## Combat Actions
 

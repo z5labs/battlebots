@@ -102,48 +102,64 @@ graph LR
 
 ### Collision Resolution
 
-When collision is detected:
-1. Movement is adjusted to place the bot at the point of contact
-2. Bots stop at the obstacle without pushing or displacement
-3. No damage is applied from collision
+The arena uses **elastic collisions** where momentum is conserved based on bot masses.
+
+**Bot-to-Bot Collision**:
+- Bots transfer momentum based on their masses (determined by equipment loadout)
+- Heavier bots push lighter bots more effectively
+- Velocity is updated along the collision normal (line connecting bot centers)
+- Perpendicular velocity components are preserved
+- No damage is applied from collision
+
+**Bot-to-Wall Collision**:
+- Walls have infinite mass and reflect bots elastically
+- Velocity component perpendicular to wall is reversed
+- Velocity component parallel to wall is preserved
+- Example: hitting the right wall (x = +50) reverses x-velocity while preserving y-velocity
 
 ## Physics
 
-### Friction
+The arena applies physics laws that govern bot movement, collisions, and projectile behavior. See [ADR-0006: BattleBot Universe Physics Laws](/research_and_development/adrs/0006-battlebot-universe-physics-laws/) and [ADR-0007: Bot Movement Mechanics](/research_and_development/adrs/0007-bot-movement-mechanics/) for detailed specifications.
 
-The arena applies **friction** to all moving bots, affecting their velocity over time.
+### Thrust-Based Movement
 
-```mermaid
-graph LR
-    A["Tick 1:<br/>Apply Move action<br/>Velocity increases"] --> B["Tick 2:<br/>No Move action<br/>Friction reduces velocity"]
-    B --> C["Tick 3:<br/>No Move action<br/>Velocity continues decreasing"]
-    C --> D["Tick 4+:<br/>Eventually stops<br/>Velocity reaches 0"]
-    style A fill:#4CAF50
-    style B fill:#FFC107
-    style C fill:#FF9800
-    style D fill:#F44336
-```
+Bots control their movement by **applying thrust force**. The game engine calculates acceleration, velocity, and position based on physics laws.
+
+#### Movement Model
+
+Each game tick, the physics engine performs:
+
+1. **Collect forces**: Bot's thrust command, friction opposing movement, and any collision forces
+2. **Calculate friction**: `F_friction = μ(position) × M × |v|` where M is bot mass and v is velocity
+3. **Calculate net force**: `F_net = F_thrust - F_friction` (friction opposes thrust)
+4. **Calculate acceleration**: `A = F_net / M` (heavier bots accelerate slower)
+5. **Update velocity**: `v_new = v_current + A × dt`
+6. **Update position**: `pos_new = pos_current + v_new × dt`
+7. **Apply boundaries and collisions**: Clamp position to arena edges and resolve collisions
+
+#### Key Movement Properties
+
+- **Continuous Thrust Required**: Without applying thrust each tick, friction decelerates your bot to a stop
+- **Mass-Based Mobility**: Heavy equipment increases mass (M), reducing acceleration from the same thrust
+- **Terminal Velocity**: When thrust force equals friction force, bots reach maximum speed:
+  ```
+  v_terminal = F_thrust / (μ(position) × M)
+  ```
+  - Heavier bots reach **lower** terminal velocity
+  - Light bots reach **higher** terminal velocity
+  - Variable friction zones affect terminal velocity (ice = higher speed, mud = lower speed)
 
 #### Friction Mechanics
 
-- **Friction coefficient (μ)**: 0.1 (subject to balance tuning)
-- **Velocity decay**: Each tick, friction reduces your bot's velocity
-- **Natural stopping**: Without continuous thrust, your bot will gradually slow to a stop
-- **Continuous movement**: Maintaining velocity requires repeated Move actions
-
-#### Friction Formula
-
-```
-friction_force = -μ × velocity
-new_velocity = velocity + friction_force
-```
-
-The negative sign indicates friction opposes the direction of movement.
+- **Surface Friction**: Position-dependent friction coefficient μ(position) resists bot movement
+- **Velocity-Dependent**: Friction force magnitude depends on bot's current velocity
+- **Natural Deceleration**: Without continuous thrust, friction gradually slows bot to stop
+- **Equipment Impact**: Heavy equipment increases mass, requiring more sustained thrust to overcome friction
 
 #### Variable Friction Zones
 
-- **Uniform friction**: By default, the entire arena has uniform friction (μ = 0.1)
-- **Future feature**: Specific areas may have different friction values (slippery or rough surfaces)
+- **Uniform friction**: Currently, the entire arena has uniform friction (coefficient TBD)
+- **Future feature**: Specific terrain areas may have different friction values (ice zones for low friction, mud zones for high friction)
 
 ## Line of Sight
 
@@ -181,9 +197,10 @@ To determine if Bot A has line of sight to Bot B:
 ## Movement Constraints
 
 - **No teleportation**: Bots cannot instantly jump to new positions; all movement follows continuous paths
-- **Speed limits**: Bots have maximum movement speeds (defined by bot characteristics and equipment)
-- **Collision blocking**: Cannot move through other bots or walls
-- **Friction decay**: Velocity naturally decreases without continuous thrust
+- **Terminal velocity**: Bots reach maximum speed when thrust force equals friction force (determined by mass and equipment)
+- **Collision blocking**: Cannot move through other bots or walls; momentum transfer via elastic collisions
+- **Friction decay**: Velocity naturally decreases without continuous thrust application
+- **Continuous control**: Each game tick requires explicit thrust commands to sustain movement
 
 ## Summary
 
@@ -191,8 +208,11 @@ The 1v1 battle arena is a 100×100 unit rectangular space with:
 - 2D Cartesian coordinates centered at origin (0, 0)
 - Bounded by walls at x=±50 and y=±50
 - Bots as circular footprints with 2-unit radius
-- Collision detection preventing overlap
-- Friction (μ=0.1) causing velocity decay
+- Elastic collisions with momentum transfer based on bot mass
+- Thrust-based movement with continuous friction opposing motion
+- Terminal velocity determined by thrust, friction, and bot mass
 - Line of sight for targeting and detection
 
-Understanding these spatial mechanics is essential for implementing effective bot movement, positioning, and targeting logic.
+For detailed physics specifications, see [ADR-0006: BattleBot Universe Physics Laws](/research_and_development/adrs/0006-battlebot-universe-physics-laws/) and [ADR-0007: Bot Movement Mechanics](/research_and_development/adrs/0007-bot-movement-mechanics/).
+
+Understanding these spatial and physics mechanics is essential for implementing effective bot movement, positioning, and targeting logic.

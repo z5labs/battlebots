@@ -98,11 +98,32 @@ flowchart TD
 - Mass cannot be optimized independently - it's a consequence of equipment choices
 - Higher Mass requires sustained thrust to overcome friction and maintain velocity
 
+### How Mass Affects Movement
+
+The thrust-based movement system makes Mass a critical factor in bot mobility:
+
+**Acceleration Formula**:
+```
+Acceleration = Thrust Force / Mass
+```
+
+- **Heavy bots** (high Mass): Same thrust produces less acceleration
+- **Light bots** (low Mass): Same thrust produces more acceleration
+- **Terminal velocity** decreases with Mass:
+  ```
+  Terminal Velocity = Max Thrust / (Friction Coefficient × Mass)
+  ```
+
+**Example impact**:
+- Light bot (Mass = 10): Can reach high speeds quickly and maneuver rapidly
+- Heavy bot (Mass = 30): Accelerates slowly but may carry heavier weapons
+- Maximum speed depends on both Mass and friction of the terrain
+
 ### Equipment Examples
 
 - **Weapons**: Heavy weapons (high Mass) vs. light weapons (low Mass)
 - **Armor**: Heavy plating (high Mass) vs. light armor (low Mass)
-- Each equipment choice contributes to your total Mass profile
+- Each equipment choice contributes to your total Mass profile and directly affects how quickly you can move
 
 ## Stat Interactions
 
@@ -118,11 +139,13 @@ Health and Defense multiply together to determine true survivability:
 
 ### Mass and Mobility
 
-Mass directly impacts movement capability:
+Mass directly impacts movement capability through thrust-based physics:
 
-- **Thrust Relationship**: `Acceleration = Thrust Force / Mass`
-- **Friction Impact**: Higher Mass requires more sustained thrust to overcome arena friction (μ=0.1)
-- **Equipment Tradeoff**: Heavy equipment increases power but reduces positioning flexibility
+- **Acceleration**: `Acceleration = Thrust Force / Mass` — heavier bots accelerate slower
+- **Terminal Velocity**: `v_terminal = F_thrust / (μ × Mass)` — heavier bots reach lower maximum speeds
+- **Friction Impact**: Higher Mass experiences greater friction force, requiring sustained thrust to maintain velocity
+- **Equipment Tradeoff**: Heavy equipment increases power but reduces positioning flexibility and responsiveness
+- **Terrain Effects**: Variable friction zones amplify Mass effects (heavy bots feel even slower on high-friction terrain)
 
 ### Survivability Tradeoffs
 
@@ -138,8 +161,15 @@ Bot characteristics create a three-stat system:
 
 - **Health**: Your survivability pool (how much damage you can take)
 - **Defense**: Damage mitigation (makes each Health point more valuable)
-- **Mass**: Equipment weight (affects acceleration and mobility)
+- **Mass**: Equipment weight (affects acceleration, friction, and maximum speed)
 
-These stats interact to create diverse bot profiles. Your equipment choices (covered in [Equipment](equipment/)) determine your final stat allocation and Mass.
+These stats interact to create diverse bot profiles through a physics-based system:
+- **Mobility-Survivability Tradeoff**: Heavy defensive equipment increases survivability but reduces movement speed
+- **Force-Based Physics**: Mass directly determines how effectively thrust translates to movement
+- **Terrain Dynamics**: Equipment Mass interacts with terrain friction to determine actual maximum speeds
+
+Your equipment choices (covered in [Equipment](equipment/)) determine your final stat allocation and Mass.
+
+For detailed movement physics, see [ADR-0007: Bot Movement Mechanics](/research_and_development/adrs/0007-bot-movement-mechanics/).
 
 Understanding these characteristics is essential for configuring effective bot loadouts and implementing smart combat logic.
