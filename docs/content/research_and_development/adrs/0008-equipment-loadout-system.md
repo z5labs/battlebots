@@ -1,9 +1,9 @@
 ---
-title: "[0007] Equipment and Loadout System"
+title: "[0008] Equipment and Loadout System"
 description: >
     Bot customization through weapons and armor enabling strategic diversity
 type: docs
-weight: 7
+weight: 8
 category: "strategic"
 status: "proposed"
 date: 2025-12-07
@@ -21,7 +21,7 @@ ADR Categories:
 
 ## Context and Problem Statement
 
-Battle Bots requires a customization system that enables players to differentiate their bots before battle begins. We need to determine how bots customize their capabilities, what equipment types exist, how equipment affects performance, and how loadout constraints create strategic tradeoffs. The equipment system must create meaningful build diversity while integrating with the characteristics system (ADR-0006) and action system (ADR-0008).
+Battle Bots requires a customization system that enables players to differentiate their bots before battle begins. We need to determine how bots customize their capabilities, what equipment types exist, how equipment affects performance, and how loadout constraints create strategic tradeoffs. The equipment system must create meaningful build diversity while integrating with the characteristics system (ADR-0007) and action system (ADR-0009).
 
 Without a well-defined equipment system, we cannot:
 - Create distinct bot builds and playstyles
@@ -35,8 +35,8 @@ Without a well-defined equipment system, we cannot:
 
 * **Build Diversity** - Multiple viable loadouts should exist with distinct strengths and weaknesses
 * **Pre-Battle Strategic Decisions** - Equipment choices should matter and create differentiation
-* **Stat Modification Clarity** - Equipment effects on characteristics (ADR-0006) should be understandable
-* **Equipment-Action Coupling** - Equipment should enable/disable specific actions (ADR-0008)
+* **Stat Modification Clarity** - Equipment effects on characteristics (ADR-0007) should be understandable
+* **Equipment-Action Coupling** - Equipment should enable/disable specific actions (ADR-0009)
 * **Tradeoff Mechanics** - Equipment should involve costs and benefits (no strictly superior choices)
 * **Extensibility** - System should support future equipment additions without redesign
 * **Protocol Integration** - Equipment selection must map to gRPC protocol (ADR-0004)
@@ -48,14 +48,14 @@ The equipment system consists of two equipment categories (Weapons, Armor) with 
 - **Weapons**: Rifle, Shotgun
 - **Armor**: Light Armor, Medium Armor, Heavy Armor
 
-Each bot equips a loadout with 1 weapon and 1 armor. Equipment modifies bot characteristics (ADR-0006) and determines available actions (ADR-0008), creating distinct tactical options for different builds.
+Each bot equips a loadout with 1 weapon and 1 armor. Equipment modifies bot characteristics (ADR-0007) and determines available actions (ADR-0009), creating distinct tactical options for different builds.
 
 ### Consequences
 
 * Good, because equipment loadout system creates meaningful build diversity (DPS, Tank, Balanced, Mobile/Skirmisher)
 * Good, because pre-battle equipment selection enables strategic planning and counter-play
 * Good, because stat modifications are clear and calculable (simple additive formula)
-* Good, because equipment-action coupling (ADR-0008) creates distinct tactical options for different builds
+* Good, because equipment-action coupling (ADR-0009) creates distinct tactical options for different builds
 * Good, because Defense vs. Speed tradeoffs in armor create natural power-mobility choices
 * Good, because loadout constraints force meaningful choices
 * Good, because modular structure (each equipment type and option in dedicated sections) makes equipment additions straightforward
@@ -82,7 +82,7 @@ The decision will be confirmed through:
 
 ## Weapons
 
-Weapons enable combat actions and determine offensive capabilities. Each weapon provides a unique attack action with different energy costs, damage patterns, and tactical applications. All weapons contribute to bot Mass (ADR-0006), with heavier weapons providing greater firepower at the cost of mobility.
+Weapons enable combat actions and determine offensive capabilities. Each weapon provides a unique attack action with different energy costs, damage patterns, and tactical applications. All weapons contribute to bot Mass (ADR-0007), with heavier weapons providing greater firepower at the cost of mobility.
 
 ### Rifle
 
@@ -115,7 +115,7 @@ Close-range weapon enabling devastating burst damage with damage falloff based o
 
 ## Armor
 
-Armor provides defensive bonuses and damage mitigation. Armor directly modifies Defense and Speed characteristics (ADR-0006), creating tradeoffs between survivability and mobility. All armor contributes to bot Mass, with heavier armor providing greater protection at the cost of reduced Speed.
+Armor provides defensive bonuses and damage mitigation. Armor directly modifies Defense and Speed characteristics (ADR-0007), creating tradeoffs between survivability and mobility. All armor contributes to bot Mass, with heavier armor providing greater protection at the cost of reduced Speed.
 
 ### Light Armor
 
@@ -248,9 +248,9 @@ The following example loadouts demonstrate the range of viable bot configuration
 
 ### Related Documentation
 
-- **[ADR-0006: Bot Characteristics System](0006-bot-characteristics-system.md)**: Stats that equipment modifies (Health, Speed, Defense, Mass)
+- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Stats that equipment modifies (Health, Speed, Defense, Mass)
 
-- **[ADR-0008: Bot Actions and Resource Management](0008-bot-actions-resource-management.md)**: Actions that equipment enables or requires
+- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Actions that equipment enables or requires
 
 - **[Equipment System Analysis](../analysis/game-mechanics/equipment/)**: Detailed technical specifications for equipment types and loadouts
 

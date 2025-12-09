@@ -208,7 +208,7 @@ The following basic movement constraints apply to the battle space:
 * Good, because choices are mutually reinforcing (Cartesian + Rectangular, 2D + R^n)
 * Good, because extensible framework supports future enhancements
 * Good, because spatial system implementation follows naturally from topological properties
-* Good, because creates foundation for ADR-0006 (characteristics), ADR-0007 (equipment), ADR-0008 (actions)
+* Good, because creates foundation for ADR-0006 (physics), ADR-0007 (characteristics), ADR-0008 (equipment), ADR-0009 (actions)
 * Good, because property-based decision structure allows independent tuning and future modifications
 * Good, because balances mathematical rigor with practical accessibility
 
@@ -439,11 +439,13 @@ Fixed circular arena boundary centered at origin.
 
 - **[ADR-0004: Bot to Battle Server Interface](0004-bot-battle-server-interface.md)**: gRPC protocol for streaming position updates in continuous 2D space
 
-- **[ADR-0006: Bot Characteristics System](0006-bot-characteristics-system.md)**: Speed and Mass characteristics that govern movement in this spatial system
+- **[ADR-0006: BattleBot Universe Physics Laws](0006-battlebot-universe-physics-laws.md)**: Physics properties (friction, collisions, gravity) that govern movement mechanics in this spatial system
 
-- **[ADR-0007: Equipment and Loadout System](0007-equipment-loadout-system.md)**: Equipment that modifies movement capabilities within this spatial framework
+- **[ADR-0007: Bot Characteristics System](0007-bot-characteristics-system.md)**: Speed and Mass characteristics that govern movement in this spatial system
 
-- **[ADR-0008: Bot Actions and Resource Management](0008-bot-actions-resource-management.md)**: Movement and combat actions that operate within this spatial system
+- **[ADR-0008: Equipment and Loadout System](0008-equipment-loadout-system.md)**: Equipment that modifies movement capabilities within this spatial framework
+
+- **[ADR-0009: Bot Actions and Resource Management](0009-bot-actions-resource-management.md)**: Movement and combat actions that operate within this spatial system
 
 - **[POC User Journey](../user-journeys/0001-poc.md)**: Proof of concept implementation using this spatial foundation
 
