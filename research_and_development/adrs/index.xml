@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Architecture Decision Records on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/</link><description>Recent content in Architecture Decision Records on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 05 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/research_and_development/adrs/index.xml" rel="self" type="application/rss+xml"/><item><title>[0001] Use MADR for Architecture Decision Records</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0001-use-madr-for-architecture-decision-records/</link><pubDate>Sun, 02 Nov 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0001-use-madr-for-architecture-decision-records/</guid><description>&lt;!--
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Architecture Decision Records on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/</link><description>Recent content in Architecture Decision Records on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Tue, 09 Dec 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z5labs.github.io/battlebots/research_and_development/adrs/index.xml" rel="self" type="application/rss+xml"/><item><title>[0001] Use MADR for Architecture Decision Records</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0001-use-madr-for-architecture-decision-records/</link><pubDate>Sun, 02 Nov 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0001-use-madr-for-architecture-decision-records/</guid><description>&lt;!--
 ADR Categories:
 - strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
 - user-journey: Solutions for specific user journey problems (feature implementation approaches)
@@ -36,4 +36,53 @@ ADR Categories:
 - api-design: API endpoint design decisions (pagination, filtering, bulk operations)
 --&gt;
 &lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
-&lt;p&gt;The Battle Bots platform requires a communication protocol for bots to interact with the battle server (client/server architecture) or with each other (peer-to-peer architecture). This protocol must support real-time bidirectional communication for game state updates and bot actions while remaining language-agnostic to enable bot development in any programming language.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;The Battle Bots platform requires a communication protocol for bots to interact with the battle server (client/server architecture) or with each other (peer-to-peer architecture). This protocol must support real-time communication while remaining language-agnostic to enable bot development in any programming language.&lt;/p&gt;</description></item><item><title>[0005] BattleBot Universe Topological Properties</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0005-battlebot-universe-topological-properties/</link><pubDate>Mon, 08 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0005-battlebot-universe-topological-properties/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;Battle Bots requires a rigorous mathematical foundation for the spatial environment where battles occur. We need to define the topological and geometric properties of the &amp;ldquo;BattleBot Universe&amp;rdquo; that govern all spatial interactions, movement mechanics, collision detection, and distance calculations.&lt;/p&gt;</description></item><item><title>[0006] BattleBot Universe Physics Laws</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0006-battlebot-universe-physics-laws/</link><pubDate>Mon, 08 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0006-battlebot-universe-physics-laws/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;The BattleBot Universe requires well-defined physics laws to govern gameplay mechanics. ADR-0005 established the mathematical and spatial foundation (2D Euclidean continuous space, rectangular boundaries, Cartesian coordinates), but did not define the physical forces and interactions that govern how objects move, collide, and behave within that space.&lt;/p&gt;</description></item><item><title>[0007] Bot Movement Mechanics</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0007-bot-movement-mechanics/</link><pubDate>Mon, 08 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0007-bot-movement-mechanics/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;The BattleBot Universe requires a clearly defined movement system that specifies &lt;strong&gt;how bots control their movement&lt;/strong&gt; in the 2D battle space. ADR-0005 established the spatial foundation (2D continuous Euclidean space with rectangular boundaries), and ADR-0006 defined the physics laws that govern movement (surface friction, collisions, Mass property). However, neither ADR has explicitly decided the movement mechanics - specifically, what API do bot developers use to move their bot, and how does the game engine translate those commands into position updates?&lt;/p&gt;</description></item><item><title>[0008] Bot Characteristics System</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0008-bot-characteristics-system/</link><pubDate>Sun, 07 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0008-bot-characteristics-system/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;Battle Bots requires an attribute system that defines bot capabilities and creates strategic differentiation between different bot builds. We need to determine how many stats, what they represent, how they interact, and how they integrate with equipment customization. The characteristic system must support diverse playstyles while remaining accessible and understandable to bot developers.&lt;/p&gt;</description></item><item><title>[0009] Equipment Type System</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0009-equipment-type-system/</link><pubDate>Mon, 08 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0009-equipment-type-system/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;The BattleBot equipment system requires a clearly defined set of &lt;strong&gt;equipment type categories&lt;/strong&gt; that bots can equip to customize their capabilities. ADR-0008 (Bot Characteristics System) established that equipment modifies bot stats—particularly Mass, Health, and Defense—and creates the foundation for equipment-based strategic differentiation. However, we have not yet decided which &lt;strong&gt;types&lt;/strong&gt; of equipment will be supported in the initial implementation.&lt;/p&gt;</description></item><item><title>[0010] Biome Definition Framework</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0010-biome-definition-framework/</link><pubDate>Tue, 09 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0010-biome-definition-framework/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;BattleBots requires diverse battle arenas with distinct tactical characteristics to provide meaningful gameplay variety. Currently, the game physics system (ADR-0006) includes variable friction with position-dependent coefficients, explicitly anticipating terrain-based mechanics. To operationalize this capability, we need a consistent framework for defining what makes one arena distinct from another.&lt;/p&gt;</description></item><item><title>[0011] 1v1 Battles</title><link>https://z5labs.github.io/battlebots/research_and_development/adrs/0011-1v1-battles/</link><pubDate>Tue, 09 Dec 2025 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/research_and_development/adrs/0011-1v1-battles/</guid><description>&lt;!--
+ADR Categories:
+- strategic: High-level architectural decisions (frameworks, auth strategies, cross-cutting patterns)
+- user-journey: Solutions for specific user journey problems (feature implementation approaches)
+- api-design: API endpoint design decisions (pagination, filtering, bulk operations)
+--&gt;
+&lt;h2 id="context-and-problem-statement"&gt;Context and Problem Statement&lt;/h2&gt;
+&lt;p&gt;BattleBot 1v1 battles require a formal definition of what constitutes an arena and how battle instances are configured. Currently, the BattleBot Universe (ADR-0005) defines the universal topological space (R² Euclidean coordinates with Cartesian system) and fixed boundary dimensions ([-50, 50] × [-50, 50]). However, this establishes a single static arena rather than a configurable system that enables tactical variety through property selection.&lt;/p&gt;</description></item></channel></rss>

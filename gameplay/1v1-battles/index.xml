@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>1v1 Battles on Battle Bots Documentation</title><link>https://z5labs.github.io/battlebots/gameplay/1v1-battles/</link><description>Recent content in 1v1 Battles on Battle Bots Documentation</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://z5labs.github.io/battlebots/gameplay/1v1-battles/index.xml" rel="self" type="application/rss+xml"/><item><title>Getting Started</title><link>https://z5labs.github.io/battlebots/gameplay/1v1-battles/getting-started/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/gameplay/1v1-battles/getting-started/</guid><description>&lt;p&gt;This guide will help you create your first bot for 1v1 battles. We&amp;rsquo;ll cover the basics of bot structure, equipment configuration, and connecting to the battle server.&lt;/p&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Programming experience in any language&lt;/li&gt;
+&lt;li&gt;Battle Bots SDK installed for your chosen language&lt;/li&gt;
+&lt;li&gt;Development environment set up&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="bot-structure"&gt;Bot Structure&lt;/h2&gt;
+&lt;p&gt;A Battle Bots bot consists of:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Equipment Configuration&lt;/strong&gt; - Choose your weapon and armor before battle&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;State Processing&lt;/strong&gt; - Receive and process battle state updates each tick&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Action Submission&lt;/strong&gt; - Decide which actions to perform based on current state&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Communication&lt;/strong&gt; - Connect to the battle server via gRPC&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="minimal-bot-example"&gt;Minimal Bot Example&lt;/h2&gt;
+&lt;p&gt;Here&amp;rsquo;s a minimal bot structure to get you started:&lt;/p&gt;</description></item><item><title>Arena</title><link>https://z5labs.github.io/battlebots/gameplay/1v1-battles/arena/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/gameplay/1v1-battles/arena/</guid><description>&lt;p&gt;1v1 battles take place in a 2D rectangular arena with defined boundaries. The arena uses a Cartesian coordinate system and applies physics rules for movement, collision, and friction.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;About Arenas&lt;/strong&gt;: A Battle Arena is a configured instance of the BattleBot Universe with specific properties: terrain type (biome), boundary dimensions, visibility rules, starting positions, and win conditions. Different battles may use different arena configurations. For complete technical specification, see &lt;strong&gt;&lt;a href="https://z5labs.github.io/battlebots/research_and_development/adrs/0011-1v1-battles.md"&gt;ADR-0011: 1v1 Battles&lt;/a&gt;&lt;/strong&gt;.&lt;/p&gt;</description></item><item><title>Bot Characteristics</title><link>https://z5labs.github.io/battlebots/gameplay/1v1-battles/bot-characteristics/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/gameplay/1v1-battles/bot-characteristics/</guid><description>&lt;p&gt;Your bot&amp;rsquo;s capabilities are defined by three core characteristics: &lt;strong&gt;Health&lt;/strong&gt;, &lt;strong&gt;Defense&lt;/strong&gt;, and &lt;strong&gt;Mass&lt;/strong&gt;. These stats determine your survivability, damage mitigation, and movement properties.&lt;/p&gt;
+&lt;h2 id="health"&gt;Health&lt;/h2&gt;
+&lt;p&gt;Health (HP) is your bot&amp;rsquo;s survivability pool - the total amount of damage your bot can sustain before being eliminated.&lt;/p&gt;
+&lt;h3 id="key-properties"&gt;Key Properties&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;HP Pool&lt;/strong&gt;: Total damage your bot can take before destruction
+&lt;ul&gt;
+&lt;li&gt;Range: 100-500 HP (placeholder values, subject to balance tuning)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Destruction&lt;/strong&gt;: Bot is eliminated when Health reaches 0&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No Regeneration&lt;/strong&gt;: Health does not regenerate during battle (current design)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="gameplay-impact"&gt;Gameplay Impact&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Higher Health allows your bot to stay in battles longer&lt;/li&gt;
+&lt;li&gt;Low-Health bots must rely on damage avoidance through mobility or defensive actions&lt;/li&gt;
+&lt;li&gt;Health works multiplicatively with Defense to create Effective HP (see below)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="defense"&gt;Defense&lt;/h2&gt;
+&lt;p&gt;Defense represents your bot&amp;rsquo;s ability to mitigate incoming damage. It reduces the effective damage from enemy attacks.&lt;/p&gt;</description></item><item><title>Equipment</title><link>https://z5labs.github.io/battlebots/gameplay/1v1-battles/equipment/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/gameplay/1v1-battles/equipment/</guid><description>&lt;div class="alert alert-warning" role="alert"&gt;
+&lt;h4 class="alert-heading"&gt;Subject to Change&lt;/h4&gt;
+
+ The equipment system described here is currently in the PROPOSED stage and may change based on playtesting and balance analysis. Check back for updates!
+
+&lt;/div&gt;
+
+&lt;p&gt;Before battle, you configure your bot&amp;rsquo;s &lt;strong&gt;loadout&lt;/strong&gt; by selecting equipment. Equipment modifies your bot&amp;rsquo;s characteristics and determines which actions are available during battle.&lt;/p&gt;
+&lt;h3 id="loadout-slots"&gt;Loadout Slots&lt;/h3&gt;
+&lt;p&gt;Each bot equips:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1 Weapon&lt;/strong&gt; - Determines available combat actions&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;1 Armor&lt;/strong&gt; - Modifies Defense and Speed characteristics&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;All equipment contributes to your bot&amp;rsquo;s total Mass, which affects movement acceleration.&lt;/p&gt;</description></item><item><title>Actions</title><link>https://z5labs.github.io/battlebots/gameplay/1v1-battles/actions/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://z5labs.github.io/battlebots/gameplay/1v1-battles/actions/</guid><description>&lt;div class="alert alert-warning" role="alert"&gt;
+&lt;h4 class="alert-heading"&gt;Subject to Change&lt;/h4&gt;
+
+ The action system described here is currently in the PROPOSED stage and may change based on playtesting and balance analysis. Energy costs, cooldowns, and action availability may be adjusted!
+
+&lt;/div&gt;
+
+&lt;p&gt;During battle, your bot performs &lt;strong&gt;actions&lt;/strong&gt; each tick. Actions allow your bot to move, attack, defend, and gather information. All actions are constrained by a dual-resource system: energy costs and cooldowns.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Physics Integration&lt;/strong&gt;: The Move action implements thrust-based movement governed by physics laws. See &lt;a href="https://z5labs.github.io/battlebots/research_and_development/adrs/0006-battlebot-universe-physics-laws/"&gt;ADR-0006: BattleBot Universe Physics Laws&lt;/a&gt; and &lt;a href="https://z5labs.github.io/battlebots/research_and_development/adrs/0007-bot-movement-mechanics/"&gt;ADR-0007: Bot Movement Mechanics&lt;/a&gt; for detailed specifications.&lt;/p&gt;</description></item></channel></rss>
