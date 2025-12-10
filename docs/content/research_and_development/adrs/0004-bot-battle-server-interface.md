@@ -1,7 +1,7 @@
 ---
 title: "[0004] Bot to Battle Server Communication Protocol"
 description: >
-    Selection of gRPC with bidirectional streaming as the communication protocol for bot-to-server and bot-to-bot interfaces
+    Selection of gRPC as the communication protocol for bot-to-server and bot-to-bot interfaces
 type: docs
 weight: 4
 category: "strategic"
@@ -21,14 +21,14 @@ ADR Categories:
 
 ## Context and Problem Statement
 
-The Battle Bots platform requires a communication protocol for bots to interact with the battle server (client/server architecture) or with each other (peer-to-peer architecture). This protocol must support real-time bidirectional communication for game state updates and bot actions while remaining language-agnostic to enable bot development in any programming language.
+The Battle Bots platform requires a communication protocol for bots to interact with the battle server (client/server architecture) or with each other (peer-to-peer architecture). This protocol must support real-time communication while remaining language-agnostic to enable bot development in any programming language.
 
 Related to User Journey [0001] Proof of Concept - 1v1 Battle, which identifies bot-to-server interface as a pending ADR required for POC implementation.
 
 **Key Requirements:**
-- Bidirectional communication (bots send actions, receive game state/events)
+- Real-time communication capabilities
 - Language-agnostic interface (Python, Go, Java, JavaScript, Rust, etc.)
-- Real-time or near-real-time performance
+- Low-latency performance
 - Support for both client/server and P2P architectural modes
 - Integration with OpenTelemetry observability stack (ADR-0002, ADR-0003)
 - Container-friendly networking (Docker/Podman)
@@ -41,7 +41,7 @@ Which communication protocol should Battle Bots adopt for the bot-to-server and 
 * **Language Support**: Must enable bot development in diverse programming languages
 * **Observability**: Seamless integration with OpenTelemetry (ADR-0002) and OTLP stack (ADR-0003)
 * **Developer Experience**: Ease of implementation for bot authors
-* **Bidirectional Communication**: Efficient server-push and client-send capabilities
+* **Communication Flexibility**: Support for various communication patterns
 * **Type Safety**: Schema validation and versioning for protocol evolution
 * **Container Networking**: Compatibility with Docker/Podman environments
 * **Dual Architecture Support**: Viability for both client/server and P2P modes
@@ -51,7 +51,7 @@ Which communication protocol should Battle Bots adopt for the bot-to-server and 
 
 ## Considered Options
 
-* **Option 1**: gRPC with bidirectional streaming
+* **Option 1**: gRPC
 * **Option 2**: WebSockets with JSON/MessagePack
 * **Option 3**: HTTP/REST with Server-Sent Events (SSE)
 * **Option 4**: Custom TCP protocol
@@ -59,9 +59,9 @@ Which communication protocol should Battle Bots adopt for the bot-to-server and 
 
 ## Decision Outcome
 
-Chosen option: **"gRPC with bidirectional streaming"**, because it provides the optimal balance of performance, developer experience, and observability integration while meeting all functional requirements for both client/server and P2P architectures.
+Chosen option: **"gRPC"**, because it provides the optimal balance of performance, developer experience, and observability integration while meeting all functional requirements for both client/server and P2P architectures.
 
-gRPC delivers near-WebSocket performance with superior type safety (Protocol Buffers), native OpenTelemetry instrumentation, and excellent language support through code generation. The bidirectional streaming model naturally fits the battle communication pattern where bots continuously send actions and receive game state updates.
+gRPC delivers excellent performance with superior type safety (Protocol Buffers), native OpenTelemetry instrumentation, and excellent language support through code generation. The protocol provides flexible communication patterns suitable for real-time battle interactions.
 
 ### Consequences
 
@@ -69,7 +69,7 @@ gRPC delivers near-WebSocket performance with superior type safety (Protocol Buf
 * ✅ **Excellent OpenTelemetry integration** - Native auto-instrumentation for traces, metrics, and logs with zero manual setup aligns perfectly with ADR-0002 and ADR-0003
 * ✅ **Language-agnostic via Protocol Buffers** - Code generation for all major languages (Go, Python, Java, JavaScript, Rust, C++, C#) enables diverse bot ecosystem
 * ✅ **Type safety and versioning** - .proto schema enforces contracts and provides forward/backward compatibility
-* ✅ **Bidirectional streaming** - Natural fit for real-time battle where bots send actions and receive continuous state updates
+* ✅ **Flexible communication patterns** - Supports unary, server streaming, client streaming, and bidirectional streaming for various use cases
 * ✅ **Performance** - Binary protocol with 7-10x better throughput than REST/JSON and 30-50% smaller payloads
 * ✅ **Container-friendly** - HTTP/2 works natively in Docker/Podman with simple port mapping
 * ✅ **Rich tooling** - grpcurl for testing, ghz for benchmarking, reflection for discovery
@@ -99,16 +99,16 @@ Implementation compliance will be verified through:
 
 ## Pros and Cons of the Options
 
-### gRPC with Bidirectional Streaming
+### gRPC
 
-**Description:** HTTP/2-based RPC framework with Protocol Buffers for serialization and bidirectional streaming for real-time communication.
+**Description:** HTTP/2-based RPC framework with Protocol Buffers for serialization and support for multiple communication patterns.
 
 **Detailed Analysis:** See [gRPC Protocol Analysis]({{< relref "../analysis/protocols/grpc/" >}})
 
 **Pros:**
 * ✅ **Native OpenTelemetry support** - Automatic trace propagation, span creation, and metrics collection integrate seamlessly with ADR-0002 observability stack
 * ✅ **Protocol Buffers** - Strong typing, schema validation, and versioning prevent runtime errors and enable protocol evolution
-* ✅ **Bidirectional streaming** - `stream BotAction → stream GameEvent` pattern matches battle communication model perfectly
+* ✅ **Flexible communication patterns** - Supports unary, server streaming, client streaming, and bidirectional streaming
 * ✅ **Code generation** - Eliminates boilerplate, enforces API contracts across all languages
 * ✅ **Performance** - Binary serialization achieves 5-20ms latency, thousands of messages/sec throughput
 * ✅ **Language coverage** - Official support for Go, Python, Java, JavaScript, C++, C#, Rust, and more
